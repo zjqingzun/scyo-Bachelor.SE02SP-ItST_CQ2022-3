@@ -278,3 +278,121 @@
         height: 500px;
     }
 }
+
+.homepage__subscribe {
+    margin: 150px auto;
+
+    display: flex;
+    padding: 28px 30px;
+
+    width: 90%;
+
+    border-radius: 20px;
+    background: #227b94;
+
+    &-left {
+        position: relative;
+
+        width: 60%;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &-title {
+        color: #fff;
+        font-size: 4rem;
+        font-weight: 600;
+    }
+
+    &-desc {
+        max-width: 52%;
+
+        color: #fff;
+        text-align: center;
+        font-size: 1.6rem;
+        font-weight: 400;
+    }
+
+    &-input-group {
+        margin-top: 20px;
+
+        display: flex;
+        align-items: center;
+
+        padding: 0 10px;
+        gap: 10px;
+
+        width: 55%;
+        height: 50px;
+
+        border-radius: 12px;
+        background: #fff;
+    }
+
+    &-input {
+        flex: 1;
+        height: 100%;
+
+        border: none;
+        outline: none;
+
+        font-size: 1.6rem;
+        font-weight: 400;
+    }
+
+    &-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 35px;
+        height: 35px;
+
+        border: none;
+        outline: none;
+
+        border-radius: 3px;
+        background-color: #f66f4d;
+
+        box-shadow: 15px 16px 154px -18px rgba(244, 183, 165, 0.66);
+        -webkit-box-shadow: 15px 16px 154px -18px rgba(244, 183, 165, 0.66);
+        -moz-box-shadow: 15px 16px 154px -18px rgba(244, 183, 165, 0.66);
+
+        &-icon {
+            width: 20px;
+            fill: #fff;
+        }
+    }
+
+    &-right {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 40%;
+    }
+
+    &-image {
+        width: 100%;
+        height: 100%;
+        border-radius: 15px;
+        object-fit: cover;
+    }
+
+    &-decor {
+        position: absolute;
+
+        &:first-of-type {
+            top: -50px;
+            left: 50px;
+        }
+
+        &:last-of-type {
+            bottom: 0;
+            right: 50px;
+        }
+    }
+}

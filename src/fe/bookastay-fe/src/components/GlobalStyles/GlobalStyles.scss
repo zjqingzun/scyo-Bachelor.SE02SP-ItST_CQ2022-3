@@ -19,3 +19,8 @@ body {
     text-rendering: optimizeSpeed;
     background-color: var(--primary-color);
 }
+
+a {
+    text-decoration: none;
+    color: inherit;
+}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import "./Home.scss";
+import SearchBar from "../../components/SearchBar";
 
 const MockData = [
     {
@@ -93,6 +94,9 @@ const Home = () => {
                     <h1 className="homepage__title">
                         No matter where you’re going to, we’ll take you there
                     </h1>
+                </div>
+                <div className="homepage__search-bar">
+                    <SearchBar border-radius={30} />
                 </div>
             </div>
         </section>

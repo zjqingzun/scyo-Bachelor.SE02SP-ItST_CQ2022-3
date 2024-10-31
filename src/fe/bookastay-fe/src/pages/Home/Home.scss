@@ -1,5 +1,6 @@
 .homepage__slider {
-    height: 500px;
+    padding-top: 50%;
+
     position: relative;
     display: flex;
     align-items: center;
@@ -20,7 +21,7 @@
 
         border-radius: inherit;
 
-        background-color: rgba(0, 0, 0, 0.3);
+        background-color: rgba(0, 0, 0, 0.4);
     }
 
     &-image-wrap {
@@ -38,7 +39,7 @@
 
         border-radius: inherit;
 
-        transition: transform 2s ease, opacity 2.5s ease;
+        transition: transform 5s ease, opacity 5s ease;
 
         &.activeSlide {
             opacity: 1;
@@ -113,4 +114,14 @@
     font-size: 5.6rem;
     color: #fff;
     font-weight: 800;
+}
+
+.homepage__search-bar {
+    position: relative;
+    margin: 0 auto;
+    margin-top: -20px;
+    width: 90%;
+
+    border-radius: 30px;
+    box-shadow: 0 0 0 10px rgba(91, 153, 194, 0.15), 0 2px 48px 0 rgba(91, 153, 194, 0.04);
 }

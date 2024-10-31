@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import "./Home.scss";
 import SearchBar from "../../components/SearchBar";
-import { id } from "date-fns/locale";
+import HotelCard from "../../components/HotelCard";
 
 const MockData = [
     {
@@ -51,6 +51,45 @@ const MockDestination = [
     },
 ];
 
+const MockRecommend = [
+    {
+        id: 1,
+        name: "The Grand Ho Tram Strip",
+        address: "Phuoc Thuan, Xuyen Moc, Ba Ria - Vung Tau",
+        image: "https://plus.unsplash.com/premium_photo-1675616563084-63d1f129623d?q=80&w=1769&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        price: 3877530,
+        rating: 9.5,
+        review: 100,
+    },
+    {
+        id: 2,
+        name: "Jan Hostel Central Point",
+        address: "Quận 1, TP. Hồ Chí Minh",
+        image: "https://cf.bstatic.com/xdata/images/hotel/square600/458830113.webp?k=ff0cb97b7983f09e099de3260a9553fa2a4d0582323e0a962b52cf67ffc2b38f&o=",
+        price: 3948613,
+        rating: 9.0,
+        review: 50,
+    },
+    {
+        id: 3,
+        name: "HANZ 345 Business Suite Grand Residence",
+        address: "Quận 1, TP. Hồ Chí Minh",
+        image: "https://cf.bstatic.com/xdata/images/hotel/square600/586909150.webp?k=422e9c17817cd27de89aaa113a1711a3b23151c8f13919aa1dc08a970b70cf97&o=",
+        price: 2660000,
+        rating: 9.3,
+        review: 80,
+    },
+    {
+        id: 4,
+        name: "Apina Saigon - Truong Dinh",
+        address: "Quận 1, TP. Hồ Chí Minh",
+        image: "https://cf.bstatic.com/xdata/images/hotel/square600/596644761.webp?k=e146b7295510455911929c4fc7e26ea69228075e46195df169989d59705c6db1&o=",
+        price: 4288680,
+        rating: 9.5,
+        review: 100,
+    },
+];
+
 const Home = () => {
     const [images, setImages] = useState(MockData);
     const [index, setIndex] = useState(0);
@@ -72,6 +111,59 @@ const Home = () => {
         }, 5000);
         return () => clearInterval(slider);
     }, [index]);
+
+    const listRef = useRef(null);
+    const itemPerView = 3;
+
+    const [isAtStart, setIsAtStart] = useState(true);
+    const [isAtEnd, setIsAtEnd] = useState(false);
+
+    useEffect(() => {
+        if (MockRecommend.length <= itemPerView) {
+            setIsAtEnd(true);
+            setIsAtStart(true);
+        }
+    }, []);
+
+    const handlePrev = () => {
+        const gap = getComputedStyle(listRef.current).gap.replace("px", "") * 1;
+
+        const scrollWidth =
+            (listRef.current.offsetWidth - gap * (itemPerView - 1)) / itemPerView + gap;
+        listRef.current.scrollLeft -=
+            (listRef.current.offsetWidth - gap * (itemPerView - 1)) / itemPerView + gap;
+
+        if (Math.ceil(listRef.current.scrollLeft) == Math.ceil(scrollWidth)) {
+            setIsAtStart(true);
+        }
+
+        if (
+            Math.ceil(listRef.current.scrollLeft) <=
+            Math.ceil((MockRecommend.length - itemPerView) * scrollWidth)
+        ) {
+            setIsAtEnd(false);
+        }
+    };
+
+    const handleNext = () => {
+        const gap = getComputedStyle(listRef.current).gap.replace("px", "") * 1;
+
+        const scrollWidth =
+            (listRef.current.offsetWidth - gap * (itemPerView - 1)) / itemPerView + gap;
+
+        listRef.current.scrollLeft += scrollWidth;
+
+        if (listRef.current.scrollLeft >= 0) {
+            setIsAtStart(false);
+        }
+
+        if (
+            Math.ceil(listRef.current.scrollLeft) >=
+            Math.ceil((MockRecommend.length - itemPerView - 1) * scrollWidth)
+        ) {
+            setIsAtEnd(true);
+        }
+    };
 
     return (
         <section className="homepage">
@@ -147,6 +239,53 @@ const Home = () => {
                                 </a>
                             );
                         })}
+                </div>
+            </div>
+
+            <div className="homepage__recommend">
+                <h2 className="homepage__recommend-title">Recommend for you</h2>
+
+                <div className="homepage__recommend-list-wrap">
+                    <div className="homepage__recommend-list" ref={listRef}>
+                        {MockRecommend &&
+                            MockRecommend.length > 0 &&
+                            MockRecommend.map((hotel, index) => {
+                                return (
+                                    <div
+                                        key={`recommend-${hotel.id}`}
+                                        className="homepage__recommend-item"
+                                    >
+                                        <HotelCard {...hotel} />
+                                    </div>
+                                );
+                            })}
+                    </div>
+                    <div className="homepage__recommend-list-actions">
+                        <button
+                            className={`homepage__recommend-btn ${isAtStart ? "hide" : ""}`}
+                            onClick={() => handlePrev()}
+                        >
+                            <svg
+                                className="homepage__recommend-btn-icon"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 320 512"
+                            >
+                                <path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z" />
+                            </svg>
+                        </button>
+                        <button
+                            className={`homepage__recommend-btn ${isAtEnd ? "hide" : ""}`}
+                            onClick={() => handleNext()}
+                        >
+                            <svg
+                                className="homepage__recommend-btn-icon"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 320 512"
+                            >
+                                <path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>

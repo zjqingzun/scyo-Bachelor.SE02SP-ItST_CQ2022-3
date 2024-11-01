@@ -216,7 +216,7 @@ const Home = () => {
                     </h1>
                 </div>
                 <div className="homepage__search-bar">
-                    <SearchBar border-radius={30} />
+                    <SearchBar border-radius={12} />
                 </div>
             </div>
 

@@ -4,17 +4,17 @@ import "react-date-range/dist/theme/default.css"; // theme css file
 import { DateRange } from "react-date-range";
 import { memo, useEffect, useRef, useState } from "react";
 import { vi } from "date-fns/locale";
-import { set } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 import "./SearchBar.scss";
 import searchIcon from "./search-icon.svg";
 import calendarIcon from "./calender-icon.svg";
 import people from "./people-icon.svg";
 import caret from "./caret-icon.svg";
-import minus from "./minus-icon.svg";
-import plus from "./plus-icon.svg";
 
 const SearchBar = (props) => {
+    const { t } = useTranslation();
+
     const [state, setState] = useState([
         {
             startDate: new Date(),
@@ -144,11 +144,17 @@ const SearchBar = (props) => {
                 >
                     <img className="search-bar__input-icon" src={people} alt="" />
                     <div className="search-bar__input">
-                        <span>{numOfPeople.adult} Adult</span>
+                        <span>
+                            {numOfPeople.adult} {t("searchBar.adults")}
+                        </span>
                         <div className="search-bar__input-separate"></div>
-                        <span>{numOfPeople.children} Children</span>
+                        <span>
+                            {numOfPeople.children} {t("searchBar.children")}
+                        </span>
                         <div className="search-bar__input-separate"></div>
-                        <span>{numOfPeople.rooms} Rooms</span>
+                        <span>
+                            {numOfPeople.rooms} {t("searchBar.rooms")}
+                        </span>
                     </div>
                     <img
                         className="search-bar__input-icon search-bar__input-icon-caret"
@@ -292,7 +298,7 @@ const SearchBar = (props) => {
                     </div>
                 </div>
 
-                <button className="search-bar__btn ms-auto">Search</button>
+                <button className="search-bar__btn ms-auto">{t("searchBar.search")}</button>
             </div>
         </div>
     );

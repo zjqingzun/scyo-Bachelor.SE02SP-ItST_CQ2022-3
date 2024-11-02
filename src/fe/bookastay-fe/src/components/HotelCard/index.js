@@ -1,8 +1,10 @@
 import { useState } from "react";
 import "./HotelCard.scss";
-import { is } from "date-fns/locale";
+import { useTranslation } from "react-i18next";
 
 const HotelCard = ({ name, address, image, price, rating, review }) => {
+    const { t } = useTranslation();
+
     const [isFavorite, setIsFavorite] = useState(false);
 
     const getTextRating = () => {
@@ -59,7 +61,9 @@ const HotelCard = ({ name, address, image, price, rating, review }) => {
                 </p>
                 <div className="hotel-card__row">
                     <span className="hotel-card__price">{toVND(price)}</span>
-                    <button className="hotel-card__btn ms-auto mt-3">Book Now</button>
+                    <button className="hotel-card__btn ms-auto mt-3">
+                        {t("hotelCard.BookNow")}
+                    </button>
                 </div>
                 <div className="hotel-card__row gap-3 mt-5">
                     <div className="hotel-card__score">
@@ -67,9 +71,13 @@ const HotelCard = ({ name, address, image, price, rating, review }) => {
                     </div>
 
                     <div className="hotel-card__row gap-2 h-100">
-                        <span className="hotel-card__review">{getTextRating()}</span>
+                        <span className="hotel-card__review">
+                            {t(`hotelCard.${getTextRating()}`)}
+                        </span>
                         <div className="hotel-card__separate"></div>
-                        <span className="hotel-card__review">{review} reviews</span>
+                        <span className="hotel-card__review">
+                            {review} {t("hotelCard.Reviews")}
+                        </span>
                     </div>
                 </div>
             </div>

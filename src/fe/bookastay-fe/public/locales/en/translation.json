@@ -1,0 +1,26 @@
+{
+    "homepage": {
+        "topDestinations": "Top Destinations",
+        "recommendedForYou": "Recommended for you"
+    },
+    "header": {
+        "signIn": "Sign in",
+        "listYourProperty": "List your property"
+    },
+    "searchBar": {
+        "search": "Search",
+        "checkIn": "Check-in",
+        "checkOut": "Check-out",
+        "guests": "Guests",
+        "adults": "Adults",
+        "children": "Children",
+        "rooms": "Rooms"
+    },
+    "hotelCard": {
+        "Great": "Great",
+        "Good": "Good",
+        "Average": "Average",
+        "BookNow": "Book Now",
+        "Reviews": "reviews"
+    }
+}

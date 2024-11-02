@@ -1,0 +1,25 @@
+{
+    "homepage": {
+        "topDestinations": "Điểm đến hàng đầu",
+        "recommendedForYou": "Được đề xuất cho bạn"
+    },
+    "header": {
+        "signIn": "Đăng nhập",
+        "listYourProperty": "Liệt kê khách sạn của bạn"
+    },
+    "searchBar": {
+        "search": "Tìm",
+        "checkIn": "Check-in",
+        "checkOut": "Check-out",
+        "adults": "Người lớn",
+        "children": "Trẻ em",
+        "rooms": "Phòng"
+    },
+    "hotelCard": {
+        "Great": "Tuyệt vời",
+        "Good": "Tốt",
+        "Average": "Trung bình",
+        "BookNow": "Đặt ngay",
+        "Reviews": "đánh giá"
+    }
+}

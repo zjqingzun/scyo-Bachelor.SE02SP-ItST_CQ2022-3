@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation, Trans } from "react-i18next";
 
 import "./Home.scss";
 import SearchBar from "../../components/SearchBar";
@@ -91,6 +92,8 @@ const MockRecommend = [
 ];
 
 const Home = () => {
+    const { t } = useTranslation();
+
     const [images, setImages] = useState(MockData);
     const [index, setIndex] = useState(0);
 
@@ -221,7 +224,7 @@ const Home = () => {
             </div>
 
             <div className="homepage__top-destination">
-                <h2 className="homepage__top-destination-title">Top Destination</h2>
+                <h2 className="homepage__top-destination-title">{t("homepage.topDestinations")}</h2>
 
                 <div className="homepage__top-destination-list">
                     {MockDestination &&
@@ -242,7 +245,7 @@ const Home = () => {
             </div>
 
             <div className="homepage__recommend">
-                <h2 className="homepage__recommend-title">Recommend for you</h2>
+                <h2 className="homepage__recommend-title">{t("homepage.recommendedForYou")}</h2>
 
                 <div className="homepage__recommend-list-wrap">
                     <div className="homepage__recommend-list" ref={listRef}>

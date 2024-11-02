@@ -45,6 +45,8 @@
     &__currency {
         font-size: 1.8rem;
         font-weight: 500;
+
+        cursor: pointer;
     }
 
     &__icon {
@@ -59,6 +61,35 @@
         display: flex;
         align-items: center;
         gap: 10px;
+    }
+
+    &__notify {
+        &-icon {
+            transition: transform 0.2s;
+
+            &:hover {
+                scale: 1.1;
+                animation: ring 0.5s;
+            }
+        }
+    }
+
+    @keyframes ring {
+        0% {
+            transform: rotate(0);
+        }
+        25% {
+            transform: rotate(15deg);
+        }
+        50% {
+            transform: rotate(-15deg);
+        }
+        75% {
+            transform: rotate(15deg);
+        }
+        100% {
+            transform: rotate(0);
+        }
     }
 
     &__language-icon {

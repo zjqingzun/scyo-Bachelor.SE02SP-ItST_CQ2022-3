@@ -1,11 +1,20 @@
-import { useState } from "react";
+import { memo, useEffect, useState } from "react";
 import "./HotelCard.scss";
 import { useTranslation } from "react-i18next";
+
+import { useSelector } from "react-redux";
+import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 
 const HotelCard = ({ name, address, image, price, rating, review }) => {
     const { t } = useTranslation();
 
+    const currency = useSelector((state) => state.currency.currency);
+    const baseCurrency = useSelector((state) => state.currency.baseCurrency);
+    const exchangeRate = useSelector((state) => state.currency.exchangeRate);
+
     const [isFavorite, setIsFavorite] = useState(false);
+
+    const [nowPrice, setNowPrice] = useState(price);
 
     const getTextRating = () => {
         if (rating > 8) {
@@ -17,17 +26,20 @@ const HotelCard = ({ name, address, image, price, rating, review }) => {
         }
     };
 
-    const toVND = (price) => {
-        return new Intl.NumberFormat("vi-VN", {
-            style: "currency",
-            currency: "VND",
-        }).format(price);
+    const handleChangeCurrency = () => {
+        setNowPrice(convertCurrency(nowPrice, baseCurrency, currency, exchangeRate));
     };
+
+    useEffect(() => {
+        handleChangeCurrency();
+    }, [currency]);
 
     return (
         <div className="hotel-card">
             <div className="hotel-card__image-wrap">
-                <img src={image} alt={name} className="hotel-card__image" />
+                <a href="#!">
+                    <img src={image} alt={name} className="hotel-card__image" />
+                </a>
 
                 <button onClick={() => setIsFavorite(!isFavorite)} className="hotel-card__favorite">
                     {!isFavorite ? (
@@ -60,7 +72,7 @@ const HotelCard = ({ name, address, image, price, rating, review }) => {
                     {address}
                 </p>
                 <div className="hotel-card__row">
-                    <span className="hotel-card__price">{toVND(price)}</span>
+                    <span className="hotel-card__price">{formatCurrency(nowPrice, currency)}</span>
                     <button className="hotel-card__btn ms-auto mt-3">
                         {t("hotelCard.BookNow")}
                     </button>
@@ -85,4 +97,4 @@ const HotelCard = ({ name, address, image, price, rating, review }) => {
     );
 };
 
-export default HotelCard;
+export default memo(HotelCard);

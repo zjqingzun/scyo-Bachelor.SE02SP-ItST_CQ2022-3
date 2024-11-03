@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useSelector, useDispatch } from "react-redux";
+import { setCurrency } from "~/redux/action/currencyAction";
 
 import "./Header.scss";
 
@@ -33,8 +35,11 @@ const CustomToggleForLanguage = React.forwardRef(({ children, onClick }, ref) =>
 
 const Header = () => {
     const { t, i18n } = useTranslation();
+    const currency = useSelector((state) => state.currency.currency);
+    const baseCurrency = useSelector((state) => state.currency.baseCurrency);
 
-    const [currency, setCurrency] = useState("VND");
+    const dispatch = useDispatch();
+
     const [language, setLanguage] = useState("English");
 
     useEffect(() => {
@@ -53,6 +58,13 @@ const Header = () => {
         i18n.changeLanguage(lng);
     };
 
+    const handleChangeCurrency = (currencyValue) => {
+        dispatch(setCurrency(currency, currencyValue));
+    };
+
+    // console.log("currency", currency);
+    // console.log("baseCurrency", baseCurrency);
+
     return (
         <header className="header">
             <span className="header__name">BookaStay</span>
@@ -63,14 +75,20 @@ const Header = () => {
                 </a>
 
                 <div className="header__currency-group" style={{ width: "40px" }}>
-                    <Dropdown onSelect={(e) => setCurrency(e)}>
+                    <Dropdown>
                         <Dropdown.Toggle as={CustomToggleForCurrency}>{currency}</Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            <Dropdown.Item eventKey="VND">
+                            <Dropdown.Item
+                                eventKey="VND"
+                                onClick={() => handleChangeCurrency("VND")}
+                            >
                                 <span className="fs-3">VND ₫</span>
                             </Dropdown.Item>
-                            <Dropdown.Item eventKey="USD">
+                            <Dropdown.Item
+                                eventKey="USD"
+                                onClick={() => handleChangeCurrency("USD")}
+                            >
                                 <span className="fs-3">USD $</span>
                             </Dropdown.Item>
                         </Dropdown.Menu>

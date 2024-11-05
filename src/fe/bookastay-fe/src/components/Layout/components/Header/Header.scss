@@ -1,0 +1,118 @@
+.header {
+    display: flex;
+    align-items: center;
+
+    height: 80px;
+    padding: 0 60px;
+
+    border-radius: 0px 0px 25px 25px;
+    background-color: #fff;
+
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+
+    &__name {
+        font-size: 3.2rem;
+        font-weight: 500;
+        color: #000;
+        letter-spacing: 1px;
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+
+        margin-left: auto;
+    }
+
+    &__list-property-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 5px 20px;
+
+        border-radius: 15px;
+        border: 1px solid #000;
+        background: transparent;
+
+        &:hover {
+            background-color: #000;
+            color: #fff;
+        }
+    }
+
+    &__currency {
+        font-size: 1.8rem;
+        font-weight: 500;
+
+        cursor: pointer;
+    }
+
+    &__icon {
+        width: 20px;
+    }
+
+    &__language-group,
+    &__currency-group,
+    &__about,
+    &__setting,
+    &__notify {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    &__notify {
+        &-icon {
+            transition: transform 0.2s;
+
+            &:hover {
+                scale: 1.1;
+                animation: ring 0.5s;
+            }
+        }
+    }
+
+    @keyframes ring {
+        0% {
+            transform: rotate(0);
+        }
+        25% {
+            transform: rotate(15deg);
+        }
+        50% {
+            transform: rotate(-15deg);
+        }
+        75% {
+            transform: rotate(15deg);
+        }
+        100% {
+            transform: rotate(0);
+        }
+    }
+
+    &__language-icon {
+        width: 30px;
+        height: 30px;
+
+        border-radius: 999px;
+
+        object-fit: cover;
+
+        cursor: pointer;
+    }
+
+    &__sign-in-btn {
+        padding: 5px 20px;
+
+        color: #fff;
+
+        border-radius: 50px;
+        background: #3b61dd;
+
+        &:hover {
+            background-color: #2e4dbf;
+        }
+    }
+}

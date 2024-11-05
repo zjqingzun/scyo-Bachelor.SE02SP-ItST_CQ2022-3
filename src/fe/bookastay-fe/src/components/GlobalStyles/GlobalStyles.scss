@@ -17,4 +17,10 @@ body {
     font-family: "Geologica", sans-serif;
     font-size: 1.6rem;
     text-rendering: optimizeSpeed;
+    background-color: var(--primary-color);
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
 }

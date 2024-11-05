@@ -23,6 +23,11 @@ export class AuthController {
     return req.user;
   }
 
+  @Post('update')
+  async updateUser(@Body() updateAuthDto: UpdateAuthDto) {
+    return this.authService.updateUser(updateAuthDto);
+  }
+
   @Post('register')
   @Public()
   async register(@Body() createAuthDto: CreateAuthDto) {

@@ -1,9 +1,7 @@
 import { Bill } from "@/module/bill/entities/bill.entity";
 import { Booking } from "@/module/booking/entities/booking.entity";
 import { Hotel } from "@/module/hotel/entities/hotel.entity";
-import { Payment } from "@/module/payment/entities/payment.entity";
 import { Review } from "@/module/review/entities/review.entity";
-import { Room } from "@/module/room/entities/room.entity";
 import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: "user"})

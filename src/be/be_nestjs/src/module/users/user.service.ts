@@ -5,10 +5,10 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { DataSource, Repository } from "typeorm";
 import { hashPassword } from "@/helpers/utils";
 import { Request } from "express";
-import { UpdateUserDto } from "./dto/update-user.dto";
 import { CreateAuthDto } from "@/auth/dto/create-auth.dto";
 import { v4 as uuidv4 } from 'uuid';
 import * as moment from "moment";
+import { UpdateAuthDto } from "@/auth/dto/update-auth.dto";
 
 
 @Injectable()
@@ -108,11 +108,18 @@ export class UserService {
     return (await user);
   }
 
-  async update(updateUserDto: UpdateUserDto) {
+  // async update(updateUserDto: UpdateUserDto) {
+  //   return await this.usersRepository.update({
+  //     id: updateUserDto.id
+  //   },
+  //   updateUserDto)
+  // }
+
+  async update(id: number, updateAuthDto : UpdateAuthDto) {
     return await this.usersRepository.update({
-      id: updateUserDto.id
+      id: id
     },
-    updateUserDto)
+    updateAuthDto)
   }
 
   async remove(id: number) {

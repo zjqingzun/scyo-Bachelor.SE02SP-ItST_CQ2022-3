@@ -19,6 +19,5 @@ export class Location {
     city: string;
 
     @ManyToMany(() => Hotel,{cascade: true})
-    @JoinTable()
     hotels: Hotel[];
 }

@@ -19,13 +19,16 @@ export class Booking {
         default: `now()`,
         nullable: true,
     })
-    checkinTime: string
+    checkinTime: string;
 
     @CreateDateColumn({
         default: `now()`,
         nullable: true,
     })
-    checkoutTime: string
+    checkoutTime: string;
+
+    @Column()
+    nums: number;
 
     @Column()
     status: string;

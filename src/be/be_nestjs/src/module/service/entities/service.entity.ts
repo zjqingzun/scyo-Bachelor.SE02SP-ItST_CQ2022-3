@@ -1,5 +1,5 @@
 import { Room } from "@/module/room/entities/room.entity";
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: "service"})
 export class Service {
@@ -8,6 +8,9 @@ export class Service {
 
     @Column()
     name: string;
+
+    @Column()
+    icon: string;
 
     @ManyToMany(() => Room, (room) => room.services)
     rooms: Room[];

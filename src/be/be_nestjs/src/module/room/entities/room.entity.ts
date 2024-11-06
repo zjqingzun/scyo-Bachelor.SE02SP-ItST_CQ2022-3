@@ -2,7 +2,7 @@ import { Booking } from "@/module/booking/entities/booking.entity";
 import { Hotel } from "@/module/hotel/entities/hotel.entity";
 import { Service } from "@/module/service/entities/service.entity";
 import { User } from "@/module/users/entities/user.entity";
-import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: "room"})
 export class Room {
@@ -10,16 +10,13 @@ export class Room {
     id: number;
 
     @Column()
-    name: string;
-
-    @Column()
     type: string;
 
     @Column()
-    price: number;
+    nums: number;
 
     @Column()
-    numOfPeople: number;
+    price: number;
 
     @Column()
     status: string;
@@ -32,5 +29,8 @@ export class Room {
     hotel: Hotel;
 
     @ManyToMany(() => Service, (service) => service.rooms)
+    @JoinTable({
+        name: "rooms_services"
+    })
     services: Service[];
 }

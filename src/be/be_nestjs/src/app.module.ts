@@ -22,8 +22,10 @@ import { MailModule } from './mail/mail.module';
 import { BillModule } from './module/bill/bill.module';
 import { ReportModule } from './module/report/report.module';
 import { ServiceModule } from './module/service/service.module';
-import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { join } from 'path';
+import { RoleModule } from './module/role/role.module';
+import { ImageModule } from './module/image/image.module';
 
 @Module({
   imports: [
@@ -62,7 +64,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
           from: '"No Reply"',
         },
         template: {
-          dir: join(__dirname, '..', 'mail/templates'),
+          dir: join(__dirname, '..','mail/templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,
@@ -82,7 +84,9 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
     MailModule,
     BillModule,
     ReportModule,
-    ServiceModule],
+    ServiceModule,
+    RoleModule,
+    ImageModule],
   controllers: [AppController],
   providers: [
     AppService,

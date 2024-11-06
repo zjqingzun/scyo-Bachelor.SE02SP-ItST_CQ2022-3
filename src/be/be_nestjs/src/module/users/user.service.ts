@@ -5,10 +5,10 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { DataSource, Repository } from "typeorm";
 import { hashPassword } from "@/helpers/utils";
 import { Request } from "express";
+import { UpdateUserDto } from "./dto/update-user.dto";
 import { CreateAuthDto } from "@/auth/dto/create-auth.dto";
 import { v4 as uuidv4 } from 'uuid';
 import * as moment from "moment";
-import { UpdateAuthDto } from "@/auth/dto/update-auth.dto";
 
 
 @Injectable()
@@ -22,11 +22,11 @@ export class UserService {
   async findAll(req: Request) {
     const {page = 1, limit = 5, sortBy = 'name', order = 'ASC', searchTerm} = req.query;
     const [users, total] = await this.usersRepository.findAndCount({
+      relations: ['roles'],
       select: {
         name: true,
         email: true,
         phone: true,
-        role: true,
       },
       order: {
         [sortBy as string]: order,
@@ -108,18 +108,11 @@ export class UserService {
     return (await user);
   }
 
-  // async update(updateUserDto: UpdateUserDto) {
-  //   return await this.usersRepository.update({
-  //     id: updateUserDto.id
-  //   },
-  //   updateUserDto)
-  // }
-
-  async update(id: number, updateAuthDto : UpdateAuthDto) {
+  async update(updateUserDto: UpdateUserDto) {
     return await this.usersRepository.update({
-      id: id
+      id: updateUserDto.id
     },
-    updateAuthDto)
+    updateUserDto)
   }
 
   async remove(id: number) {

@@ -25,14 +25,14 @@ export class UserController {
     return await this.userService.create(createUserDto);
   }
 
-  // @Patch('update')
-  // async update(@Body() updateUserDto: UpdateUserDto) {
-  // let result = await this.userService.update(updateUserDto);
-  // if (result.affected === 0) {
-  //   throw new BadRequestException("no record has been updated");
-  // }
-  // return "Updated";
-  // }
+  @Patch('update')
+  async update(@Body() updateUserDto: UpdateUserDto) {
+  let result = await this.userService.update(updateUserDto);
+  if (result.affected === 0) {
+    throw new BadRequestException("no record has been updated");
+  }
+  return "Updated";
+  }
 
   @Delete('delete/:id')
   async delete(@Param('id') id : number) {

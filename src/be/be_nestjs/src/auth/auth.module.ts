@@ -10,6 +10,7 @@ import { LocalStrategy } from './passport/local.strategy';
 import { JwtStrategy } from './passport/jwt.strategy';
 import { MailService } from '@/mail/mail.service';
 import { MailModule } from '@/mail/mail.module';
+import { GoogleStrategy } from './passport/google.strategy';
 
 @Module({
   imports: [
@@ -28,6 +29,6 @@ import { MailModule } from '@/mail/mail.module';
     MailModule
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy],
 })
 export class AuthModule {}

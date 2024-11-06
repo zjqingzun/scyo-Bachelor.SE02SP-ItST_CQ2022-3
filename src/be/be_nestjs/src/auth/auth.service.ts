@@ -1,12 +1,11 @@
 
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '@/module/users/user.service';
-import { comparePassword, hashPassword } from '@/helpers/utils';
+import { comparePassword } from '@/helpers/utils';
 import { JwtService } from '@nestjs/jwt';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { MailService } from '@/mail/mail.service';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -36,19 +35,20 @@ export class AuthService {
     };
   }
 
+  async loginWithGoogle(user: any) {
+    const existed = await this.usersService.findByEmail(user.email);
+    if (existed) {
+      const payload = { email: user.email, sub: user.username };
+      return {
+        access_token: this.jwtService.sign(payload),
+      };
+    }
+  }
+
   async register(createAuthDto : CreateAuthDto) {
     const user = await this.usersService.registerUser(createAuthDto);
     this.mailService.sendUserActivation(user);
     return user;
-  }
-
-  async updateUser(updateAuthDto : UpdateAuthDto) {
-    const user = await this.usersService.findByEmail(updateAuthDto.email);
-    if (!user) {
-      throw new BadRequestException("User not exist");
-    }
-    updateAuthDto.password = await hashPassword(updateAuthDto.password);
-    return this.usersService.update(user.id, updateAuthDto);
   }
 
   // async sendEmail() {

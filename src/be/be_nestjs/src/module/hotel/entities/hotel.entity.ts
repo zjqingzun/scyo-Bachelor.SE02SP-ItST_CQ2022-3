@@ -3,7 +3,7 @@ import { Location } from "@/module/location/entities/location.entity";
 import { Report } from "@/module/report/entities/report.entity";
 import { Review } from "@/module/review/entities/review.entity";
 import { Room } from "@/module/room/entities/room.entity";
-import { User } from "@/module/users/entities/user.entity";
+import { User } from "@/module/user/entities/user.entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: "hotel"})

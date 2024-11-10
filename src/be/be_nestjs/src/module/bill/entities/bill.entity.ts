@@ -1,6 +1,6 @@
 import { Booking } from "@/module/booking/entities/booking.entity";
 import { Payment } from "@/module/payment/entities/payment.entity";
-import { User } from "@/module/users/entities/user.entity";
+import { User } from "@/module/user/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: "bill"})

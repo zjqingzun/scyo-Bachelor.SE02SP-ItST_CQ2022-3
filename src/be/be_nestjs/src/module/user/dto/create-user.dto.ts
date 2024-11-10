@@ -1,8 +1,9 @@
-import { Transform } from "class-transformer";
-import { IsEmail, isNotEmpty, IsNotEmpty } from "class-validator";
+import { IsEmail, IsInt, IsNotEmpty, Length } from "class-validator";
+import { User } from "@/module/user/entities/user.entity";
+import { Expose, Transform } from "class-transformer";
 import * as moment from 'moment';
 
-export class CreateAuthDto {
+export class CreateUserDto {
     @IsNotEmpty()
     name: string;
 

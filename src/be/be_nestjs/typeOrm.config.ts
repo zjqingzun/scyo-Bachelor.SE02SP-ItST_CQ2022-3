@@ -9,7 +9,7 @@ import { Review } from "@/module/review/entities/review.entity";
 import { Role } from "@/module/role/entities/role.entity";
 import { Room } from "@/module/room/entities/room.entity";
 import { Service } from "@/module/service/entities/service.entity";
-import { User } from "@/module/users/entities/user.entity";
+import { User } from "@/module/user/entities/user.entity";
 import { ConfigService } from "@nestjs/config";
 import { DataSource } from "typeorm";
 

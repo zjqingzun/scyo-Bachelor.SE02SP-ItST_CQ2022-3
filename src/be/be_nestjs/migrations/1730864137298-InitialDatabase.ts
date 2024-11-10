@@ -3,23 +3,22 @@ import { MigrationInterface, QueryRunner } from "typeorm";
 export class InitialDatabase1730864137298 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-          // Tạo bảng "user"
-    await queryRunner.query(`
-        CREATE TABLE "user" (
-          "id" SERIAL PRIMARY KEY,
-          "name" VARCHAR NOT NULL,
-          "dob" DATE NOT NULL DEFAULT CURRENT_DATE,
-          "cccd" VARCHAR NOT NULL DEFAULT '0000000000',
-          "email" VARCHAR NOT NULL,
-          "password" VARCHAR NOT NULL,
-          "phone" VARCHAR NOT NULL,
-          "accountType" VARCHAR NOT NULL DEFAULT 'email',
-          "codeId" VARCHAR NOT NULL DEFAULT '',
-          "codeExpired" TIMESTAMP NOT NULL DEFAULT now(),
-          "avatar" VARCHAR
-        );
-      `);
-  
+      await queryRunner.query(`
+          CREATE TABLE "user" (
+            "id" SERIAL PRIMARY KEY,
+            "name" VARCHAR NOT NULL,
+            "dob" DATE NOT NULL DEFAULT CURRENT_DATE,
+            "cccd" VARCHAR NOT NULL DEFAULT '0000000000',
+            "email" VARCHAR NOT NULL,
+            "password" VARCHAR NOT NULL,
+            "phone" VARCHAR NOT NULL,
+            "accountType" VARCHAR NOT NULL DEFAULT 'google',
+            "codeId" VARCHAR NOT NULL DEFAULT '',
+            "codeExpired" TIMESTAMP NOT NULL DEFAULT now(),
+            "avatar" VARCHAR
+          );
+        `);
+
       // Tạo bảng "role"
       await queryRunner.query(`
         CREATE TABLE "role" (
@@ -27,7 +26,7 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
           "name" VARCHAR
         );
       `);
-  
+
       // Tạo bảng "user_role" (mối quan hệ giữa user và role)
       await queryRunner.query(`
         CREATE TABLE "user_role" (
@@ -38,7 +37,7 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
           FOREIGN KEY ("roleId") REFERENCES "role"("id") ON DELETE CASCADE
         );
       `);
-  
+
       // Tạo bảng "hotel"
       await queryRunner.query(`
         CREATE TABLE "hotel" (
@@ -54,7 +53,7 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
           FOREIGN KEY ("ownerId") REFERENCES "user"("id") ON DELETE CASCADE
         );
       `);
-  
+
       // Tạo bảng "image"
       await queryRunner.query(`
         CREATE TABLE "image" (
@@ -64,7 +63,7 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
           FOREIGN KEY ("hotelId") REFERENCES "hotel"("id") ON DELETE CASCADE
         );
       `);
-  
+
       // Tạo bảng "room"
       await queryRunner.query(`
         CREATE TABLE "room" (
@@ -77,7 +76,7 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
           FOREIGN KEY ("hotelId") REFERENCES "hotel"("id") ON DELETE CASCADE
         );
       `);
-  
+
       // Tạo bảng "booking"
       await queryRunner.query(`
         CREATE TABLE "booking" (
@@ -94,7 +93,7 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
           FOREIGN KEY ("roomId") REFERENCES "room"("id") ON DELETE CASCADE
         );
       `);
-  
+
       // Tạo bảng "bill"
       await queryRunner.query(`
         CREATE TABLE "bill" (
@@ -108,7 +107,7 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
           FOREIGN KEY ("bookingId") REFERENCES "booking"("id") ON DELETE CASCADE
         );
       `);
-  
+
       // Tạo bảng "payment"
       await queryRunner.query(`
         CREATE TABLE "payment" (
@@ -119,7 +118,7 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
           FOREIGN KEY ("billId") REFERENCES "bill"("id") ON DELETE CASCADE
         );
       `);
-  
+
       // Tạo bảng "review"
       await queryRunner.query(`
         CREATE TABLE "review" (
@@ -133,7 +132,7 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
           FOREIGN KEY ("hotelId") REFERENCES "hotel"("id") ON DELETE CASCADE
         );
       `);
-  
+
       // Tạo bảng "report"
       await queryRunner.query(`
         CREATE TABLE "report" (
@@ -145,7 +144,7 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
           FOREIGN KEY ("hotelId") REFERENCES "hotel"("id") ON DELETE CASCADE
         );
       `);
-  
+
       // Tạo bảng "location"
       await queryRunner.query(`
         CREATE TABLE "location" (
@@ -156,7 +155,7 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
           "city" VARCHAR NOT NULL
         );
       `);
-  
+
       // Tạo bảng "service"
       await queryRunner.query(`
         CREATE TABLE "service" (
@@ -165,7 +164,7 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
           "icon" VARCHAR NOT NULL
         );
       `);
-  
+
       // Tạo bảng "rooms_services"
       await queryRunner.query(`
         CREATE TABLE "rooms_services" (
@@ -176,7 +175,7 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
           FOREIGN KEY ("serviceId") REFERENCES "service"("id") ON DELETE CASCADE
         );
       `);
-  
+
       // Tạo bảng "hotels_locations"
       await queryRunner.query(`
         CREATE TABLE "hotels_locations" (
@@ -187,7 +186,7 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
           FOREIGN KEY ("locationId") REFERENCES "location"("id") ON DELETE CASCADE
         );
       `);
-  
+
       // Tạo bảng "user_favouriteHotel"
       await queryRunner.query(`
         CREATE TABLE "user_favouriteHotel" (

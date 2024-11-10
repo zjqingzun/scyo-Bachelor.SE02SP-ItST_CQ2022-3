@@ -1,7 +1,7 @@
 import { Booking } from "@/module/booking/entities/booking.entity";
 import { Hotel } from "@/module/hotel/entities/hotel.entity";
 import { Service } from "@/module/service/entities/service.entity";
-import { User } from "@/module/users/entities/user.entity";
+import { User } from "@/module/user/entities/user.entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: "room"})

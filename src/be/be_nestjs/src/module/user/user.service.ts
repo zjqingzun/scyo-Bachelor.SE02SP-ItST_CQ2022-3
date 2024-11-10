@@ -9,6 +9,7 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 import { CreateAuthDto } from "@/auth/dto/create-auth.dto";
 import { v4 as uuidv4 } from 'uuid';
 import * as moment from "moment";
+import { MinioService } from "@/minio/minio.service";
 
 
 @Injectable()
@@ -16,7 +17,8 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    private dataSource : DataSource
+    private dataSource : DataSource,
+    private readonly minioService : MinioService
   ) {}
 
   async findAll(req: Request) {
@@ -93,18 +95,18 @@ export class UserService {
   }
 
   async registerUser(createAuthDto: CreateAuthDto) {
-    const {name, email, password, phone} = createAuthDto;
+    const {name, dob, cccd, email, password, phone} = createAuthDto;
     const isEmailExist = await this.isEmailExist(email);
     if (isEmailExist) {
       throw new BadRequestException("email has existed");
     }
     const hashPassord = await hashPassword(password);
     const user = {
-      name, email, password: hashPassord, phone,
+      name, dob, cccd, email, password: hashPassord, phone,
       codeId: uuidv4(),
       codeExpired: moment().add(30, 'minute')
     };
-    this.usersRepository.save(user);
+    await this.usersRepository.save(user);
     return (await user);
   }
 
@@ -113,6 +115,36 @@ export class UserService {
       id: updateUserDto.id
     },
     updateUserDto)
+  }
+
+  async uploadAvatar(file: Express.Multer.File, email: string) {
+    const bucketName = 'bookastay';
+    const fileName = `user_avatar/${file.originalname}`;
+    await this.minioService.uploadFile(bucketName, fileName, file.buffer);
+    const user = await this.findByEmail(email);
+    if (!user) {
+      throw new BadRequestException('User not existed');
+    }
+    await this.usersRepository.update({
+      id: user.id
+    },
+    {
+      'avatar': file.originalname
+    })
+  }
+
+  async getAvatarUrl(email: string) {
+    const user = await this.findByEmail(email);
+    if (!user) {
+      throw new BadRequestException('User not existed');
+    }
+    const objectName = `user_avatar/${user.avatar}`;
+    try {
+      const url = await this.minioService.getPresignedUrl(objectName);
+      return { url };
+    } catch (error) {
+      return { message: 'Failed to retrieve image URL', error };
+    }
   }
 
   async remove(id: number) {

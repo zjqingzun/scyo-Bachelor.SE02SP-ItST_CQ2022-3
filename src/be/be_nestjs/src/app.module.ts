@@ -1,9 +1,9 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './module/users/users.module';
+import { UsersModule } from './module/user/users.module';
 import { LoggerMiddleware } from './logger/logger.middleware';
-import { UserController } from './module/users/user.controller';
+import { UserController } from './module/user/user.controller';
 import { logger } from './logger/logger.fn.middleware';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -26,6 +26,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { join } from 'path';
 import { RoleModule } from './module/role/role.module';
 import { ImageModule } from './module/image/image.module';
+import { MinioService } from './minio/minio.service';
 
 @Module({
   imports: [
@@ -94,6 +95,7 @@ import { ImageModule } from './module/image/image.module';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
+    MinioService
   ],
 })
 export class AppModule implements NestModule {

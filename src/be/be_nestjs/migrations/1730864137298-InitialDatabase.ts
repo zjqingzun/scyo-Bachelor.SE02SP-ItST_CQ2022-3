@@ -29,7 +29,7 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
 
       // Tạo bảng "user_role" (mối quan hệ giữa user và role)
       await queryRunner.query(`
-        CREATE TABLE "user_role" (
+        CREATE TABLE "users_roles" (
           "userId" INT NOT NULL,
           "roleId" INT NOT NULL,
           PRIMARY KEY ("userId", "roleId"),
@@ -48,7 +48,6 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
           "ownerId" INT NOT NULL,
           "phone" VARCHAR NOT NULL,
           "email" VARCHAR NOT NULL,
-          "images" VARCHAR NOT NULL,
           "star" INT,
           FOREIGN KEY ("ownerId") REFERENCES "user"("id") ON DELETE CASCADE
         );
@@ -68,6 +67,7 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
       await queryRunner.query(`
         CREATE TABLE "room" (
           "id" SERIAL PRIMARY KEY,
+          "name" VARCHAR NOT NULL,
           "roomType" INT NOT NULL,
           "nums" INT NOT NULL,
           "price" INT NOT NULL,
@@ -85,8 +85,8 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
           "roomId" INT NOT NULL,
           "nums" INT NOT NULL,
           "createdAt" TIMESTAMP DEFAULT now(),
-          "checkinTime" TIMESTAMP NOT NULL,
-          "checkoutTime" TIMESTAMP NOT NULL,
+          "checkinTime" TIMESTAMP DEFAULT now(),
+          "checkoutTime" TIMESTAMP DEFAULT now(),
           "status" VARCHAR NOT NULL,
           "note" VARCHAR,
           FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE,

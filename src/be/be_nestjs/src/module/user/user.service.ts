@@ -119,17 +119,17 @@ export class UserService {
 
   async uploadAvatar(file: Express.Multer.File, email: string) {
     const bucketName = 'bookastay';
-    const fileName = `user_avatar/${file.originalname}`;
-    await this.minioService.uploadFile(bucketName, fileName, file.buffer);
     const user = await this.findByEmail(email);
     if (!user) {
       throw new BadRequestException('User not existed');
     }
+    const fileName = user.name.split(' ').pop() + '.' + file.originalname.split('.').pop();
+    await this.minioService.uploadFile(bucketName, `user_avatar/${fileName}`, file.buffer);
     await this.usersRepository.update({
       id: user.id
     },
     {
-      'avatar': file.originalname
+      'avatar': fileName
     })
   }
 

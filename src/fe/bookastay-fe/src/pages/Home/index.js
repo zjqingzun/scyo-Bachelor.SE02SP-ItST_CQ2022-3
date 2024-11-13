@@ -232,11 +232,13 @@ const Home = () => {
                         MockDestination.map((destination, index) => {
                             return (
                                 <a href="#!" key={destination.id} className="destination-item">
-                                    <img
-                                        className="destination-item__image"
-                                        src={destination.url}
-                                        alt={destination.title}
-                                    />
+                                    <div className="destination-item__image-wrap">
+                                        <img
+                                            className="destination-item__image"
+                                            src={destination.url}
+                                            alt={destination.title}
+                                        />
+                                    </div>
                                     <h3 className="destination-item__title">{destination.title}</h3>
                                 </a>
                             );

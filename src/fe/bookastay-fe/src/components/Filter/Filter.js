@@ -20,11 +20,11 @@ const Filter = (props) => {
     const handlePriceInput = (event) => {
         setPrice(event);
 
-        props.handleFilter({
-            price,
-            selectedScores,
-            selectedStars,
-        });
+        // props.handleFilter({
+        //     price,
+        //     selectedScores,
+        //     selectedStars,
+        // });
     };
 
     // Tạo state để quản lý các checkbox
@@ -44,11 +44,11 @@ const Filter = (props) => {
         }));
 
         // Gọi hàm filter ở component cha
-        props.handleFilter({
-            price,
-            selectedScores,
-            selectedStars,
-        });
+        // props.handleFilter({
+        //     price,
+        //     selectedScores,
+        //     selectedStars,
+        // });
     };
 
     const [selectedStars, setSelectedStars] = useState({
@@ -68,7 +68,7 @@ const Filter = (props) => {
         }));
     };
 
-    const debouncedPrice = useDebounce(price, 500);
+    const debouncedPrice = useDebounce(price, 200);
     const debouncedSelectedScores = useDebounce(selectedScores, 200);
     const debouncedSelectedStars = useDebounce(selectedStars, 200);
 

@@ -146,12 +146,10 @@ const AfterSearch = () => {
             }
 
             if (selectedScoresToArray.length > 0) {
-                _data = _data.filter((hotel) =>
-                    selectedScoresToArray.some((score) => score <= hotel.rating)
-                );
+                _data = _data.filter((hotel) => {
+                    return selectedScoresToArray.some((score) => score <= hotel.rating);
+                });
             }
-
-            console.log(selectedScoresToArray);
         }
 
         if (selectedStars) {
@@ -180,7 +178,7 @@ const AfterSearch = () => {
                 />
             </div>
 
-            <div className="after-search__body">
+            <div className="after-search__body mt-4">
                 <div className="row gx-5">
                     <div className="col-3">
                         <div className="after-search__filter">

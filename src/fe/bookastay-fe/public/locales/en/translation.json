@@ -27,7 +27,14 @@
     "filter": {
         "filter": "Filter",
         "price": "Price (per night)",
-        "starRating": "Star Rating",
+        "starRating": {
+            "title": "Star Rating",
+            "5stars": "5 stars",
+            "4stars": "4 stars",
+            "3stars": "3 stars",
+            "2stars": "2 stars",
+            "1star": "1 star"
+        },
         "reviewScore": {
             "title": "Review Score",
             "excellent": "Excellent: 9 points or more",

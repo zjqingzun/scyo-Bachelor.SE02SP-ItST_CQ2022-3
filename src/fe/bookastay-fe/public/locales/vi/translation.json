@@ -26,7 +26,14 @@
     "filter": {
         "filter": "Lọc",
         "price": "Giá (mỗi đêm)",
-        "starRating": "Số sao",
+        "starRating": {
+            "title": "Đánh giá sao",
+            "5stars": "5 sao",
+            "4stars": "4 sao",
+            "3stars": "3 sao",
+            "2stars": "2 sao",
+            "1star": "1 sao"
+        },
         "reviewScore": {
             "title": "Điểm đánh giá",
             "excellent": "Xuất sắc: 9 điểm trở lên",

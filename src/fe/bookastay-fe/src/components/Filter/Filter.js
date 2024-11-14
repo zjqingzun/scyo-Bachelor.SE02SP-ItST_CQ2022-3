@@ -6,6 +6,7 @@ import "react-range-slider-input/dist/style.css";
 
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 import { useDebounce } from "~/hooks";
+import geocodeAddress from "~/utils/geocodeAddress";
 
 import "./Filter.scss";
 
@@ -79,6 +80,15 @@ const Filter = (props) => {
             selectedStars: selectedStars,
         });
     }, [debouncedPrice, debouncedSelectedScores, debouncedSelectedStars]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const data = await geocodeAddress("Phuoc Thuan, Xuyen Moc, Ba Ria - Vung Tau");
+            console.log(data);
+        };
+
+        fetchData();
+    }, []);
 
     return (
         <div className="filter-container">
@@ -164,7 +174,9 @@ const Filter = (props) => {
             <div className="separate"></div>
 
             <div className="filter__group">
-                <span className="filter__title fs-3 fw-semibold">{t("filter.starRating")}</span>
+                <span className="filter__title fs-3 fw-semibold">
+                    {t("filter.starRating.title")}
+                </span>
 
                 <div className="form-check">
                     <input
@@ -175,7 +187,7 @@ const Filter = (props) => {
                         id="checkboxFiveStar"
                     />
                     <label className="form-check-label" htmlFor="checkboxFiveStar">
-                        5 stars
+                        {t("filter.starRating.5stars")}
                     </label>
                 </div>
 
@@ -188,7 +200,7 @@ const Filter = (props) => {
                         id="checkboxFourStar"
                     />
                     <label className="form-check-label" htmlFor="checkboxFourStar">
-                        4 stars
+                        {t("filter.starRating.4stars")}
                     </label>
                 </div>
 
@@ -201,7 +213,7 @@ const Filter = (props) => {
                         id="checkboxThreeStar"
                     />
                     <label className="form-check-label" htmlFor="checkboxThreeStar">
-                        3 stars
+                        {t("filter.starRating.3stars")}
                     </label>
                 </div>
 
@@ -214,7 +226,7 @@ const Filter = (props) => {
                         id="checkboxTwoStar"
                     />
                     <label className="form-check-label" htmlFor="checkboxTwoStar">
-                        2 stars
+                        {t("filter.starRating.2stars")}
                     </label>
                 </div>
 
@@ -227,7 +239,7 @@ const Filter = (props) => {
                         id="checkboxOneStar"
                     />
                     <label className="form-check-label" htmlFor="checkboxOneStar">
-                        1 star
+                        {t("filter.starRating.1star")}
                     </label>
                 </div>
             </div>

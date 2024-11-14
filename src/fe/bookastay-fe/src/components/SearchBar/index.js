@@ -11,20 +11,24 @@ import searchIcon from "./search-icon.svg";
 import calendarIcon from "./calender-icon.svg";
 import people from "./people-icon.svg";
 import caret from "./caret-icon.svg";
+import { useNavigate } from "react-router-dom";
 
 const SearchBar = (props) => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
+
+    const [destination, setDestination] = useState(props?.searchData?.destination || "");
 
     const [state, setState] = useState([
         {
-            startDate: new Date(),
-            endDate: null,
+            startDate: new Date() || new Date(props?.searchData?.startDate),
+            endDate: null || new Date(props?.searchData?.endDate),
             key: "selection",
         },
     ]);
 
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
+    const [startDate, setStartDate] = useState(props?.searchData?.startDate || "");
+    const [endDate, setEndDate] = useState(props?.searchData?.endDate || "");
 
     const handleDateChange = (item) => {
         setState([item.selection]);
@@ -74,12 +78,34 @@ const SearchBar = (props) => {
     };
 
     const [numOfPeople, setNumOfPeople] = useState(() => {
-        return {
-            adult: 2,
-            children: 0,
-            rooms: 1,
-        };
+        return (
+            props?.searchData?.numOfPeople || {
+                adult: 2,
+                children: 0,
+                rooms: 1,
+            }
+        );
     });
+
+    const handleClickSearchBtn = () => {
+        if (window.location.pathname === "/") {
+            navigate("/after-search", {
+                state: {
+                    destination,
+                    startDate,
+                    endDate,
+                    numOfPeople,
+                },
+            });
+        } else {
+            props.handleSearch({
+                destination,
+                startDate,
+                endDate,
+                numOfPeople,
+            });
+        }
+    };
 
     return (
         <div className="test">
@@ -95,6 +121,8 @@ const SearchBar = (props) => {
                         className="search-bar__input"
                         type="text"
                         placeholder="Ho Chi Minh City, Vietnam"
+                        value={destination}
+                        onChange={(e) => setDestination(e.target.value)}
                     />
                 </div>
                 <div className="search-bar__date-wrap">
@@ -298,7 +326,9 @@ const SearchBar = (props) => {
                     </div>
                 </div>
 
-                <button className="search-bar__btn ms-auto">{t("searchBar.search")}</button>
+                <button onClick={() => handleClickSearchBtn()} className="search-bar__btn ms-auto">
+                    {t("searchBar.search")}
+                </button>
             </div>
         </div>
     );

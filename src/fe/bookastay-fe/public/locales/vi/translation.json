@@ -20,6 +20,19 @@
         "Good": "Tốt",
         "Average": "Trung bình",
         "BookNow": "Đặt ngay",
-        "Reviews": "đánh giá"
+        "Reviews": "đánh giá",
+        "OpenMap": "Xem bản đồ"
+    },
+    "filter": {
+        "filter": "Lọc",
+        "price": "Giá (mỗi đêm)",
+        "starRating": "Số sao",
+        "reviewScore": {
+            "title": "Điểm đánh giá",
+            "excellent": "Xuất sắc: 9 điểm trở lên",
+            "veryGood": "Rất tốt: 8 điểm trở lên",
+            "good": "Tốt: 7 điểm trở lên",
+            "pleasant": "Dễ chịu: 6 điểm trở lên"
+        }
     }
 }

@@ -106,7 +106,6 @@ export class InitialData1730889215378 implements MigrationInterface {
         await queryRunner.query(`
             INSERT INTO "image" (url, "hotelId") 
             VALUES
-                ('257330293.jpg', 2),
                 ('604751720.jpg', 1),
                 ('604748509.jpg', 1),
                 ('604748411.jpg', 1),

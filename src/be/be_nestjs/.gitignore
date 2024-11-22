@@ -62,3 +62,5 @@ Dockerfile
 
 .eslintrc.js
 .prettierrc
+
+!minio

@@ -4,8 +4,11 @@ import { UserService } from '@/module/user/user.service';
 import { comparePassword } from '@/helpers/utils';
 import { JwtService } from '@nestjs/jwt';
 import { CreateAuthDto } from './dto/create-auth.dto';
-import { MailerService } from '@nestjs-modules/mailer';
+import { v4 as uuidv4 } from 'uuid';
 import { MailService } from '@/mail/mail.service';
+import { ResetpassAuthDto } from './dto/resetpassword-auth.dto';
+import moment from 'moment';
+
 
 @Injectable()
 export class AuthService {
@@ -49,6 +52,16 @@ export class AuthService {
     const user = await this.usersService.registerUser(createAuthDto);
     this.mailService.sendUserActivation(user);
     return user;
+  }
+
+  async forgetPassword(email : string) {
+    const user = await this.usersService.setupResetPassword(email);
+    this.mailService.sendResetPassword(user);
+    return user.codeId;
+  }
+
+  async resetPassword(resetInfo: ResetpassAuthDto) {
+    return await this.usersService.resetPassword(resetInfo);
   }
 
   // async sendEmail() {

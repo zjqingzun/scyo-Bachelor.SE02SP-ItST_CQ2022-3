@@ -10,6 +10,7 @@ import { CreateAuthDto } from "@/auth/dto/create-auth.dto";
 import { v4 as uuidv4 } from 'uuid';
 import * as moment from "moment";
 import { MinioService } from "@/minio/minio.service";
+import { ResetpassAuthDto } from "@/auth/dto/resetpassword-auth.dto";
 
 
 @Injectable()
@@ -110,11 +111,47 @@ export class UserService {
     return (await user);
   }
 
+  async setupResetPassword(email : string) {
+    const user = await this.findByEmail(email);
+    if (!user) {
+      throw new BadRequestException("Email has not existed!");
+    }
+    user.codeId = uuidv4();
+    user.codeExpired = moment().add(5, 'minute').toDate();
+    await this.updateUser(user);
+    return user;
+  }
+
+  async resetPassword(resetInfo : ResetpassAuthDto) {
+    const user = await this.findByEmail(resetInfo.email);
+    if (!user) {
+      throw new BadRequestException("Email has not existed!");
+    }
+    if (user.codeId === resetInfo.codeId) {
+      if (moment().isBefore(user.codeExpired)) {
+        user.password = await hashPassword(resetInfo.newPassword);
+        await this.updateUser(user);
+        return "Reset password successfully!";
+      } else {
+        throw new BadRequestException("The reset code has expired!");
+      }
+    } else {
+      throw new BadRequestException("Invalid reset code!");
+    }
+  }
+
   async update(updateUserDto: UpdateUserDto) {
     return await this.usersRepository.update({
       id: updateUserDto.id
     },
-    updateUserDto)
+    updateUserDto);
+  }
+
+  async updateUser(user : User) {
+    return await this.usersRepository.update({
+      id: user.id
+    },
+    user);
   }
 
   async uploadAvatar(file: Express.Multer.File, email: string) {

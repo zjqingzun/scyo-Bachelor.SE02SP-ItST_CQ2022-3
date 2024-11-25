@@ -18,4 +18,17 @@ export class MailService {
       },
     });
   }
+
+  async sendResetPassword(user : any) {
+    await this.mailerService.sendMail({
+      to: user.email,
+      // from: '"Support Team" <support@example.com>', // override default from
+      subject: 'Reset your password',
+      template: './register', // `.hbs` extension is appended automatically
+      context: { // ✏️ filling curly brackets with content
+        name: user.name,
+        activationCode: user.codeId
+      },
+    });
+  }
 }

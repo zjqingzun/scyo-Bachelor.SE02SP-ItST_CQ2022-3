@@ -7,6 +7,7 @@ import { LocalAuthGuard } from './guard/local-auth.guard';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { Public } from '@/helpers/decorator/public';
 import { GoogleAuthGuard } from './guard/google-auth.guard';
+import { ResetpassAuthDto } from './dto/resetpassword-auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -28,6 +29,18 @@ export class AuthController {
   @Public()
   async register(@Body() createAuthDto: CreateAuthDto) {
     return this.authService.register(createAuthDto);
+  }
+
+  @Get('forgetPassword/:email')
+  @Public()
+  async forgetPassword(@Param('email') email : string) {
+    return await this.authService.forgetPassword(email);
+  }
+
+  @Post('resetPassword')
+  @Public()
+  async resetPassword(@Body() resetInfo : ResetpassAuthDto) {
+    return await this.authService.resetPassword(resetInfo);
   }
 
   @Get('google')

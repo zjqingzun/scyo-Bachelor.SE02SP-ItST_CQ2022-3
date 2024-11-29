@@ -21,6 +21,26 @@
         "Good": "Good",
         "Average": "Average",
         "BookNow": "Book Now",
-        "Reviews": "reviews"
+        "Reviews": "reviews",
+        "OpenMap": "Open Map"
+    },
+    "filter": {
+        "filter": "Filter",
+        "price": "Price (per night)",
+        "starRating": {
+            "title": "Star Rating",
+            "5stars": "5 stars",
+            "4stars": "4 stars",
+            "3stars": "3 stars",
+            "2stars": "2 stars",
+            "1star": "1 star"
+        },
+        "reviewScore": {
+            "title": "Review Score",
+            "excellent": "Excellent: 9 points or more",
+            "veryGood": "Very good: 8 points or more",
+            "good": "Good: 7 points or more",
+            "pleasant": "Pleasant: 6 points or more"
+        }
     }
 }

@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { useTranslation, Trans } from "react-i18next";
+import { useTranslation } from "react-i18next";
 
 import "./Home.scss";
 import SearchBar from "../../components/SearchBar";
-import HotelCard from "../../components/HotelCard";
+import HotelCard from "../../components/HotelCard/HotelCard";
 
 const MockData = [
     {
@@ -135,7 +135,7 @@ const Home = () => {
         listRef.current.scrollLeft -=
             (listRef.current.offsetWidth - gap * (itemPerView - 1)) / itemPerView + gap;
 
-        if (Math.ceil(listRef.current.scrollLeft) == Math.ceil(scrollWidth)) {
+        if (Math.ceil(listRef.current.scrollLeft) === Math.ceil(scrollWidth)) {
             setIsAtStart(true);
         }
 

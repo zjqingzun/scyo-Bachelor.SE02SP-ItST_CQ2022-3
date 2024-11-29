@@ -1,20 +1,21 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import "./HotelCard.scss";
 import { useTranslation } from "react-i18next";
 
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 
 const HotelCard = ({ name, address, image, price, rating, review }) => {
     const { t } = useTranslation();
 
     const currency = useSelector((state) => state.currency.currency);
-    const baseCurrency = useSelector((state) => state.currency.baseCurrency);
     const exchangeRate = useSelector((state) => state.currency.exchangeRate);
 
     const [isFavorite, setIsFavorite] = useState(false);
 
     const [nowPrice, setNowPrice] = useState(price);
+
+    const nowCurrency = useRef("VND");
 
     const getTextRating = () => {
         if (rating > 8) {
@@ -27,7 +28,11 @@ const HotelCard = ({ name, address, image, price, rating, review }) => {
     };
 
     const handleChangeCurrency = () => {
-        setNowPrice(convertCurrency(nowPrice, baseCurrency, currency, exchangeRate));
+        if (currency != nowCurrency.current) {
+            setNowPrice(convertCurrency(nowPrice, nowCurrency.current, currency, exchangeRate));
+
+            nowCurrency.current = currency;
+        }
     };
 
     useEffect(() => {

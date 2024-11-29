@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import RangeSlider from "react-range-slider-input";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
@@ -9,6 +9,7 @@ import { useDebounce } from "~/hooks";
 import geocodeAddress from "~/utils/geocodeAddress";
 
 import "./Filter.scss";
+import { set } from "date-fns";
 
 const Filter = (props) => {
     const { t } = useTranslation();
@@ -18,8 +19,14 @@ const Filter = (props) => {
 
     const [price, setPrice] = useState([0, 0]);
 
+    const [priceToShow, setPriceToShow] = useState([0, 0]);
+
+    const [rangePrice, setRangePrice] = useState([0, 5000000]);
+
     const handlePriceInput = (event) => {
-        setPrice(event);
+        // setPrice((prev) => [...event]);
+
+        setPriceToShow((prev) => [...event]);
 
         // props.handleFilter({
         //     price,
@@ -69,13 +76,20 @@ const Filter = (props) => {
         }));
     };
 
-    const debouncedPrice = useDebounce(price, 200);
+    const debouncedPrice = useDebounce(priceToShow, 200);
     const debouncedSelectedScores = useDebounce(selectedScores, 200);
     const debouncedSelectedStars = useDebounce(selectedStars, 200);
 
     useEffect(() => {
+        const dataPrice = [
+            convertCurrency(priceToShow[0], currency, "VND", exchangeRate),
+            convertCurrency(priceToShow[1], currency, "VND", exchangeRate),
+        ];
+
+        console.log(">>> data", dataPrice);
+
         props.handleFilter({
-            price: price,
+            price: dataPrice,
             selectedScores: selectedScores,
             selectedStars: selectedStars,
         });
@@ -84,11 +98,31 @@ const Filter = (props) => {
     useEffect(() => {
         const fetchData = async () => {
             const data = await geocodeAddress("Phuoc Thuan, Xuyen Moc, Ba Ria - Vung Tau");
-            console.log(data);
+            // console.log(data);
         };
 
         fetchData();
     }, []);
+
+    const handleChangeCurrency = () => {
+        setPriceToShow((prev) => [
+            ...[
+                convertCurrency(prev[0], baseCurrency, currency, exchangeRate),
+                convertCurrency(prev[1], baseCurrency, currency, exchangeRate),
+            ],
+        ]);
+
+        setRangePrice((prev) => [
+            ...[
+                convertCurrency(prev[0], baseCurrency, currency, exchangeRate),
+                convertCurrency(prev[1], baseCurrency, currency, exchangeRate),
+            ],
+        ]);
+    };
+
+    useEffect(() => {
+        handleChangeCurrency();
+    }, [currency]);
 
     return (
         <div className="filter-container">
@@ -99,15 +133,13 @@ const Filter = (props) => {
             <div className="fitter__group d-flex flex-column">
                 <span className="filter__title fs-3 fw-semibold">{t("filter.price")}</span>
                 <span className="filter__text fs-5 mb-5">
-                    {currency === "VND" ? "VND" : "$"}{" "}
-                    {convertCurrency(price[0], baseCurrency, currency, exchangeRate)} -{" "}
-                    {currency === "VND" ? "VND" : "$"}{" "}
-                    {convertCurrency(price[1], baseCurrency, currency, exchangeRate)}+
+                    {formatCurrency(priceToShow[0], currency)} -{" "}
+                    {formatCurrency(priceToShow[1], currency)}+
                 </span>
                 <RangeSlider
-                    min={0}
-                    max={5000000}
-                    value={price}
+                    min={rangePrice[0]}
+                    max={rangePrice[1]}
+                    value={priceToShow}
                     onInput={(event) => handlePriceInput(event)}
                 />
             </div>

@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 
@@ -6,17 +6,28 @@ import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 import icons from "~/assets/icon";
 
 import "./HotelCard.scss";
+import { set } from "date-fns";
 
-const HotelAfterSearchCard = ({ name, address, image, price, rating, review, star }) => {
+const HotelAfterSearchCard = ({
+    name,
+    address,
+    image,
+    price,
+    rating,
+    review,
+    star,
+    handleShowMapModel = () => {},
+}) => {
     const { t } = useTranslation();
 
     const currency = useSelector((state) => state.currency.currency);
-    const baseCurrency = useSelector((state) => state.currency.baseCurrency);
     const exchangeRate = useSelector((state) => state.currency.exchangeRate);
 
     const [isFavorite, setIsFavorite] = useState(false);
 
     const [nowPrice, setNowPrice] = useState(price);
+
+    const nowCurrency = useRef("VND");
 
     const getTextRating = () => {
         if (rating > 8) {
@@ -28,12 +39,12 @@ const HotelAfterSearchCard = ({ name, address, image, price, rating, review, sta
         }
     };
 
-    const handleChangeCurrency = () => {
-        setNowPrice(convertCurrency(nowPrice, baseCurrency, currency, exchangeRate));
-    };
-
     useEffect(() => {
-        handleChangeCurrency();
+        if (currency != nowCurrency.current) {
+            setNowPrice(convertCurrency(nowPrice, nowCurrency.current, currency, exchangeRate));
+
+            nowCurrency.current = currency;
+        }
     }, [currency]);
 
     return (
@@ -85,7 +96,11 @@ const HotelAfterSearchCard = ({ name, address, image, price, rating, review, sta
                 </p>
 
                 <div className="hotel-card__row justify-content-between w-100 mt-auto">
-                    <a href="#!" className="hotel-card__open-map">
+                    <a
+                        href="#!"
+                        onClick={() => handleShowMapModel(address)}
+                        className="hotel-card__open-map"
+                    >
                         {t("hotelCard.OpenMap")}
                     </a>
 

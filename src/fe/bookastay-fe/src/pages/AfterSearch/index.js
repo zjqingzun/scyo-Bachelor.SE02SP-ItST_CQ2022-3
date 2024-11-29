@@ -1,11 +1,18 @@
 import { useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import Modal from "react-bootstrap/Modal";
 
 import "./AfterSearch.scss";
+
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 
 import SearchBar from "~/components/SearchBar";
 import Filter from "~/components/Filter";
 import { HotelAfterSearchCard as HotelCard } from "~/components/HotelCard";
+
+import geocodeAddress from "~/utils/geocodeAddress";
 
 // This function converts the string to lowercase, then perform the conversion
 function toLowerCaseNonAccentVietnamese(str) {
@@ -82,7 +89,12 @@ const AfterSearch = () => {
     const backup = useRef([]);
 
     useEffect(() => {
-        console.log(">>> first render AfterSearch");
+        // console.log(">>> first render AfterSearch");
+
+        if (!location.state) {
+            return;
+        }
+
         let data = MockRecommend.filter((hotel) => {
             return toLowerCaseNonAccentVietnamese(hotel.address).includes(
                 toLowerCaseNonAccentVietnamese(location.state.destination)
@@ -98,7 +110,7 @@ const AfterSearch = () => {
 
     const handleSearch = (searchData) => {
         let data = MockRecommend.filter((hotel) => {
-            console.log(hotel.address.includes(searchData.destination));
+            // console.log(hotel.address.includes(searchData.destination));
             return toLowerCaseNonAccentVietnamese(hotel.address).includes(
                 toLowerCaseNonAccentVietnamese(searchData.destination)
             );
@@ -168,8 +180,47 @@ const AfterSearch = () => {
         setSearchedHotel((prev) => [..._data]);
     };
 
+    const [showMapModal, setShowMapModal] = useState(false);
+    const mapPositionRef = useRef([10.5279716, 107.3921728]);
+
+    const handleCloseMapModel = () => setShowMapModal(false);
+    const handleShowMapModel = async (address) => {
+        mapPositionRef.current = await geocodeAddress(address);
+
+        // console.log(mapPositionRef.current);
+
+        setShowMapModal(true);
+    };
+
+    console.log(">>> render afterserch");
+
     return (
         <div className="after-search">
+            <Modal size="xl" centered show={showMapModal} onHide={handleCloseMapModel}>
+                <Modal.Body>
+                    <Modal.Header closeButton></Modal.Header>
+                    <MapContainer center={mapPositionRef.current} zoom={13}>
+                        <TileLayer
+                            maxZoom={30}
+                            attribution="Google Maps"
+                            url="https://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}"
+                        />
+                        <Marker
+                            position={mapPositionRef.current}
+                            icon={L.divIcon({
+                                className: "custom-marker",
+                                html: `<div style="background-color: white; padding: 5px; border-radius: 5px; border: 1px solid black; text-align: center;">${123123}</div>`,
+                                iconSize: [50, 30],
+                            })}
+                        >
+                            <Popup>
+                                <h2>Hello man</h2>
+                            </Popup>
+                        </Marker>
+                    </MapContainer>
+                </Modal.Body>
+            </Modal>
+
             <div className="after-search__search-bar">
                 <SearchBar
                     handleSearch={handleSearch}
@@ -189,7 +240,7 @@ const AfterSearch = () => {
                         <div className="row row-cols-1 gy-5">
                             {searchedHotel.map((hotel) => (
                                 <div key={hotel.id} className="col">
-                                    <HotelCard {...hotel} />
+                                    <HotelCard {...hotel} handleShowMapModel={handleShowMapModel} />
                                 </div>
                             ))}
                         </div>

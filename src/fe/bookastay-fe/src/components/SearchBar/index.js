@@ -175,10 +175,10 @@ const SearchBar = (props) => {
                         <span>
                             {numOfPeople.adult} {t("searchBar.adults")}
                         </span>
-                        <div className="search-bar__input-separate"></div>
+                        {/* <div className="search-bar__input-separate"></div>
                         <span>
                             {numOfPeople.children} {t("searchBar.children")}
-                        </span>
+                        </span> */}
                         <div className="search-bar__input-separate"></div>
                         <span>
                             {numOfPeople.rooms} {t("searchBar.rooms")}
@@ -195,7 +195,7 @@ const SearchBar = (props) => {
                         className={`search-bar__people-popup ${isShowPopup}`}
                     >
                         <div className="search-bar__people-popup-item">
-                            <label htmlFor="adult">Adults</label>
+                            <label htmlFor="adult">Phòng 2</label>
                             <div className="number-select">
                                 <button
                                     className="number-select__btn"
@@ -237,7 +237,7 @@ const SearchBar = (props) => {
                                 </button>
                             </div>
                         </div>
-                        <div className="search-bar__people-popup-item">
+                        {/* <div className="search-bar__people-popup-item">
                             <label htmlFor="children">Children</label>
                             <div className="number-select">
                                 <button
@@ -279,9 +279,9 @@ const SearchBar = (props) => {
                                     </svg>
                                 </button>
                             </div>
-                        </div>
+                        </div> */}
                         <div className="search-bar__people-popup-item">
-                            <label htmlFor="room">Rooms</label>
+                            <label htmlFor="room">Phòng 4</label>
                             <div className="number-select">
                                 <button
                                     className="number-select__btn"

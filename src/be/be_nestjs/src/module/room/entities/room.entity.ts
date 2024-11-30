@@ -10,7 +10,7 @@ export class Room {
     id: number;
 
     @Column()
-    type: string;
+    roomType: string;
 
     @Column()
     nums: number;

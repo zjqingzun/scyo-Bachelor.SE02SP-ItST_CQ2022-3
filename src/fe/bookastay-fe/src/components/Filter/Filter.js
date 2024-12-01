@@ -6,10 +6,9 @@ import "react-range-slider-input/dist/style.css";
 
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 import { useDebounce } from "~/hooks";
-import geocodeAddress from "~/utils/geocodeAddress";
+// import geocodeAddress from "~/utils/geocodeAddress";
 
 import "./Filter.scss";
-import { set } from "date-fns";
 
 const Filter = (props) => {
     const { t } = useTranslation();
@@ -17,7 +16,7 @@ const Filter = (props) => {
     const baseCurrency = useSelector((state) => state.currency.baseCurrency);
     const exchangeRate = useSelector((state) => state.currency.exchangeRate);
 
-    const [price, setPrice] = useState([0, 0]);
+    const nowCurrency = useRef("VND");
 
     const [priceToShow, setPriceToShow] = useState([0, 0]);
 
@@ -95,29 +94,37 @@ const Filter = (props) => {
         });
     }, [debouncedPrice, debouncedSelectedScores, debouncedSelectedStars]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const data = await geocodeAddress("Phuoc Thuan, Xuyen Moc, Ba Ria - Vung Tau");
-            // console.log(data);
-        };
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         const data = await geocodeAddress("Phuoc Thuan, Xuyen Moc, Ba Ria - Vung Tau");
+    //         // console.log(data);
+    //     };
 
-        fetchData();
-    }, []);
+    //     fetchData();
+    // }, []);
 
     const handleChangeCurrency = () => {
-        setPriceToShow((prev) => [
-            ...[
-                convertCurrency(prev[0], baseCurrency, currency, exchangeRate),
-                convertCurrency(prev[1], baseCurrency, currency, exchangeRate),
-            ],
-        ]);
+        if (currency !== nowCurrency.current) {
+            setPriceToShow((prev) => [
+                ...[
+                    convertCurrency(prev[0], baseCurrency, currency, exchangeRate),
+                    convertCurrency(prev[1], baseCurrency, currency, exchangeRate),
+                ],
+            ]);
 
-        setRangePrice((prev) => [
-            ...[
-                convertCurrency(prev[0], baseCurrency, currency, exchangeRate),
-                convertCurrency(prev[1], baseCurrency, currency, exchangeRate),
-            ],
-        ]);
+            if (currency === "VND") {
+                setRangePrice((prev) => [...[0, 5000000]]);
+            } else {
+                setRangePrice((prev) => [
+                    ...[
+                        convertCurrency(prev[0], baseCurrency, currency, exchangeRate),
+                        convertCurrency(prev[1], baseCurrency, currency, exchangeRate),
+                    ],
+                ]);
+            }
+
+            nowCurrency.current = currency;
+        }
     };
 
     useEffect(() => {

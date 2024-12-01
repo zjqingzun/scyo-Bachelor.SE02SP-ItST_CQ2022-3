@@ -2,7 +2,7 @@ import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
 
 import { DateRange } from "react-date-range";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { vi } from "date-fns/locale";
 import { useTranslation } from "react-i18next";
 

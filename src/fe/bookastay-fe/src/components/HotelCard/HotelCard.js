@@ -2,7 +2,7 @@ import { memo, useEffect, useRef, useState } from "react";
 import "./HotelCard.scss";
 import { useTranslation } from "react-i18next";
 
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 
 const HotelCard = ({ name, address, image, price, rating, review }) => {
@@ -28,8 +28,12 @@ const HotelCard = ({ name, address, image, price, rating, review }) => {
     };
 
     const handleChangeCurrency = () => {
-        if (currency != nowCurrency.current) {
-            setNowPrice(convertCurrency(nowPrice, nowCurrency.current, currency, exchangeRate));
+        if (currency !== nowCurrency.current) {
+            if (currency === "VND") {
+                setNowPrice(price);
+            } else {
+                setNowPrice(convertCurrency(nowPrice, nowCurrency.current, currency, exchangeRate));
+            }
 
             nowCurrency.current = currency;
         }

@@ -21,22 +21,21 @@ const CustomToggleForCurrency = React.forwardRef(({ children, onClick }, ref) =>
     </span>
 ));
 
-const CustomToggleForLanguage = React.forwardRef(({ children, onClick }, ref) => (
-    <span
-        ref={ref}
-        onClick={(e) => {
-            e.preventDefault();
-            onClick(e);
-        }}
-    >
-        {children}
-    </span>
-));
+// const CustomToggleForLanguage = React.forwardRef(({ children, onClick }, ref) => (
+//     <span
+//         ref={ref}
+//         onClick={(e) => {
+//             e.preventDefault();
+//             onClick(e);
+//         }}
+//     >
+//         {children}
+//     </span>
+// ));
 
 const Header = () => {
     const { t, i18n } = useTranslation();
     const currency = useSelector((state) => state.currency.currency);
-    const baseCurrency = useSelector((state) => state.currency.baseCurrency);
 
     const dispatch = useDispatch();
 

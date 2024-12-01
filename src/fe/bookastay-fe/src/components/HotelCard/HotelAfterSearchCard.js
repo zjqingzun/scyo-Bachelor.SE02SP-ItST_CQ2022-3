@@ -6,7 +6,6 @@ import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 import icons from "~/assets/icon";
 
 import "./HotelCard.scss";
-import { set } from "date-fns";
 
 const HotelAfterSearchCard = ({
     name,
@@ -40,8 +39,12 @@ const HotelAfterSearchCard = ({
     };
 
     useEffect(() => {
-        if (currency != nowCurrency.current) {
-            setNowPrice(convertCurrency(nowPrice, nowCurrency.current, currency, exchangeRate));
+        if (currency !== nowCurrency.current) {
+            if (currency === "VND") {
+                setNowPrice(price);
+            } else {
+                setNowPrice(convertCurrency(nowPrice, nowCurrency.current, currency, exchangeRate));
+            }
 
             nowCurrency.current = currency;
         }

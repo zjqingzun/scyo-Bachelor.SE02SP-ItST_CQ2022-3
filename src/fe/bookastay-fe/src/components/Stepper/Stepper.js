@@ -43,11 +43,6 @@ const Stepper = ({
                             className={`step ${isCurrent ? "step--current" : ""} ${
                                 isCompleted ? "step--completed" : ""
                             }`}
-                            onClick={() => {
-                                if (isCompleted) {
-                                    setCurrentStep(index + 1);
-                                }
-                            }}
                         >
                             <div className="step__title">{step.title}</div>
                             <div className="step__number">{index + 1}</div>

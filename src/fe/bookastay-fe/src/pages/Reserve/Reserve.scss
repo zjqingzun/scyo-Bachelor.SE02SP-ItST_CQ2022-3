@@ -1,0 +1,70 @@
+.reserve-page {
+    margin-top: 50px;
+
+    &__content {
+        margin-top: 60px;
+    }
+
+    .red-dot {
+        color: red;
+    }
+
+    .separate {
+        height: 1px;
+
+        margin: 35px -15px;
+
+        background: #1a4870;
+
+        &--vertical {
+            width: 1.5px;
+            height: auto;
+            margin: 0 20px;
+
+            background: #1a4870;
+        }
+    }
+
+    .form-check-input {
+        width: 1.5em;
+        height: 1.5em;
+        margin-top: 0;
+    }
+
+    .slide {
+        max-height: 0;
+        opacity: 0;
+        visibility: hidden;
+
+        transition: opacity 1s, visibility 1s, max-height 0.5s;
+
+        &--active {
+            max-height: 1000px;
+            opacity: 1;
+            visibility: visible;
+        }
+    }
+
+    &__change {
+        position: relative;
+        padding: 10px;
+        margin: 0 -10px;
+        color: #006ce4;
+
+        &:hover {
+            background-color: rgba(0, 108, 228, 0.06);
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    }
+}
+
+.reserve-container {
+    border: 2px solid #1a4870;
+    border-radius: 15px;
+    padding: 40px;
+
+    background: #fff;
+
+    box-shadow: -4px 4px 6px 0px rgba(0, 0, 0, 0.25);
+}

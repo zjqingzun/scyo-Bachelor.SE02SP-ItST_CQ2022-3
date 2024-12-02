@@ -42,5 +42,20 @@
             "good": "Good: 7 points or more",
             "pleasant": "Pleasant: 6 points or more"
         }
+    },
+    "calendar": {
+        "sunday": "Su",
+        "monday": "Mo",
+        "tuesday": "Tu",
+        "wednesday": "We",
+        "thursday": "Th",
+        "friday": "Fr",
+        "saturday": "Sa",
+        "ok": "OK",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "hours": "Hours",
+        "minutes": "Minutes",
+        "seconds": "Seconds"
     }
 }

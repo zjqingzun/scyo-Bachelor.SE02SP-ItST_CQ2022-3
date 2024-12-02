@@ -41,5 +41,20 @@
             "good": "Tốt: 7 điểm trở lên",
             "pleasant": "Dễ chịu: 6 điểm trở lên"
         }
+    },
+    "calendar": {
+        "sunday": "CN",
+        "monday": "T2",
+        "tuesday": "T3",
+        "wednesday": "T4",
+        "thursday": "T5",
+        "friday": "T6",
+        "saturday": "T7",
+        "ok": "OK",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "hours": "Giờ",
+        "minutes": "Phút",
+        "seconds": "Giây"
     }
 }

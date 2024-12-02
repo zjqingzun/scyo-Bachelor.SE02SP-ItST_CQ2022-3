@@ -5,6 +5,8 @@ const icons = {
     vietnamIcon: require("~/assets/icon/vietnam-icon.svg").default,
     englishIcon: require("~/assets/icon/english-icon.svg").default,
     yellowStarIcon: require("~/assets/icon/yellow-star-icon.svg").default,
+    chevronDownIcon: require("~/assets/icon/chevron-down-icon.svg").default,
+    chevronUpIcon: require("~/assets/icon/chevron-up-icon.svg").default,
 };
 
 export default icons;

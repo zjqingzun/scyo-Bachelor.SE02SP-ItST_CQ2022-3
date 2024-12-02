@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
+import { Dropdown } from "react-bootstrap";
+import { Link } from "react-router-dom";
+
+import icons from "~/assets/icon";
 import { setCurrency } from "~/redux/action/currencyAction";
 
 import "./Header.scss";
-
-import icons from "~/assets/icon";
-import { Dropdown } from "react-bootstrap";
 
 const CustomToggleForCurrency = React.forwardRef(({ children, onClick }, ref) => (
     <span
@@ -66,7 +67,9 @@ const Header = () => {
 
     return (
         <header className="header">
-            <span className="header__name">BookaStay</span>
+            <Link to="/">
+                <span className="header__name">BookaStay</span>
+            </Link>
 
             <div className="header__actions">
                 <a href="#!" className="header__list-property-btn">

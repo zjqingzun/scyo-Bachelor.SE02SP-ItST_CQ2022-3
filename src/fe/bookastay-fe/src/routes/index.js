@@ -7,6 +7,7 @@ import About from "../pages/AboutUs";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import AfterSearch from "../pages/AfterSearch";
+import Reserve from "~/pages/Reserve/Reserve";
 
 const publicRoutes = [
     {
@@ -20,6 +21,10 @@ const publicRoutes = [
     {
         path: "/after-search",
         component: AfterSearch,
+    },
+    {
+        path: "/reserve",
+        component: Reserve,
     },
     {
         path: "/login",

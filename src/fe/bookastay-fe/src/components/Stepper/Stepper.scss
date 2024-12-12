@@ -1,0 +1,72 @@
+.stepper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+    max-width: 800px;
+
+    position: relative;
+}
+
+.stepper .step {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+
+    &__title {
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: #1a4870;
+        margin-bottom: 10px;
+    }
+
+    &__number {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #81bff5;
+        color: #fff;
+        font-size: 1.6rem;
+        font-weight: 600;
+
+        z-index: 9;
+
+        transition: background-color 0.5s ease;
+    }
+
+    &--current {
+        .step__number {
+            background-color: #1a4870;
+        }
+    }
+
+    &--completed {
+        .step__number {
+            background-color: #1a4870;
+        }
+    }
+}
+
+.stepper .progress-bar {
+    position: absolute;
+
+    left: 0;
+    top: 70%;
+
+    height: 5px;
+    background-color: #81bff5;
+
+    &__progress {
+        height: 100%;
+        background-color: #1a4870;
+
+        transition: width 0.5s ease;
+    }
+}

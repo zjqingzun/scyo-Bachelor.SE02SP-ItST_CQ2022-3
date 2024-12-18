@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&family=Gravitas+One&family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    font-family: "Geologica", serif;
+}
+
+.breadcrumb {
+    list-style: none;
+    padding: 0;
+}
+
+.property-images .main-img {
+    width: 100%;
+    height: 450px;
+    /* Tăng chiều cao cho hình ảnh chính */
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.property-images .thumbnail {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.rating-header {
+    gap: 15px;
+}
+
+.rating-header .score {
+    font-size: 6rem;
+}
+
+.rating-header .review-text {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.review-slider {
+    gap: 20px;
+}
+
+.review-card-container {
+    display: flex;
+    overflow: hidden;
+    gap: 15px;
+}
+
+.review-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    width: 250px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background-color: #ffffff;
+}
+
+.review-card .profile-pic {
+    background-color: #ddd;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+}
+
+.review-card .name {
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.review-card .comment {
+    color: #555;
+    font-size: 1.1rem;
+}
+
+.location-icon {
+    width: 15px;
+}
+
+.star-icon, .star-half-icon, .star-half-yellow-icon {
+    width: 25px;
+    margin-right: 10px;
+    margin-bottom: 15px;
+}

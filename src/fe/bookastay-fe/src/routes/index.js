@@ -4,10 +4,11 @@ import { HeaderOnly } from "../components/Layout";
 // Pages
 import Home from "../pages/Home";
 import About from "../pages/AboutUs";
-import Login from "../pages/Login";
-import Register from "../pages/Register";
+import Login from "../pages/Login/login";
+import Register from "../pages/Register/register";
 import AfterSearch from "../pages/AfterSearch";
 import Reserve from "~/pages/Reserve/Reserve";
+import HotelDetails from "../pages/Hotel Details/hotelDetails";
 
 const publicRoutes = [
     {
@@ -36,6 +37,10 @@ const publicRoutes = [
         component: Register,
         layout: HeaderOnly,
     },
+    {
+        path: "/hotel-details",
+        component: HotelDetails,
+    }
 ];
 
 const privateRoutes = [];

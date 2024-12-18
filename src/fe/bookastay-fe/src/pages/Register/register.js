@@ -48,14 +48,14 @@ function RegisterForm() {
     };
 
     return (
-        <div className="p-5 d-flex justify-content-center align-items-center body">
-            <div className="login-container my-5 pt-5 pb-2 shadow-lg">
-                <h1 className='text-center mb-2 fs-1'>Create account!</h1>
+        <div className="p-4 d-flex justify-content-center align-items-center body">
+            <div className="login-container my-4 pt-5 pb-2 shadow-lg">
+                <h1 className='text-center mt-3 mb-3 fs-1'>Create account!</h1>
                 <form onSubmit={handleSubmit} id="registerForm" className='d-flex flex-column py-3'>
                     {/* Full Name */}
                     <input
                         type="text"
-                        className='form-control my-2'
+                        className='form-control my-2 py-3 fs-4'
                         name="name"
                         placeholder="Full name"
                         pattern="^[A-Za-zÀ-ÖØ-ÿ' -]{2,}( [A-Za-zÀ-ÖØ-ÿ' -]{2,}){1,2}$"
@@ -69,7 +69,7 @@ function RegisterForm() {
                     <div className="row g-2">
                         <div className="col-5">
                             <input
-                                className='form-control my-2'
+                                className='form-control my-2 py-3 fs-4'
                                 type="date"
                                 name="dob"
                                 placeholder="Date of Birth"
@@ -83,7 +83,7 @@ function RegisterForm() {
                         <div className="col-7">
                             <input
                                 type="text"
-                                className='form-control my-2'
+                                className='form-control my-2 py-3 fs-4'
                                 name="identifiedNumber"
                                 placeholder="Identified Number"
                                 pattern="^\d{9}|\d{12}$"
@@ -98,7 +98,7 @@ function RegisterForm() {
                     {/* Contact and Phone */}
                     <input
                         type="text"
-                        className='form-control my-2'
+                        className='form-control my-2 py-3 fs-4'
                         name="contact"
                         placeholder="Email"
                         pattern="^(\+?\d{1,3}[-.\s]?)?(\(?\d{1,4}\)?[-.\s]?)?\d{1,4}[-.\s]?\d{1,9}$|^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
@@ -108,7 +108,7 @@ function RegisterForm() {
                     />
                     <input
                         type="text"
-                        className='form-control my-2'
+                        className='form-control my-2 py-3 fs-4'
                         name="phoneNumber"
                         placeholder="Phone number"
                         pattern="^(\+?\d{1,3}[-.\s]?)?(\(?\d{1,4}\)?[-.\s]?)?\d{1,4}[-.\s]?\d{1,9}$"
@@ -120,7 +120,7 @@ function RegisterForm() {
                     {/* Password and Confirm Password */}
                     <input
                         type="password"
-                        className='form-control my-2'
+                        className='form-control my-2 py-3 fs-4'
                         name="password"
                         placeholder="Password"
                         pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$"
@@ -131,7 +131,7 @@ function RegisterForm() {
                     />
                     <input
                         type="password"
-                        className='form-control my-2'
+                        className='form-control my-2 py-3 fs-4'
                         name="confirmPassword"
                         placeholder="Confirm Password"
                         required
@@ -141,10 +141,10 @@ function RegisterForm() {
                     {passwordMessage && <span className="error-message">{passwordMessage}</span>}
 
                     {/* Agreement Checkbox */}
-                    <div className="form-agreement d-flex justify-content-start align-items-center">
+                    <div className="form-agreement d-flex justify-content-start align-items-center mb-4">
                         <input
                             type="checkbox"
-                            className='me-2 mt-1'
+                            className='me-2 mt-1 py-3 fs-4'
                             name="agree"d
                             id="agree"
                             checked={formData.agree}
@@ -157,7 +157,7 @@ function RegisterForm() {
                     {alertMessage && <span className="error-message">{alertMessage}</span>}
 
                     {/* Submit Button */}
-                    <input type="submit" className="my-4 py-2" value="Sign up" id="submitBtn" />
+                    <input type="submit" className="my-4 py-3" value="Sign up" id="submitBtn" />
                 </form>
                 <p className='text-center'>
                     Đã có tài khoản? <a href="/login">Đăng nhập</a>

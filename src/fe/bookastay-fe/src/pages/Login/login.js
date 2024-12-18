@@ -10,12 +10,12 @@ function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate('/dashboard'); // Chuyển hướng tới Dashboard
+    navigate('/'); // Chuyển hướng tới Dashboard
   };
 
   return (
-    <div className='p-5 d-flex justify-content-center align-items-center body'>
-      <div className='login-container my-5 p-5 shadow-lg'>
+    <div className='d-flex justify-content-center align-items-center body'>
+      <div className='login-container shadow-lg'>
         <h1 className='text-center my-3 fs-1'>Login</h1>
         <form onSubmit={handleSubmit} className='d-flex flex-column py-3'>
           <div className="mb-3">
@@ -24,7 +24,7 @@ function Login() {
             </label>
             <input
               type="email"
-              className="form-control"
+              className="form-control py-3 fs-4 mb-3"
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -38,7 +38,7 @@ function Login() {
             </label>
             <input
               type="password"
-              className="form-control"
+              className="form-control py-3 fs-4"
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -53,9 +53,10 @@ function Login() {
                 </div>
                 <a id="forgetPassword" href="#">Quên mật khẩu?</a>
             </div>
-          <input type="submit" className="login my-3 py-2" value="OK" />
+          <input type="submit" className="login mb-0 py-2 mt-5" value="OK" />
 
         </form>
+        <p className='text-center mt-5 mb-0'>Chưa có tài khoản? <a href="/register">Đăng ký</a></p>
       </div>
     </div>
   );

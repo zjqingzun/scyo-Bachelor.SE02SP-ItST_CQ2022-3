@@ -9,6 +9,9 @@ import Register from "../pages/Register";
 import AfterSearch from "../pages/AfterSearch";
 import Reserve from "~/pages/Reserve/Reserve";
 
+// Hotel Owner Pages
+import RegisterHotel from "~/pages/HotelOwner/RegisterHotel/RegisterHotel";
+
 const publicRoutes = [
     {
         path: "/",
@@ -34,6 +37,19 @@ const publicRoutes = [
     {
         path: "/register",
         component: Register,
+        layout: HeaderOnly,
+    },
+    {
+        path: "/hotel-owner/register-hotel",
+        component: RegisterHotel,
+        layout: HeaderOnly,
+    },
+];
+
+const hotelOwnerRoutes = [
+    {
+        path: "/hotel-owner/register-hotel",
+        component: RegisterHotel,
         layout: HeaderOnly,
     },
 ];

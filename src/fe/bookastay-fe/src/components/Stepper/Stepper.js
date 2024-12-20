@@ -16,12 +16,12 @@ const Stepper = ({
     });
 
     const calculateProgressBarWidth = () => {
-        return ((currentStep - 1) / (stepsConfig.length - 1)) * 100;
+        return Math.ceil(((currentStep - 1) / (stepsConfig.length - 1)) * 100);
     };
 
     useEffect(() => {
         setMargins({
-            marginLeft: stepRef.current[0].offsetWidth / 2,
+            marginLeft: Math.ceil(stepRef.current[0].offsetWidth / 2),
             marginRight: stepRef.current[stepsConfig.length - 1].offsetWidth / 2,
         });
     }, [stepRef, stepsConfig.length]);

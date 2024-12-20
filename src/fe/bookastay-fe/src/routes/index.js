@@ -1,5 +1,5 @@
 // Layouts
-import { HeaderOnly } from "../components/Layout";
+import { HeaderOnly, HotelOwnerLayout } from "../components/Layout";
 
 // Pages
 import Home from "../pages/Home";
@@ -11,6 +11,7 @@ import Reserve from "~/pages/Reserve/Reserve";
 
 // Hotel Owner Pages
 import RegisterHotel from "~/pages/HotelOwner/RegisterHotel/RegisterHotel";
+import { Dashboard } from "~/pages/HotelOwner";
 
 const publicRoutes = [
     {
@@ -43,6 +44,11 @@ const publicRoutes = [
         path: "/hotel-owner/register-hotel",
         component: RegisterHotel,
         layout: HeaderOnly,
+    },
+    {
+        path: "/hotel-owner",
+        component: Dashboard,
+        layout: HotelOwnerLayout,
     },
 ];
 

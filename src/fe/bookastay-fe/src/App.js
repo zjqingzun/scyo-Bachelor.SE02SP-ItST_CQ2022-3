@@ -5,12 +5,14 @@ import { publicRoutes } from "./routes";
 import DefaultLayout from "./components/Layout/DefaultLayout";
 import { Fragment } from "react";
 import { Suspense } from "react";
+import { ToastContainer } from "react-toastify";
 
 function App() {
     return (
         <Router>
             <Suspense fallback="...is loading">
                 <div className="App">
+                    <ToastContainer />
                     <Routes>
                         {publicRoutes.map((route, index) => {
                             const Page = route.component;

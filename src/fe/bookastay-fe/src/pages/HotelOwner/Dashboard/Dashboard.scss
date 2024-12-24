@@ -1,0 +1,48 @@
+.dashboard {
+    &__group {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+
+        margin-bottom: 20px;
+    }
+
+    &__cards {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 20px;
+    }
+}
+
+.dashboard-card {
+    display: flex;
+    flex-wrap: wrap;
+
+    &__label {
+        font-size: 1.4rem;
+        color: #5d6679;
+    }
+
+    &__info {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    &__desc {
+        font-size: 2rem !important;
+        color: #5d6679 !important;
+        margin-bottom: 0px !important;
+    }
+
+    &__value {
+        font-size: 2.4rem;
+        font-weight: 600;
+        color: #1366d9;
+    }
+}

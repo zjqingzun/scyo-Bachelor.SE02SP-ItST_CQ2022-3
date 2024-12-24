@@ -1,5 +1,5 @@
 // Layouts
-import { HeaderOnly } from "../components/Layout";
+import { HeaderOnly, HotelOwnerLayout } from "../components/Layout";
 
 // Pages
 import Home from "../pages/Home";
@@ -9,6 +9,10 @@ import Register from "../pages/Register/register";
 import AfterSearch from "../pages/AfterSearch";
 import Reserve from "~/pages/Reserve/Reserve";
 import HotelDetails from "../pages/Hotel Details/hotelDetails";
+
+// Hotel Owner Pages
+import RegisterHotel from "~/pages/HotelOwner/RegisterHotel/RegisterHotel";
+import { Dashboard, Room, Guest, AddRoom } from "~/pages/HotelOwner";
 
 const publicRoutes = [
     {
@@ -38,6 +42,43 @@ const publicRoutes = [
         layout: HeaderOnly,
     },
     {
+        path: "/hotel-owner/register-hotel",
+        component: RegisterHotel,
+        layout: HeaderOnly,
+    },
+    {
+        path: "/hotel-owner/dashboard",
+        component: Dashboard,
+        layout: HotelOwnerLayout,
+    },
+    {
+        path: "/hotel-owner/room",
+        component: Room,
+        layout: HotelOwnerLayout,
+    },
+    {
+        path: "/hotel-owner/guest",
+        component: Guest,
+        layout: HotelOwnerLayout,
+    },
+    {
+        path: "/hotel-owner",
+        component: Dashboard,
+        layout: HotelOwnerLayout,
+    },
+    {
+        path: "/hotel-owner/room/add-room",
+        component: AddRoom,
+        layout: HotelOwnerLayout,
+    }
+];
+
+const hotelOwnerRoutes = [
+    {
+        path: "/hotel-owner/register-hotel",
+        component: RegisterHotel,
+        layout: HeaderOnly,
+    },
         path: "/hotel-details",
         component: HotelDetails,
     }

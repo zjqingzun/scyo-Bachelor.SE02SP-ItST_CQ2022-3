@@ -25,6 +25,7 @@ const AddRoom = () => {
 
     const [openEditModal, setOpenEditModal] = useState(false);
     const editedRoomRef = useRef(null);
+    const actionRef = useRef(null);
 
     const filteredRooms = useMemo(() => {
         return rooms.filter((room) => room.roomNumber.includes(searchTerm));
@@ -70,6 +71,8 @@ const AddRoom = () => {
     }, []);
 
     const addRoom = useCallback(() => {
+        actionRef.current = "add";
+
         setRooms((prevRooms) => {
             const maxRoomNumber = prevRooms.reduce((max, room) => {
                 const roomNumber = room.roomNumber.split("-")[1];
@@ -81,9 +84,14 @@ const AddRoom = () => {
             return [...prevRooms, { roomNumber: `${prefix}-${newRoomNumber}`, id: uuidv4() }];
         });
         setNumberOfRooms((prevRooms) => prevRooms + 1);
+
+        const roomList = document.getElementById("roomList");
+        roomList.scrollTop = roomList.scrollHeight;
     }, [prefix, startingRoomNumber]);
 
     const removeRoom = useCallback((roomId) => {
+        actionRef.current = "remove";
+
         setRooms((prevRooms) => prevRooms.filter((room) => room.id !== roomId));
         setNumberOfRooms((prevRooms) => prevRooms - 1);
         setSelectedRooms(new Set()); // Reset selected rooms
@@ -123,6 +131,17 @@ const AddRoom = () => {
             )
         );
     }, []);
+
+    useEffect(() => {
+        if (actionRef && actionRef.current) {
+            if (actionRef.current === "add") {
+                const roomList = document.getElementById("roomList");
+                roomList.scrollTop = roomList.scrollHeight;
+            }
+
+            actionRef.current = "";
+        }
+    }, [rooms]);
 
     const showEditModal = (roomNumber) => {
         editedRoomRef.current = roomNumber;
@@ -251,6 +270,7 @@ const AddRoom = () => {
                         </div>
 
                         <div
+                            id="roomList"
                             style={{
                                 maxHeight: "160px",
                                 overflowY: "auto",
@@ -293,7 +313,12 @@ const AddRoom = () => {
                         </div>
 
                         <div className="form-group">
-                            <button type="button" onClick={addRoom}>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    addRoom();
+                                }}
+                            >
                                 <IoAddCircleOutline color="blue" size={30} />
                             </button>
                         </div>

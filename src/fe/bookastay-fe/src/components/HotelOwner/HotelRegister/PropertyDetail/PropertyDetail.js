@@ -258,33 +258,6 @@ const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () 
                                 <div className="invalid-feedback">{formik.errors.hotelWard}</div>
                             </div>
                         </div>
-                        <div className="row row-cols-lg-2 mb-3">
-                            <div className="col">
-                                <label htmlFor="hotelFloor" className="form-label">
-                                    Number of floors
-                                </label>
-                                <input
-                                    type="number"
-                                    min={1}
-                                    className="form-control form-control-lg fs-4"
-                                    id="hotelFloor"
-                                />
-                                <div className="invalid-feedback"></div>
-                            </div>
-
-                            <div className="col">
-                                <label htmlFor="hotelRoom" className="form-label">
-                                    Number room per floor
-                                </label>
-                                <input
-                                    type="number"
-                                    min={1}
-                                    className="form-control form-control-lg fs-4"
-                                    id="hotelRoom"
-                                />
-                                <div className="invalid-feedback"></div>
-                            </div>
-                        </div>
                     </div>
                     <div className="col">
                         <div className="mb-3">

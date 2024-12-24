@@ -11,7 +11,7 @@ import Reserve from "~/pages/Reserve/Reserve";
 
 // Hotel Owner Pages
 import RegisterHotel from "~/pages/HotelOwner/RegisterHotel/RegisterHotel";
-import { Dashboard } from "~/pages/HotelOwner";
+import { Dashboard, Room, Guest, AddRoom } from "~/pages/HotelOwner";
 
 const publicRoutes = [
     {
@@ -46,10 +46,30 @@ const publicRoutes = [
         layout: HeaderOnly,
     },
     {
+        path: "/hotel-owner/dashboard",
+        component: Dashboard,
+        layout: HotelOwnerLayout,
+    },
+    {
+        path: "/hotel-owner/room",
+        component: Room,
+        layout: HotelOwnerLayout,
+    },
+    {
+        path: "/hotel-owner/guest",
+        component: Guest,
+        layout: HotelOwnerLayout,
+    },
+    {
         path: "/hotel-owner",
         component: Dashboard,
         layout: HotelOwnerLayout,
     },
+    {
+        path: "/hotel-owner/room/add-room",
+        component: AddRoom,
+        layout: HotelOwnerLayout,
+    }
 ];
 
 const hotelOwnerRoutes = [

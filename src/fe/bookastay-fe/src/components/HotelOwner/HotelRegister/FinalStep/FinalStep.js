@@ -122,7 +122,7 @@ const FinalStep = ({ handlePrev = () => {}, formData = {} }) => {
                                     style={{ background: "#227B94" }}
                                     onClick={() => checkValidation()}
                                 >
-                                    Next
+                                    Finish
                                 </button>
                             </div>
                         </Card.Body>

@@ -28,7 +28,7 @@ const DenseNavLink = styled(NavLink).withConfig({
 
 const links = [
     {
-        to: "/hotel-owner",
+        to: "/hotel-owner/dashboard",
         icon: IoHome,
         label: "Dashboard",
     },
@@ -38,7 +38,7 @@ const links = [
         label: "Guest",
     },
     {
-        to: "/hotel-owner/rooms",
+        to: "/hotel-owner/room",
         icon: FaBookmark,
         label: "Rooms",
     },
@@ -61,7 +61,7 @@ const NavLinksGroup = (props) => {
                 </LinkGroup>
             ) : (
                 <LinkGroup>
-                    {links.map((link) => (
+                    {links.map((link, index) => (
                         <NavLink
                             compact={props.compact}
                             key={link.to}

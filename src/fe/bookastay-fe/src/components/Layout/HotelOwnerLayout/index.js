@@ -41,7 +41,7 @@ const HotelOwnerLayout = ({ children }) => {
             <GridHeader>
                 <Header toggle={toggle} />
             </GridHeader>
-            <GridContent className="container">
+            <GridContent className="container mt-5">
                 <div className="content">{children}</div>
             </GridContent>
         </Grid>

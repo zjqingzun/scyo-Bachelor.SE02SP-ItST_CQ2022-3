@@ -12,7 +12,7 @@ import HotelDetails from "../pages/Hotel Details/hotelDetails";
 
 // Hotel Owner Pages
 import RegisterHotel from "~/pages/HotelOwner/RegisterHotel/RegisterHotel";
-import { Dashboard, Room, Guest, AddRoom } from "~/pages/HotelOwner";
+import { Dashboard, Room, Guest, AddRoom, RoomType } from "~/pages/HotelOwner";
 
 const publicRoutes = [
     {
@@ -70,7 +70,12 @@ const publicRoutes = [
         path: "/hotel-owner/room/add-room",
         component: AddRoom,
         layout: HotelOwnerLayout,
-    }
+    },
+    {
+        path: "/hotel-owner/room-type",
+        component: RoomType,
+        layout: HotelOwnerLayout,
+    },
 ];
 
 const hotelOwnerRoutes = [
@@ -79,9 +84,10 @@ const hotelOwnerRoutes = [
         component: RegisterHotel,
         layout: HeaderOnly,
     },
+    {
         path: "/hotel-details",
         component: HotelDetails,
-    }
+    },
 ];
 
 const privateRoutes = [];

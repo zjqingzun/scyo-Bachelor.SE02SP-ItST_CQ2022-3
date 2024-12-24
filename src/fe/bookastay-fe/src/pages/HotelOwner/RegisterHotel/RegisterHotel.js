@@ -1,4 +1,5 @@
 import { useEffect, useReducer, useState } from "react";
+import { Button, Result } from "antd";
 
 import Stepper from "~/components/Stepper/Stepper";
 import {
@@ -40,6 +41,7 @@ const RegisterHotel = () => {
     const [formData, dispatch] = useReducer(formReducer, {
         propertyDetails: {},
         images: [],
+        payment: {},
     });
 
     const persistData = () => {
@@ -69,32 +71,65 @@ const RegisterHotel = () => {
         }
     };
 
+    const handleComplete = () => {
+        setIsComplete(true);
+        console.log(">>> Completed");
+        console.log(">>> persist data", formData);
+    };
+
     return (
         <div className="register-hotel mt-5">
-            <Stepper stepsConfig={stepsConfig} currentStep={currentStep} />
+            {isComplete ? (
+                <Result
+                    status="success"
+                    title="Successfully registered"
+                    subTitle="Your hotel has been successfully registered."
+                    extra={[
+                        <Button
+                            type="primary"
+                            key="console"
+                            onClick={() => {
+                                setIsComplete(false);
+                                setCurrentStep(1);
+                            }}
+                        >
+                            Go to dashboard
+                        </Button>,
+                    ]}
+                />
+            ) : (
+                <>
+                    <Stepper stepsConfig={stepsConfig} currentStep={currentStep} />
 
-            <div className="register-hotel__content mt-5">
-                <div className="register-hotel__form">
-                    {currentStep === 1 && (
-                        <PropertyDetail
-                            formData={formData.propertyDetails}
-                            updateData={(data) => updateStepData("propertyDetails", data)}
-                            handleNext={handleNextStep}
-                        />
-                    )}
-                    {currentStep === 2 && (
-                        <HotelImages
-                            handleNext={handleNextStep}
-                            formData={formData.images}
-                            updateData={(data) => updateStepData("images", data)}
-                            handlePrev={handlePrevStep}
-                        />
-                    )}
-                    {currentStep === 3 && (
-                        <FinalStep handlePrev={handlePrevStep} formData={formData} />
-                    )}
-                </div>
-            </div>
+                    <div className="register-hotel__content mt-5">
+                        <div className="register-hotel__form">
+                            {currentStep === 1 && (
+                                <PropertyDetail
+                                    formData={formData.propertyDetails}
+                                    updateData={(data) => updateStepData("propertyDetails", data)}
+                                    handleNext={handleNextStep}
+                                />
+                            )}
+                            {currentStep === 2 && (
+                                <HotelImages
+                                    handleNext={handleNextStep}
+                                    formData={formData.images}
+                                    updateData={(data) => updateStepData("images", data)}
+                                    handlePrev={handlePrevStep}
+                                />
+                            )}
+                            {currentStep === 3 && (
+                                <FinalStep
+                                    handlePrev={handlePrevStep}
+                                    formData={formData}
+                                    updateData={(data) => updateStepData("payment", data)}
+                                    handleComplete={handleComplete}
+                                />
+                            )}
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
     );
 };

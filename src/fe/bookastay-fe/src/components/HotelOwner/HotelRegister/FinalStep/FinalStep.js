@@ -1,8 +1,16 @@
 import { Card, Form } from "react-bootstrap";
-import "./FinalStep.scss";
 import { useState } from "react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
-const FinalStep = ({ handlePrev = () => {}, formData = {} }) => {
+import "./FinalStep.scss";
+
+const FinalStep = ({
+    handlePrev = () => {},
+    formData = {},
+    updateData = () => {},
+    handleComplete = () => {},
+}) => {
     const [isOnlinePayment, setIsOnlinePayment] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState("");
     const [paymentNumber, setPaymentNumber] = useState("");
@@ -20,7 +28,41 @@ const FinalStep = ({ handlePrev = () => {}, formData = {} }) => {
                 return;
             }
         }
+
+        formik.setTouched({
+            doubleRoomPrice: true,
+            quadRoomPrice: true,
+        });
+
+        if (formik.isValid && formik.dirty) {
+            updateData({
+                isOnlinePayment,
+                paymentMethod,
+                paymentNumber,
+                doubleRoomPrice: formik.values.doubleRoomPrice,
+                quadRoomPrice: formik.values.quadRoomPrice,
+            });
+            handleComplete();
+        }
     };
+
+    const formik = useFormik({
+        initialValues: {
+            doubleRoomPrice: "",
+            quadRoomPrice: "",
+        },
+        validationSchema: Yup.object({
+            doubleRoomPrice: Yup.number()
+                .positive("Room price must be a positive number.")
+                .required("Required"),
+            quadRoomPrice: Yup.number()
+                .positive("Room price must be a positive number.")
+                .required("Required"),
+        }),
+        onSubmit: (values) => {
+            console.log(values);
+        },
+    });
 
     return (
         <div className="final-step">
@@ -103,31 +145,81 @@ const FinalStep = ({ handlePrev = () => {}, formData = {} }) => {
                                     </div>
                                 )}
                             </div>
-
-                            <div className="d-flex justify-content-end gap-2 mt-3">
-                                <button
-                                    className="btn btn-secondary btn-lg fs-3 px-4"
-                                    style={{
-                                        background: "transparent",
-                                        border: "1px solid #227B94",
-                                        color: "#227B94",
-                                    }}
-                                    onClick={() => handlePrev()}
-                                >
-                                    Back
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-success btn-lg fs-3 px-4"
-                                    style={{ background: "#227B94" }}
-                                    onClick={() => checkValidation()}
-                                >
-                                    Finish
-                                </button>
+                        </Card.Body>
+                    </Card>
+                </div>
+                <div className="col-6">
+                    <h2>Price</h2>
+                    <Card>
+                        <Card.Body>
+                            <div className="p-3">
+                                <p className="h3">Enter price of two base room type?</p>
+                                <Form.Group className="mt-3">
+                                    <Form.Label className="fs-4">Double Room</Form.Label>
+                                    <Form.Control
+                                        size="lg"
+                                        type="number"
+                                        name="doubleRoomPrice"
+                                        value={formik.values.doubleRoomPrice}
+                                        placeholder="Price of double room type"
+                                        className={`fs-4 mt-3  ${
+                                            formik.errors.doubleRoomPrice &&
+                                            formik.touched.doubleRoomPrice
+                                                ? "is-invalid"
+                                                : ""
+                                        }`}
+                                        onChange={formik.handleChange}
+                                    />
+                                    <div className="invalid-feedback">
+                                        {formik.errors.doubleRoomPrice}
+                                    </div>
+                                </Form.Group>
+                                <Form.Group className="mt-3">
+                                    <Form.Label className="fs-4">Quad Room</Form.Label>
+                                    <Form.Control
+                                        size="lg"
+                                        type="number"
+                                        name="quadRoomPrice"
+                                        value={formik.values.quadRoomPrice}
+                                        placeholder="Price of quad room type"
+                                        className={`fs-4 mt-3 ${
+                                            formik.errors.quadRoomPrice &&
+                                            formik.touched.quadRoomPrice
+                                                ? "is-invalid"
+                                                : ""
+                                        }`}
+                                        onChange={formik.handleChange}
+                                    />
+                                    <div className="invalid-feedback">
+                                        {formik.errors.quadRoomPrice}
+                                    </div>
+                                </Form.Group>
                             </div>
                         </Card.Body>
                     </Card>
                 </div>
+            </div>
+
+            <div className="d-flex justify-content-end gap-2 mt-3">
+                <button
+                    className="btn btn-secondary btn-lg fs-3 px-4"
+                    style={{
+                        background: "transparent",
+                        border: "1px solid #227B94",
+                        color: "#227B94",
+                    }}
+                    onClick={() => handlePrev()}
+                >
+                    Back
+                </button>
+                <button
+                    type="button"
+                    className="btn btn-success btn-lg fs-3 px-4"
+                    style={{ background: "#227B94" }}
+                    onClick={() => checkValidation()}
+                >
+                    Finish
+                </button>
             </div>
         </div>
     );

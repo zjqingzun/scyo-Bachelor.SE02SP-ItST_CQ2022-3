@@ -15,8 +15,6 @@ const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () 
             hotelCity: "",
             hotelDistrict: "",
             hotelWard: "",
-            // hotelFloor: "",
-            // hotelRoom: "",
             hotelStar: "N/A",
         },
         validationSchema: Yup.object({
@@ -25,8 +23,6 @@ const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () 
             hotelCity: Yup.string().required("City is required"),
             hotelDistrict: Yup.string().required("District is required"),
             hotelWard: Yup.string().required("Ward is required"),
-            // hotelFloor: Yup.number().required("Number of floors is required"),
-            // hotelRoom: Yup.number().required("Number of rooms is required"),
         }),
         onSubmit: (values) => {
             console.log(values);
@@ -61,8 +57,6 @@ const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () 
             hotelCity: formData.hotelCity || "",
             hotelDistrict: formData.hotelDistrict || "",
             hotelWard: formData.hotelWard || "",
-            // hotelFloor: formData.hotelFloor || "",
-            // hotelRoom: formData.hotelRoom || "",
             hotelStar: formData.hotelStar || "N/A",
         });
     }, []);
@@ -127,7 +121,22 @@ const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () 
         formik.handleSubmit();
 
         if (formik.isValid && formik.dirty) {
-            updateData(formik.values);
+            const selectedProvince = provinces.find(
+                (province) => province.id === formik.values.hotelCity
+            );
+            const selectedDistrict = districts.find(
+                (district) => district.id === formik.values.hotelDistrict
+            );
+            const selectedWard = wards.find((ward) => ward.id === formik.values.hotelWard);
+
+            const address = {
+                province: selectedProvince.name,
+                district: selectedDistrict.name,
+                ward: selectedWard.name,
+                detail: formik.values.hotelAddress,
+            };
+
+            updateData({ ...formik.values, address });
             handleNext();
         }
     };

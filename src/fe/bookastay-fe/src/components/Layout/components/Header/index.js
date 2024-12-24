@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
-import { Dropdown } from "react-bootstrap";
+import { Dropdown as BDropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { Drawer } from "antd";
+import { DownOutlined } from "@ant-design/icons";
 
 import icons from "~/assets/icon";
 import { setCurrency } from "~/redux/action/currencyAction";
@@ -42,6 +44,8 @@ const Header = () => {
 
     const [language, setLanguage] = useState("English");
 
+    const [openDrawer, setOpenDrawer] = useState(false);
+
     useEffect(() => {
         if (localStorage.getItem("i18nextLng")) {
             if (localStorage.getItem("i18nextLng") === "vi") {
@@ -66,90 +70,192 @@ const Header = () => {
     // console.log("baseCurrency", baseCurrency);
 
     return (
-        <header className="header">
-            <Link to="/">
-                <span className="header__name">BookaStay</span>
-            </Link>
+        <>
+            <header className="header">
+                <Link to="/">
+                    <span className="header__name">BookaStay</span>
+                </Link>
 
-            <div className="header__actions">
-                <a href="#!" className="header__list-property-btn">
-                    {t("header.listYourProperty")}
-                </a>
+                <div className="header__actions">
+                    <a href="#!" className="header__list-property-btn">
+                        {t("header.listYourProperty")}
+                    </a>
 
-                <div className="header__currency-group" style={{ width: "40px" }}>
-                    <Dropdown>
-                        <Dropdown.Toggle as={CustomToggleForCurrency}>{currency}</Dropdown.Toggle>
+                    <div className="header__currency-group" style={{ width: "40px" }}>
+                        <BDropdown>
+                            <BDropdown.Toggle as={CustomToggleForCurrency}>
+                                {currency}
+                            </BDropdown.Toggle>
 
-                        <Dropdown.Menu>
-                            <Dropdown.Item
-                                eventKey="VND"
-                                onClick={() => handleChangeCurrency("VND")}
-                            >
-                                <span className="fs-3">VND ₫</span>
-                            </Dropdown.Item>
-                            <Dropdown.Item
-                                eventKey="USD"
-                                onClick={() => handleChangeCurrency("USD")}
-                            >
-                                <span className="fs-3">USD $</span>
-                            </Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
-                    {/* <span className="header__currency-icon"></span> */}
+                            <BDropdown.Menu>
+                                <BDropdown.Item
+                                    eventKey="VND"
+                                    onClick={() => handleChangeCurrency("VND")}
+                                >
+                                    <span className="fs-3">VND ₫</span>
+                                </BDropdown.Item>
+                                <BDropdown.Item
+                                    eventKey="USD"
+                                    onClick={() => handleChangeCurrency("USD")}
+                                >
+                                    <span className="fs-3">USD $</span>
+                                </BDropdown.Item>
+                            </BDropdown.Menu>
+                        </BDropdown>
+                        {/* <span className="header__currency-icon"></span> */}
+                    </div>
+
+                    <div className="header__language-group">
+                        <BDropdown onSelect={(e) => setLanguage(e)}>
+                            <BDropdown.Toggle as={CustomToggleForCurrency}>
+                                <img
+                                    src={
+                                        language === "Vietnam"
+                                            ? icons.vietnamIcon
+                                            : icons.englishIcon
+                                    }
+                                    alt=""
+                                    className="header__language-icon"
+                                ></img>
+                            </BDropdown.Toggle>
+
+                            <BDropdown.Menu>
+                                <BDropdown.Item
+                                    eventKey="Vietnam"
+                                    onClick={() => handleChangeLanguage("vi")}
+                                >
+                                    <span className="fs-3">Vietnam</span>
+                                </BDropdown.Item>
+                                <BDropdown.Item
+                                    eventKey="English"
+                                    onClick={() => handleChangeLanguage("en")}
+                                >
+                                    <span className="fs-3">English</span>
+                                </BDropdown.Item>
+                            </BDropdown.Menu>
+                        </BDropdown>
+                    </div>
+
+                    <a href="#!" className="header__about">
+                        <img
+                            src={icons.questionIcon}
+                            alt=""
+                            className="header__about-icon header__icon"
+                        />
+                    </a>
+
+                    <a href="#!" className="header__notify">
+                        <img
+                            src={icons.bellIcon}
+                            alt=""
+                            className="header__notify-icon header__icon"
+                        />
+                    </a>
+
+                    <a href="#!" className="header__setting" onClick={() => setOpenDrawer(true)}>
+                        <img
+                            src={icons.settingIcon}
+                            alt=""
+                            className="header__setting-icon header__icon"
+                        />
+                    </a>
+
+                    <a href="/login" className="header__sign-in-btn">
+                        {t("header.signIn")}
+                    </a>
                 </div>
+            </header>
 
-                <div className="header__language-group">
-                    <Dropdown onSelect={(e) => setLanguage(e)}>
-                        <Dropdown.Toggle as={CustomToggleForCurrency}>
-                            <img
-                                src={language === "Vietnam" ? icons.vietnamIcon : icons.englishIcon}
-                                alt=""
-                                className="header__language-icon"
-                            ></img>
-                        </Dropdown.Toggle>
+            <Drawer
+                title="Menu"
+                placement={"left"}
+                closable={true}
+                onClose={() => setOpenDrawer(false)}
+                open={openDrawer}
+                key={"left"}
+            >
+                <Link to="/">
+                    <span className="header__name">BookaStay</span>
+                </Link>
 
-                        <Dropdown.Menu>
-                            <Dropdown.Item
-                                eventKey="Vietnam"
-                                onClick={() => handleChangeLanguage("vi")}
-                            >
-                                <span className="fs-3">Vietnam</span>
-                            </Dropdown.Item>
-                            <Dropdown.Item
-                                eventKey="English"
-                                onClick={() => handleChangeLanguage("en")}
-                            >
-                                <span className="fs-3">English</span>
-                            </Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
+                <div className="d-flex flex-column gap-3 mt-3">
+                    <a href="#!" className="header__list-property-btn">
+                        {t("header.listYourProperty")}
+                    </a>
+
+                    <div className="header__currency-group" style={{ width: "40px" }}>
+                        <BDropdown>
+                            <BDropdown.Toggle as={CustomToggleForCurrency}>
+                                {currency}
+                            </BDropdown.Toggle>
+
+                            <BDropdown.Menu>
+                                <BDropdown.Item
+                                    eventKey="VND"
+                                    onClick={() => handleChangeCurrency("VND")}
+                                >
+                                    <span className="fs-3">VND ₫</span>
+                                </BDropdown.Item>
+                                <BDropdown.Item
+                                    eventKey="USD"
+                                    onClick={() => handleChangeCurrency("USD")}
+                                >
+                                    <span className="fs-3">USD $</span>
+                                </BDropdown.Item>
+                            </BDropdown.Menu>
+                        </BDropdown>
+                        {/* <span className="header__currency-icon"></span> */}
+                    </div>
+
+                    <div className="header__language-group">
+                        <BDropdown onSelect={(e) => setLanguage(e)}>
+                            <BDropdown.Toggle as={CustomToggleForCurrency}>
+                                <img
+                                    src={
+                                        language === "Vietnam"
+                                            ? icons.vietnamIcon
+                                            : icons.englishIcon
+                                    }
+                                    alt=""
+                                    className="header__language-icon"
+                                ></img>
+                            </BDropdown.Toggle>
+
+                            <BDropdown.Menu>
+                                <BDropdown.Item
+                                    eventKey="Vietnam"
+                                    onClick={() => handleChangeLanguage("vi")}
+                                >
+                                    <span className="fs-3">Vietnam</span>
+                                </BDropdown.Item>
+                                <BDropdown.Item
+                                    eventKey="English"
+                                    onClick={() => handleChangeLanguage("en")}
+                                >
+                                    <span className="fs-3">English</span>
+                                </BDropdown.Item>
+                            </BDropdown.Menu>
+                        </BDropdown>
+                    </div>
+
+                    <a href="#!" className="header__about">
+                        <img
+                            src={icons.questionIcon}
+                            alt=""
+                            className="header__about-icon header__icon"
+                        />
+                    </a>
+
+                    <a href="#!" className="header__notify">
+                        <img
+                            src={icons.bellIcon}
+                            alt=""
+                            className="header__notify-icon header__icon"
+                        />
+                    </a>
                 </div>
-
-                <a href="#!" className="header__about">
-                    <img
-                        src={icons.questionIcon}
-                        alt=""
-                        className="header__about-icon header__icon"
-                    />
-                </a>
-
-                <a href="#!" className="header__notify">
-                    <img src={icons.bellIcon} alt="" className="header__notify-icon header__icon" />
-                </a>
-
-                <a href="#!" className="header__setting">
-                    <img
-                        src={icons.settingIcon}
-                        alt=""
-                        className="header__setting-icon header__icon"
-                    />
-                </a>
-
-                <a href="/login" className="header__sign-in-btn">
-                    {t("header.signIn")}
-                </a>
-            </div>
-        </header>
+            </Drawer>
+        </>
     );
 };
 

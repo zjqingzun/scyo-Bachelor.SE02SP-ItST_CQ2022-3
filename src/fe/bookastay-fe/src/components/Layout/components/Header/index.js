@@ -145,7 +145,7 @@ const Header = () => {
                     />
                 </a>
 
-                <a href="#!" className="header__sign-in-btn">
+                <a href="/login" className="header__sign-in-btn">
                     {t("header.signIn")}
                 </a>
             </div>

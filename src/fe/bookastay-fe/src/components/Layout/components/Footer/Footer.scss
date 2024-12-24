@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&family=Gravitas+One&family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    font-family: "Geologica", serif;
+}
+
+.footer {
+    background-image: url('./image/image.png');
+    background-size: cover;
+    background-position: center;
+    padding: 0 50px;
+    color: #fff;
+    position: relative;
+}
+
+.footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Dark overlay */
+    z-index: 1;
+}
+
+.footer-content {
+    position: relative;
+    z-index: 2;
+    padding: 10px 30px 10px 50px;
+}
+
+.footer-left p {
+    font-size: 17px;
+    line-height: 1.6;
+    width: 85%;
+    font-style: normal;
+}
+
+.footer-right ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-right li {
+    margin-bottom: 10px;
+}
+
+.footer-right li a{
+    text-decoration: none;
+    color: #fff;
+}
+
+.footer-right li a:hover {
+    color: #f1f1f1;
+}
+
+.footer-bottom::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    /* Dark overlay */
+    height: 58px;
+    z-index: 1;
+}
+
+.footer-bottom p {
+    color: #d0d0d0;
+    z-index: 3;
+    opacity: 1;
+}

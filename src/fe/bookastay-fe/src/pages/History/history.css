@@ -1,0 +1,17 @@
+.clockRotateLeftIcon, .searchIcon {
+    width: 35px;
+}
+
+h1 {
+    font-size: 2.5em;
+}
+
+.history-card {
+    background-color: white;
+    border-radius: 10px;
+}
+
+.img-card {
+    width: 150px;
+    border-radius: 5px;
+}

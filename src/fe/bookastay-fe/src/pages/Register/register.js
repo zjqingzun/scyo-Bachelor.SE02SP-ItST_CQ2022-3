@@ -14,7 +14,7 @@ function RegisterForm() {
     });
 
     const [alertMessage, setAlertMessage] = useState('');
-    const [passwordMessage, setPasswordMessage] = useState('');
+    const [alertType, setAlertType] = useState(''); // 'success' or 'danger'
 
     // Handle input changes
     const handleChange = (e) => {
@@ -30,29 +30,40 @@ function RegisterForm() {
         e.preventDefault();
 
         if (!formData.agree) {
+            setAlertType('danger');
             setAlertMessage('Please agree to the privacy policy to sign up.');
             return;
         }
 
         if (formData.password !== formData.confirmPassword) {
-            setPasswordMessage('Passwords do not match!');
+            setAlertType('danger');
+            setAlertMessage('Passwords do not match!');
             return;
         }
 
-        // Clear alerts
-        setPasswordMessage('');
+        // Clear alert messages
         setAlertMessage('');
+        setAlertType('');
 
-        // Submit form data
+        // Simulate successful registration
+        setAlertType('success');
+        setAlertMessage('Registration successful!');
         console.log('Form submitted:', formData);
     };
 
     return (
         <div className="p-4 d-flex justify-content-center align-items-center body">
-            <div className="login-container my-4 pt-5 pb-2 shadow-lg">
+            <div className="register-container my-4 pt-5 pb-2 shadow-lg">
                 <h1 className='text-center mt-3 mb-3 fs-1'>Create account!</h1>
+
+                {/* Alert Section */}
+                {alertMessage && (
+                    <div className={`alert alert-${alertType} my-3`} role="alert">
+                        {alertMessage}
+                    </div>
+                )}
+
                 <form onSubmit={handleSubmit} id="registerForm" className='d-flex flex-column py-3'>
-                    {/* Full Name */}
                     <input
                         type="text"
                         className='form-control my-2 py-3 fs-4'
@@ -64,15 +75,12 @@ function RegisterForm() {
                         value={formData.name}
                         onChange={handleChange}
                     />
-
-                    {/* Date of Birth and ID */}
                     <div className="row g-2">
                         <div className="col-5">
                             <input
                                 className='form-control my-2 py-3 fs-4'
                                 type="date"
                                 name="dob"
-                                placeholder="Date of Birth"
                                 required
                                 min="1900-01-01"
                                 max="2024-10-30"
@@ -94,8 +102,6 @@ function RegisterForm() {
                             />
                         </div>
                     </div>
-
-                    {/* Contact and Phone */}
                     <input
                         type="text"
                         className='form-control my-2 py-3 fs-4'
@@ -116,8 +122,6 @@ function RegisterForm() {
                         value={formData.phoneNumber}
                         onChange={handleChange}
                     />
-
-                    {/* Password and Confirm Password */}
                     <input
                         type="password"
                         className='form-control my-2 py-3 fs-4'
@@ -138,14 +142,11 @@ function RegisterForm() {
                         value={formData.confirmPassword}
                         onChange={handleChange}
                     />
-                    {passwordMessage && <span className="error-message">{passwordMessage}</span>}
-
-                    {/* Agreement Checkbox */}
-                    <div className="form-agreement d-flex justify-content-start align-items-center mb-4">
+                    <div className="form-agreement d-flex justify-content-start align-items-center">
                         <input
                             type="checkbox"
                             className='me-2 mt-1 py-3 fs-4'
-                            name="agree"d
+                            name="agree"
                             id="agree"
                             checked={formData.agree}
                             onChange={handleChange}
@@ -154,13 +155,10 @@ function RegisterForm() {
                             I agree with your <a href="#">privacy</a>.
                         </label>
                     </div>
-                    {alertMessage && <span className="error-message">{alertMessage}</span>}
-
-                    {/* Submit Button */}
-                    <input type="submit" className="my-4 py-3" value="Sign up" id="submitBtn" />
+                    <input type="submit" className="mb-4 mt-5 py-3" value="Sign up" id="submitBtn" />
                 </form>
                 <p className='text-center'>
-                    Đã có tài khoản? <a href="/login">Đăng nhập</a>
+                    Have an account? <a href="/login">Login</a>
                 </p>
             </div>
         </div>

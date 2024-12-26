@@ -1,4 +1,4 @@
-.login-container {
+.register-container {
     background-color: #ffffff;
     padding: 50px;
     border-radius: 10px;
@@ -13,4 +13,10 @@ input[type="submit"] {
     border-radius: 15px;
     margin: 0 30%;
     width: 40%;
+}
+
+.error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 0;
 }

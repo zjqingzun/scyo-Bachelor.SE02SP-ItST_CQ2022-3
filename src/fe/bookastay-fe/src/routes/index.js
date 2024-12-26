@@ -9,6 +9,8 @@ import Register from "../pages/Register/register";
 import AfterSearch from "../pages/AfterSearch";
 import Reserve from "~/pages/Reserve/Reserve";
 import HotelDetails from "../pages/Hotel Details/hotelDetails";
+import History from "../pages/History";
+import Favorite from "../pages/FAV";
 
 // Hotel Owner Pages
 import RegisterHotel from "~/pages/HotelOwner/RegisterHotel/RegisterHotel";
@@ -40,6 +42,10 @@ const publicRoutes = [
         path: "/register",
         component: Register,
         layout: HeaderOnly,
+    },
+    {
+        path: "/hotel-details",
+        component: HotelDetails,
     },
     {
         path: "/hotel-owner/register-hotel",
@@ -76,6 +82,14 @@ const publicRoutes = [
         component: RoomType,
         layout: HotelOwnerLayout,
     },
+    {
+        path: "/history",
+        component: History,
+    },
+    {
+        path: "/favorite",
+        component: Favorite,
+    }
 ];
 
 const hotelOwnerRoutes = [

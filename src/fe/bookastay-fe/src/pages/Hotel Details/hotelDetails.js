@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './hotelDetails.css';
 import icons from "~/assets/icon";
+import { ro } from 'date-fns/locale';
 
 const locations = [
     { id: 1, name: 'Home', parentId: null },
@@ -10,6 +11,21 @@ const locations = [
 ];
 
 const HotelDetails = () => {
+    const [room1Count, setRoom1Count] = useState(0);
+    const [room2Count, setRoom2Count] = useState(0);
+    const roomPrice1 = 500000;
+    const roomPrice2 = 800000;
+
+    const handleIncrease = (room, setRoomCount) => {
+        setRoomCount((prev) => prev + 1);
+    };
+
+    const handleDecrease = (room, setRoomCount) => {
+        setRoomCount((prev) => (prev > 1 ? prev - 1 : 0));
+    };
+
+    const totalRooms = room1Count + room2Count;
+    const totalPrice = room1Count * roomPrice1 + room2Count * roomPrice2;
     const [breadcrumbItems, setBreadcrumbItems] = useState([]);
 
     useEffect(() => {
@@ -128,53 +144,58 @@ const HotelDetails = () => {
                         <li>2.4 km from Tan Son Nhat International Airport</li>
                     </ul>
                     <p><strong>Distance in property description is calculated using © OpenStreetMap</strong></p>
+
+                    <button className="btn btn-primary fs-3 py-2 px-5 mt-5">Reserve</button>
                 </div>
             </div>
-            <ul className="nav nav-tabs mx-5" role="tablist">
-                <li className="nav-item" role="presentation">
-                    <a
-                        className={`nav-link ${activeTab === "info" ? "active" : ""}`}
-                        onClick={() => handleTabClick("info")}
-                        role="tab"
-                        aria-selected={activeTab === "info"}
-                    >
-                        Information
-                    </a>
-                </li>
-                <li className="nav-item" role="presentation">
-                    <a
-                        className={`nav-link ${activeTab === "payment" ? "active" : ""}`}
-                        onClick={() => handleTabClick("payment")}
-                        role="tab"
-                        aria-selected={activeTab === "payment"}
-                    >
-                        Payment
-                    </a>
-                </li>
-                <li className="nav-item" role="presentation">
-                    <a
-                        className={`nav-link ${activeTab === "review" ? "active" : ""}`}
-                        onClick={() => handleTabClick("review")}
-                        role="tab"
-                        aria-selected={activeTab === "review"}
-                    >
-                        Review
-                    </a>
-                </li>
-                <li className="nav-item" role="presentation">
-                    <a
-                        className={`nav-link ${activeTab === "qa" ? "active" : ""}`}
-                        onClick={() => handleTabClick("qa")}
-                        role="tab"
-                        aria-selected={activeTab === "qa"}
-                    >
-                        Q&A
-                    </a>
-                </li>
-            </ul>
+            <div className='tablist'>
+                <ul className="nav nav-tabs mx-5 tablist" role="tablist">
+                    <li className="nav-item" role="presentation">
+                        <a
+                            className={`nav-link ${activeTab === "info" ? "active" : ""}`}
+                            onClick={() => handleTabClick("info")}
+                            role="tab"
+                            aria-selected={activeTab === "info"}
+                        >
+                            Information
+                        </a>
+                    </li>
+                    <li className="nav-item" role="presentation">
+                        <a
+                            className={`nav-link ${activeTab === "payment" ? "active" : ""}`}
+                            onClick={() => handleTabClick("payment")}
+                            role="tab"
+                            aria-selected={activeTab === "payment"}
+                        >
+                            Payment
+                        </a>
+                    </li>
+                    <li className="nav-item" role="presentation">
+                        <a
+                            className={`nav-link ${activeTab === "review" ? "active" : ""}`}
+                            onClick={() => handleTabClick("review")}
+                            role="tab"
+                            aria-selected={activeTab === "review"}
+                        >
+                            Review
+                        </a>
+                    </li>
+                    <li className="nav-item" role="presentation">
+                        <a
+                            className={`nav-link ${activeTab === "qa" ? "active" : ""}`}
+                            onClick={() => handleTabClick("qa")}
+                            role="tab"
+                            aria-selected={activeTab === "qa"}
+                        >
+                            Q&A
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
 
             <div className="tab-content mt-3 px-5 py-4" id="myTabContent">
-                {activeTab === "info" && <div className="tab-pane fade show active px-2 mb-5 py-5" id="info" role="tabpanel" aria-labelledby="info-tab">
+                {activeTab === "info" && <div className="tab-pane fade show active px-2 my-5" id="info" role="tabpanel" aria-labelledby="info-tab">
                     <p className="fs-3">Sabay Airport Apartment - 1 min to TSN Airport - Breakfast included has air-conditioned
                         guest
                         accommodation in Ho Chi Minh City, 5 km from Tan Dinh Market, 5 km from Giac Lam Pagoda and 6 km
@@ -192,8 +213,112 @@ const HotelDetails = () => {
                         included, while Diamond Plaza is 6 km from the property.
                         The nearest airport is Tan Son Nhat International Airport, 2.4 km from the accommodation.</p>
                 </div>}
-                {activeTab === "payment" && <div className="tab-pane fade show active" id="payment" role="tabpanel" aria-labelledby="payment-tab">
-                    <p>Payment details go here.</p>
+                {activeTab === "payment" && <div className="tab-pane fade show active px-2 my-5" id="payment" role="tabpanel" aria-labelledby="payment-tab">
+                    <div className="card shadow p-3">
+                        <div className="card-body">
+                            <table className="table">
+                                <thead>
+                                    <tr>
+                                        <th>Room type</th>
+                                        <th>Number of guest</th>
+                                        <th>Today's price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {/* Room 1 */}
+                                    <tr>
+                                        <td>
+                                            <strong>One-Bedroom Apartment</strong>
+                                        </td>
+                                        <td>
+                                            <span className="fs-4">👤👤</span>
+                                        </td>
+                                        <td>
+                                            <div className="d-flex align-items-center">
+                                                <div className="me-3">
+                                                    <span>VND {roomPrice1.toLocaleString()}</span>
+                                                </div>
+                                                <div className="d-flex align-items-center ms-3">
+                                                    <button
+                                                        className="btn btn-outline-secondary"
+                                                        onClick={() => handleDecrease("room1", setRoom1Count)}
+                                                    >
+                                                        -
+                                                    </button>
+                                                    <input
+                                                        type="text"
+                                                        value={room1Count}
+                                                        readOnly
+                                                        className="form-control mx-2 text-center"
+                                                        style={{ width: "50px" }}
+                                                    />
+                                                    <button
+                                                        className="btn btn-outline-secondary"
+                                                        onClick={() => handleIncrease("room1", setRoom1Count)}
+                                                    >
+                                                        +
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <p className="mt-2">
+                                                = VND {(room1Count * roomPrice1).toLocaleString()}
+                                            </p>
+                                        </td>
+                                    </tr>
+
+                                    {/* Room 2 */}
+                                    <tr>
+                                        <td>
+                                            <strong>One-Bedroom Apartment</strong>
+                                        </td>
+                                        <td>
+                                            <span className="fs-4">👤👤👤👤</span>
+                                        </td>
+                                        <td>
+                                            <div className="d-flex align-items-center"> 
+                                                <div className="me-3">
+                                                    <span>VND {roomPrice2.toLocaleString()}</span>
+                                                </div>
+                                                <div className="d-flex align-items-center ms-3">
+                                                    <button
+                                                        className="btn btn-outline-secondary"
+                                                        onClick={() => handleDecrease("room2", setRoom2Count)}
+                                                    >
+                                                        -
+                                                    </button>
+                                                    <input
+                                                        type="text"
+                                                        value={room2Count}
+                                                        readOnly
+                                                        className="form-control mx-2 text-center"
+                                                        style={{ width: "50px" }}
+                                                    />
+                                                    <button
+                                                        className="btn btn-outline-secondary"
+                                                        onClick={() => handleIncrease("room2", setRoom2Count)}
+                                                    >
+                                                        +
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <p className="mt-2">
+                                                = VND {(room2Count * roomPrice2).toLocaleString()}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            {/* Summary Section */}
+                            <div className="text-end">
+                                <h5>
+                                    {totalRooms} rooms for VND {totalPrice.toLocaleString()}
+                                </h5>
+                                <p>Includes taxes and charges</p>
+                                <button className="btn btn-primary fs-3 py-2 px-5 mt-2">Reserve</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>}
                 {activeTab === "review" && <div className="tab-pane fade show active" id="review" role="tabpanel" aria-labelledby="review-tab">
                     <div className="review-container d-flex flex-column align-items-center mx-auto">

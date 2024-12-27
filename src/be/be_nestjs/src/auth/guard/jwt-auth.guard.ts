@@ -21,11 +21,16 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         return super.canActivate(context);
       }
     
-      handleRequest(err, user, info) {
-        // You can throw an exception based on either "info" or "err" arguments
-        if (err || !user) {
-          throw err || new UnauthorizedException("Access Token not valid");
+    handleRequest(err: any, user: any, info: any) {
+      if (!user) {
+        if (info && info.name === 'TokenExpiredError') {
+          throw new UnauthorizedException('Access Token has expired');
+        } else if (info && info.name === 'JsonWebTokenError') {
+          throw new UnauthorizedException('Invalid Access Token');
+        } else {
+          throw new UnauthorizedException('Access Token is missing or invalid');
         }
-        return user;
       }
+      return user;
+    }
 }

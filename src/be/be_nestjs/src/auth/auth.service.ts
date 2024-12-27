@@ -35,7 +35,21 @@ export class AuthService {
     const payload = { email: user.email, sub: user.username };
     return {
       access_token: this.jwtService.sign(payload),
+      refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' })
     };
+  }
+
+  async refreshAccessToken(refreshToken: string) {
+    try {
+      const decoded = this.jwtService.verify(refreshToken);
+
+      const payload = { email: decoded.email, sub: decoded.sub };
+      const newAccessToken = this.jwtService.sign(payload);
+
+      return { access_token: newAccessToken };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
   }
 
   async loginWithGoogle(user: any) {
@@ -48,8 +62,8 @@ export class AuthService {
     }
   }
 
-  async register(createAuthDto : CreateAuthDto) {
-    const user = await this.usersService.registerUser(createAuthDto);
+  async register(createAuthDto : CreateAuthDto, role: string) {
+    const user = await this.usersService.registerUser(createAuthDto, role);
     this.mailService.sendUserActivation(user);
     return user;
   }

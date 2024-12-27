@@ -293,7 +293,7 @@ const Home = () => {
                 </div>
             </div>
 
-            <div className="homepage__subscribe">
+            {/* <div className="homepage__subscribe">
                 <div className="homepage__subscribe-left">
                     <h2 className="homepage__subscribe-title">Subscribe our newsletter</h2>
                     <p className="homepage__subscribe-desc">
@@ -351,7 +351,7 @@ const Home = () => {
                         alt=""
                     />
                 </div>
-            </div>
+            </div> */}
         </section>
     );
 };

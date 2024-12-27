@@ -12,6 +12,7 @@ import HotelDetails from "../pages/Hotel Details/hotelDetails";
 import History from "../pages/History";
 import Favorite from "../pages/FAV";
 import AccountSetting from "../pages/Account";
+import Review from "~/pages/Review";
 
 // Hotel Owner Pages
 import RegisterHotel from "~/pages/HotelOwner/RegisterHotel/RegisterHotel";
@@ -94,6 +95,10 @@ const publicRoutes = [
     {
         path: "/account-setting",
         component: AccountSetting,
+    },
+    {
+        path: "/review",
+        component: Review,
     }
 ];
 

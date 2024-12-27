@@ -1,4 +1,5 @@
-import { IsDateString, IsOptional, IsString } from "class-validator";
+import { IsDateString, IsNumber, IsOptional, IsString } from "class-validator";
+import internal from "stream";
 
 
 export class SearchHotelDto {
@@ -13,4 +14,12 @@ export class SearchHotelDto {
     @IsDateString()
     @IsOptional()
     checkOutDate?: string;
+
+    @IsNumber()
+    @IsOptional()
+    roomType2?: number;
+
+    @IsNumber()
+    @IsOptional()
+    roomType4?: number;
 }

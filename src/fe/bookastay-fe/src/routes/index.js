@@ -11,6 +11,7 @@ import Reserve from "~/pages/Reserve/Reserve";
 import HotelDetails from "../pages/Hotel Details/hotelDetails";
 import History from "../pages/History";
 import Favorite from "../pages/FAV";
+import AccountSetting from "../pages/Account";
 
 // Hotel Owner Pages
 import RegisterHotel from "~/pages/HotelOwner/RegisterHotel/RegisterHotel";
@@ -89,6 +90,10 @@ const publicRoutes = [
     {
         path: "/favorite",
         component: Favorite,
+    },
+    {
+        path: "/account-setting",
+        component: AccountSetting,
     }
 ];
 

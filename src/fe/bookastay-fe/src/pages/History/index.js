@@ -53,7 +53,7 @@ const History = () => {
 
     return (
         <div>
-            <div className='row my-5 py-5'>
+            <div className='row my-5'>
                 <div className='col-6 d-flex align-items-center ps-5 pt-5'>
                     <img src={icons.clockRotateLeftIcon} alt="ClockRotateLeft" className='clockRotateLeftIcon ms-5' />
                     <h1 className='ms-5 pt-2'>History</h1>

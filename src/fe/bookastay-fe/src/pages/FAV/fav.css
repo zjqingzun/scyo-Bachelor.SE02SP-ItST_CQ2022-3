@@ -1,3 +1,26 @@
-.heartIcon {
+.heartIcon, .searchIcon {
     width: 35px;
+}
+
+.favorite-container {
+    padding: 20px;
+}
+
+.favorite-header .heart-icon {
+    width: 50px;
+    height: 50px;
+}
+
+.favorite-header .search-input {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.favorite-hotels .hotel-card {
+    transition: transform 0.3s ease;
+}
+
+.favorite-hotels .hotel-card:hover {
+    transform: scale(1.05);
 }

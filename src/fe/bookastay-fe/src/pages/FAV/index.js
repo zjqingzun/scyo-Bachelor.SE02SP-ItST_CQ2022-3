@@ -4,12 +4,12 @@ import icons from "~/assets/icon";
 import HotelCard from "~/components/HotelCard/HotelCard";
 
 const Favorite = () => {
-    const data = [
+    const cardsData = [
         {
             name: 'Hotel ABC',
             address: '123 Street, City, Country',
             image: 'https://kinsley.bslthemes.com/wp-content/uploads/2021/08/img-banner-2-scaled-1-1920x1315.jpg',
-            price: 200000,
+            price: 200,
             rating: 9.5,
             review: 100
         },
@@ -52,52 +52,105 @@ const Favorite = () => {
             price: 400,
             rating: 4.5,
             review: 110
-        },
-        {
-            name: 'Hotel STU',
-            address: '901 Street, City, Country',
-            image: 'https://cf.bstatic.com/xdata/images/hotel/square600/586909150.webp?k=422e9c17817cd27de89aaa113a1711a3b23151c8f13919aa1dc08a970b70cf97&o=',
-            price: 350,
-            rating: 3.5,
-            review: 120
         }
     ];
+
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 6; // 6 items per page
+    // Pagination logic
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const filteredCards = cardsData.filter(card =>
+        card.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    const currentCards = filteredCards.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredCards.length / itemsPerPage);
+
+    // Change page
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
     return (
-        <div>
-            <div className='row my-5 py-5'>
-                <div className='col-6 d-flex align-items-center ps-5 pt-5'>
-                    <img src={icons.heartIcon} alt="Heart" className='heartIcon ms-5' />
-                    <h1 className='ms-5 pt-2'>Favorite</h1>
+        <div className="favorite-container">
+            {/* Header Section */}
+            <div className="favorite-header row my-5 py-5">
+                <div className="col-6 d-flex align-items-center ps-5 pt-5">
+                    <img src={icons.redHeartIcon} alt="Heart" className="heartIcon ms-5" />
+                    <h1 className="ms-5 pt-2">Favorite</h1>
                 </div>
                 <div className='col-6'>
-                    <div className='d-flex justify-content-end'>
+                    <div className="input-group pe-5 pt-5">
                         <input
-                            type='text'
-                            placeholder='Search'
-                            className='searchInput'
+                            type="text"
+                            className="form-control p-3 fs-3"
+                            placeholder="Search"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                        <img src={icons.searchIcon} alt="Search" className='searchIcon' />
+                        <img src={icons.searchIcon} alt="search" className='btn btn-outline-primary searchIcon' />
                     </div>
                 </div>
             </div>
-            <div className='row'>
-                <div className='col-12'>
-                    <div className='row'>
-                        {data.map((item, index) => (
-                        <HotelCard 
-                            key={index}
+
+            {/* Hotels Section */}
+            <div className="favorite-hotels row mx-5">
+                {cardsData.map((item, index) => (
+                    <div key={index} className="col-lg-4 col-md-6 col-sm-12 mb-4">
+                        <HotelCard
                             name={item.name}
                             address={item.address}
                             image={item.image}
                             price={item.price}
                             rating={item.rating}
                             review={item.review}
-
-                            />
-                        ))}
+                        />
                     </div>
+                ))}
+            </div>
 
-                </div>
+            {/* Pagination */}
+            <div className="d-flex justify-content-center my-5 pb-5 pt-3">
+                <nav>
+                    <ul className="pagination">
+                        {/* Nút "Trước" */}
+                        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                            <button
+                                className="page-link px-4 py-2 fs-2"
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                aria-label="Previous"
+                                disabled={currentPage === 1}
+                            >
+                                <span aria-hidden="true">&laquo;</span>
+                            </button>
+                        </li>
+
+                        {/* Các số trang */}
+                        {[...Array(totalPages).keys()].map((page) => (
+                            <li
+                                key={page}
+                                className={`page-item ${page + 1 === currentPage ? 'active' : ''}`}
+                                onClick={() => handlePageChange(page + 1)}
+                            >
+                                <button className="page-link px-4 py-2 fs-2">{page + 1}</button>
+                            </li>
+                        ))}
+
+                        {/* Nút "Sau" */}
+                        <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                            <button
+                                className="page-link px-4 py-2 fs-2"
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                aria-label="Next"
+                                disabled={currentPage === totalPages}
+                            >
+                                <span aria-hidden="true">&raquo;</span>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     );

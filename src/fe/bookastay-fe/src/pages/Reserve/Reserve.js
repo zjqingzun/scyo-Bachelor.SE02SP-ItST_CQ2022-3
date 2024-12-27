@@ -12,6 +12,7 @@ import "rsuite/DatePicker/styles/index.css";
 
 import images from "~/assets/image";
 import icons from "~/assets/icon";
+import { toast } from "react-toastify";
 
 const Reserve = () => {
     const { t } = useTranslation();

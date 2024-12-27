@@ -54,10 +54,10 @@ const FinalStep = ({
         validationSchema: Yup.object({
             doubleRoomPrice: Yup.number()
                 .positive("Room price must be a positive number.")
-                .required("Required"),
+                .required("Room price is required"),
             quadRoomPrice: Yup.number()
                 .positive("Room price must be a positive number.")
-                .required("Required"),
+                .required("Room price is required"),
         }),
         onSubmit: (values) => {
             console.log(values);

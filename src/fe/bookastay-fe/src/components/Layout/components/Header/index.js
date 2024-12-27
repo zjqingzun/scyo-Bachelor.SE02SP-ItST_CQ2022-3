@@ -3,13 +3,40 @@ import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
 import { Dropdown as BDropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { Drawer } from "antd";
-import { DownOutlined } from "@ant-design/icons";
+import { Drawer, Avatar, Dropdown } from "antd";
+import { DownOutlined, SettingOutlined } from "@ant-design/icons";
 
 import icons from "~/assets/icon";
 import { setCurrency } from "~/redux/action/currencyAction";
 
 import "./Header.scss";
+
+const items = [
+    {
+        key: "1",
+        label: "My Account",
+        disabled: true,
+    },
+    {
+        type: "divider",
+    },
+    {
+        key: "2",
+        label: "Profile",
+        extra: "⌘P",
+    },
+    {
+        key: "3",
+        label: "Billing",
+        extra: "⌘B",
+    },
+    {
+        key: "4",
+        label: "Settings",
+        icon: <SettingOutlined />,
+        extra: "⌘S",
+    },
+];
 
 const CustomToggleForCurrency = React.forwardRef(({ children, onClick }, ref) => (
     <span
@@ -77,11 +104,14 @@ const Header = () => {
                 </Link>
 
                 <div className="header__actions">
-                    <a href="#!" className="header__list-property-btn">
+                    <a href="#!" className="header__list-property-btn d-none d-md-block">
                         {t("header.listYourProperty")}
                     </a>
 
-                    <div className="header__currency-group" style={{ width: "40px" }}>
+                    <div
+                        className="header__currency-group d-none d-md-block"
+                        style={{ width: "40px" }}
+                    >
                         <BDropdown>
                             <BDropdown.Toggle as={CustomToggleForCurrency}>
                                 {currency}
@@ -105,7 +135,7 @@ const Header = () => {
                         {/* <span className="header__currency-icon"></span> */}
                     </div>
 
-                    <div className="header__language-group">
+                    <div className="header__language-group d-none d-md-block">
                         <BDropdown onSelect={(e) => setLanguage(e)}>
                             <BDropdown.Toggle as={CustomToggleForCurrency}>
                                 <img
@@ -136,7 +166,7 @@ const Header = () => {
                         </BDropdown>
                     </div>
 
-                    <a href="#!" className="header__about">
+                    <a href="#!" className="header__about d-none d-md-block">
                         <img
                             src={icons.questionIcon}
                             alt=""
@@ -144,15 +174,19 @@ const Header = () => {
                         />
                     </a>
 
-                    <a href="#!" className="header__notify">
+                    {/* <a href="#!" className="header__notify">
                         <img
                             src={icons.bellIcon}
                             alt=""
                             className="header__notify-icon header__icon"
                         />
-                    </a>
+                    </a> */}
 
-                    <a href="#!" className="header__setting" onClick={() => setOpenDrawer(true)}>
+                    <a
+                        href="#!"
+                        className="header__setting d-bloc d-md-none"
+                        onClick={() => setOpenDrawer(true)}
+                    >
                         <img
                             src={icons.settingIcon}
                             alt=""
@@ -163,6 +197,15 @@ const Header = () => {
                     <a href="/login" className="header__sign-in-btn">
                         {t("header.signIn")}
                     </a>
+
+                    {/* <Dropdown menu={{ items }}>
+                        <Avatar
+                            style={{ cursor: "pointer" }}
+                            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                        >
+                            Nam
+                        </Avatar>
+                    </Dropdown> */}
                 </div>
             </header>
 
@@ -184,6 +227,7 @@ const Header = () => {
                     </a>
 
                     <div className="header__currency-group" style={{ width: "40px" }}>
+                        <span className="fs-3">Currency:</span>
                         <BDropdown>
                             <BDropdown.Toggle as={CustomToggleForCurrency}>
                                 {currency}
@@ -208,6 +252,7 @@ const Header = () => {
                     </div>
 
                     <div className="header__language-group">
+                        <span className="fs-3">Language:</span>
                         <BDropdown onSelect={(e) => setLanguage(e)}>
                             <BDropdown.Toggle as={CustomToggleForCurrency}>
                                 <img
@@ -246,13 +291,13 @@ const Header = () => {
                         />
                     </a>
 
-                    <a href="#!" className="header__notify">
+                    {/* <a href="#!" className="header__notify">
                         <img
                             src={icons.bellIcon}
                             alt=""
                             className="header__notify-icon header__icon"
                         />
-                    </a>
+                    </a> */}
                 </div>
             </Drawer>
         </>

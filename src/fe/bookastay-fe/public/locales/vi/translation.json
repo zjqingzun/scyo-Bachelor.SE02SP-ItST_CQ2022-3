@@ -11,9 +11,11 @@
         "search": "Tìm",
         "checkIn": "Check-in",
         "checkOut": "Check-out",
-        "adults": "Người lớn",
+        "adults": "Đôi",
         "children": "Trẻ em",
-        "rooms": "Phòng"
+        "rooms": "Bốn",
+        "double": "Phòng đôi",
+        "quadruple": "Phòng bốn người"
     },
     "hotelCard": {
         "Great": "Tuyệt vời",

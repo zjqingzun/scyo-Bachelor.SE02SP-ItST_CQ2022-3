@@ -5,17 +5,20 @@ import { DateRange } from "react-date-range";
 import { memo, useEffect, useState } from "react";
 import { vi } from "date-fns/locale";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 import "./SearchBar.scss";
 import searchIcon from "./search-icon.svg";
 import calendarIcon from "./calender-icon.svg";
 import people from "./people-icon.svg";
 import caret from "./caret-icon.svg";
-import { useNavigate } from "react-router-dom";
+import useWindowSize from "~/hooks/useWindowSize";
 
 const SearchBar = (props) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
+
+    // const { width } = useWindowSize();
 
     const [destination, setDestination] = useState(props?.searchData?.destination || "");
 
@@ -107,6 +110,8 @@ const SearchBar = (props) => {
         }
     };
 
+    // const months = width > 800 ? 2 : 1;
+
     return (
         <div className="test">
             <div
@@ -158,7 +163,7 @@ const SearchBar = (props) => {
                         editableDateInputs={true}
                         minDate={new Date()}
                         onChange={(item) => handleDateChange(item)}
-                        months={2}
+                        months={1}
                         moveRangeOnFirstSelection={false}
                         direction="horizontal"
                         locale={vi}
@@ -170,7 +175,6 @@ const SearchBar = (props) => {
                     className="search-bar__input-group search-bar__input-group-people"
                     onClick={() => handleTurnPopup()}
                 >
-                    <img className="search-bar__input-icon" src={people} alt="" />
                     <div className="search-bar__input">
                         <span>
                             {numOfPeople.adult} {t("searchBar.adults")}
@@ -195,7 +199,7 @@ const SearchBar = (props) => {
                         className={`search-bar__people-popup ${isShowPopup}`}
                     >
                         <div className="search-bar__people-popup-item">
-                            <label htmlFor="adult">Phòng 2</label>
+                            <label htmlFor="adult">{t("searchBar.double")}</label>
                             <div className="number-select">
                                 <button
                                     className="number-select__btn"
@@ -281,7 +285,7 @@ const SearchBar = (props) => {
                             </div>
                         </div> */}
                         <div className="search-bar__people-popup-item">
-                            <label htmlFor="room">Phòng 4</label>
+                            <label htmlFor="room">{t("searchBar.quadruple")}</label>
                             <div className="number-select">
                                 <button
                                     className="number-select__btn"

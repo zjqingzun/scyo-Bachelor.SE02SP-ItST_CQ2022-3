@@ -12,9 +12,11 @@
         "checkIn": "Check-in",
         "checkOut": "Check-out",
         "guests": "Guests",
-        "adults": "Adults",
-        "children": "Children",
-        "rooms": "Rooms"
+        "adults": "Double",
+        "children": "Quadruple",
+        "rooms": "Quadruple",
+        "double": "Double Room",
+        "quadruple": "Quadruple Room"
     },
     "hotelCard": {
         "Great": "Great",

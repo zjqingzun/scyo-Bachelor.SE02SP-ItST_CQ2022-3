@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import Modal from "react-bootstrap/Modal";
+import { Collapse } from "antd";
 
 import "./AfterSearch.scss";
 
@@ -230,13 +231,33 @@ const AfterSearch = () => {
             </div>
 
             <div className="after-search__body mt-4">
-                <div className="row gx-5">
-                    <div className="col-3">
-                        <div className="after-search__filter">
+                <div className="row gx-4">
+                    <div className="col-12 col-lg-3">
+                        <div className="after-search__filter d-none d-lg-block">
                             <Filter handleFilter={handleFilter} />
                         </div>
+
+                        <div className="d-lg-none">
+                            <Collapse
+                                style={{ padding: "0", marginBottom: "1rem" }}
+                                items={[
+                                    {
+                                        key: "1",
+                                        label: "Filter",
+                                        children: (
+                                            <div className="after-search__filter">
+                                                <Filter handleFilter={handleFilter} />
+                                            </div>
+                                        ),
+                                        styles: {
+                                            body: { padding: "0" },
+                                        },
+                                    },
+                                ]}
+                            />
+                        </div>
                     </div>
-                    <div className="col-9">
+                    <div className="col-12 col-lg-9">
                         <div className="row row-cols-1 gy-5">
                             {searchedHotel.map((hotel) => (
                                 <div key={hotel.id} className="col">

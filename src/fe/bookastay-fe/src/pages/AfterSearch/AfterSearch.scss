@@ -1,3 +1,5 @@
+@import "../../components/GlobalStyles/mixins.scss";
+
 .after-search {
     &__search-bar {
         position: relative;
@@ -7,6 +9,14 @@
 
         border-radius: 15px;
         box-shadow: 0 0 0 10px rgba(91, 153, 194, 0.15), 0 2px 48px 0 rgba(91, 153, 194, 0.04);
+
+        @include screen(xxl) {
+            width: 90%;
+        }
+
+        @include screen(xl) {
+            width: 95%;
+        }
     }
 
     &__filter {

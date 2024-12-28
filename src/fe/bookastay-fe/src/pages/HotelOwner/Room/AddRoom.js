@@ -9,9 +9,7 @@ import "./Room.scss";
 import { toast } from "react-toastify";
 
 const roomType = [
-    { label: "Single", value: "single" },
     { label: "Double", value: "double" },
-    { label: "Triple", value: "triple" },
     { label: "Quad", value: "quad" },
 ];
 

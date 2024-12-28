@@ -185,12 +185,12 @@ const RoomType = () => {
 
     return (
         <div className="room">
-            <h1>Room Type</h1>
-            <div className="d-flex my-3">
+            <h1 className="mb-4">Room Type</h1>
+            {/* <div className="d-flex my-3">
                 <button className="btn btn-primary ms-auto fs-4" onClick={() => handleModalShow()}>
                     Add Room Type
                 </button>
-            </div>
+            </div> */}
 
             <Table
                 columns={columns}

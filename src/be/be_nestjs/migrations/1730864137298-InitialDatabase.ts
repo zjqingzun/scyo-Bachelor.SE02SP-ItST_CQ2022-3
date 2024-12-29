@@ -66,14 +66,28 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
       // Tạo bảng "room"
       await queryRunner.query(`
         CREATE TABLE "room" (
-          "id" SERIAL PRIMARY KEY,
-          "name" VARCHAR NOT NULL,
+          "id" SERIAL,
           "roomType" INT NOT NULL,
-          "nums" INT NOT NULL,
           "price" INT NOT NULL,
-          "status" VARCHAR NOT NULL,
+          "weekend_price" INT NOT NULL,
+          "flexible_price" INT NOT NULL,
           "hotelId" INT NOT NULL,
+          "nums" INT,
+          PRIMARY KEY ("id", "hotelId", "roomType"),
           FOREIGN KEY ("hotelId") REFERENCES "hotel"("id") ON DELETE CASCADE
+        );
+      `);
+
+      // Tạo bảng "detail_room"
+      await queryRunner.query(`
+        CREATE TABLE "detail_room" (
+          "id" SERIAL PRIMARY KEY, 
+          "name" VARCHAR NOT NULL,  
+          "status" VARCHAR NOT NULL,
+          "hotelId" INT NOT NULL, 
+          "roomType" INT NOT NULL,
+          FOREIGN KEY ("hotelId") REFERENCES "hotel"("id") ON DELETE CASCADE, 
+          FOREIGN KEY ("roomType", "hotelId") REFERENCES "room"("roomType", "hotelId") ON DELETE CASCADE 
         );
       `);
 

@@ -283,9 +283,9 @@ const Guest = () => {
         });
     };
 
-    const handleAddRoom = () => {
-        // navigate("/hotel-owner/room/add-room");
-    };
+    // const handleAddRoom = () => {
+    //     navigate("/hotel-owner/room/add-room");
+    // };
 
     return (
         <div className="guest">

@@ -1,8 +1,10 @@
+import { Booking } from "@/module/booking/entities/booking.entity";
 import { Image } from "@/module/image/entities/image.entity";
 import { Location } from "@/module/location/entities/location.entity";
 import { Report } from "@/module/report/entities/report.entity";
 import { Review } from "@/module/review/entities/review.entity";
 import { Room } from "@/module/room/entities/room.entity";
+import { RoomType } from "@/module/room_type/entites/room_type.entity";
 import { User } from "@/module/user/entities/user.entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
@@ -53,4 +55,10 @@ export class Hotel {
 
     @OneToMany(() => Image, (image) => image.hotel)
     images: Image[];
+
+    @OneToMany(() => RoomType, (roomType) => roomType.hotel )
+    roomTypes: RoomType[];
+
+    @OneToMany(() => Booking, (booking) => booking.hotel)
+    bookings: Booking[];
 }

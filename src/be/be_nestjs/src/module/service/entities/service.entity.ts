@@ -11,7 +11,4 @@ export class Service {
 
     @Column()
     icon: string;
-
-    @ManyToMany(() => Room, (room) => room.services)
-    rooms: Room[];
 }

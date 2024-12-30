@@ -1,4 +1,6 @@
 import { Bill } from "@/module/bill/entities/bill.entity";
+import { BookingDetail } from "@/module/booking_detail/entities/booking_detail.entity";
+import { Hotel } from "@/module/hotel/entities/hotel.entity";
 import { Payment } from "@/module/payment/entities/payment.entity";
 import { Room } from "@/module/room/entities/room.entity";
 import { User } from "@/module/user/entities/user.entity";
@@ -40,11 +42,13 @@ export class Booking {
     @JoinColumn({name: "userId"})
     user: User;
 
-    @OneToOne(() => Room, (room) => room.booking)
-    @JoinColumn({name: "roomId"})
-    room: Room;
+    @ManyToOne(() => Hotel, (hotel) => hotel.bookings)
+    @JoinColumn({name: "hotelId"})
+    hotel: Hotel;
 
     @OneToOne(() => Bill, (bill) => bill.booking)
-    @JoinColumn()
     bill: Bill;
+
+    @OneToOne(() => BookingDetail, (bookingDetail) => bookingDetail.booking)
+    detail: BookingDetail;
 }

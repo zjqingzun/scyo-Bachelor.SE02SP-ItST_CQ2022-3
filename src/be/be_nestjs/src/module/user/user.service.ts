@@ -25,7 +25,6 @@ export class UserService {
   async findAll(req: Request) {
     const {page = 1, limit = 5, sortBy = 'name', order = 'ASC', searchTerm} = req.query;
     const [users, total] = await this.usersRepository.findAndCount({
-      relations: ['roles'],
       select: {
         name: true,
         email: true,
@@ -44,10 +43,37 @@ export class UserService {
     return this.usersRepository.findOneBy({ id });
   }
 
+  async findAllFav(req : Request) {
+    const {page = 1, limit = 5, sortBy = 'name', order = 'ASC', userId = 1} = req.query;
+    const queryRunner = this.dataSource.createQueryRunner();
+    const take = limit;
+    const skip = (page as number - 1) * (limit as number);
+    let allFavHotel = await queryRunner.query(`
+      SELECT *
+      FROM hotel
+      WHERE id IN (
+        SELECT "hotelId"
+        FROM "user_favouriteHotel"
+        WHERE "userId" = ${userId}
+      )
+      ORDER BY ${sortBy} ${order}
+      LIMIT ${take} OFFSET ${skip}
+    `);
+    return allFavHotel;
+  }
+
   async findByEmail(email : string) {
     return await this.usersRepository.findOne({
       where: {
         email,
+      }
+    });
+  }
+
+  async findById(id : number) {
+    return await this.usersRepository.findOne({
+      where: {
+        id,
       }
     });
   }
@@ -95,7 +121,7 @@ export class UserService {
     }
   }
 
-  async registerUser(createAuthDto: CreateAuthDto) {
+  async registerUser(createAuthDto: CreateAuthDto, role : string) {
     const {name, dob, cccd, email, password, phone} = createAuthDto;
     const isEmailExist = await this.isEmailExist(email);
     if (isEmailExist) {
@@ -107,8 +133,9 @@ export class UserService {
       codeId: uuidv4(),
       codeExpired: moment().add(30, 'minute')
     };
-    await this.usersRepository.save(user);
-    return (await user);
+    const userSaved = await this.usersRepository.save(user);
+    await this.setRole(userSaved.id, role);
+    return (user);
   }
 
   async setupResetPassword(email : string) {
@@ -191,4 +218,44 @@ export class UserService {
     return await this.usersRepository.delete(id);
   }
 
+  async setRole(userId: number, role : string) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    const roleObj = await queryRunner.manager.query(`SELECT * FROM role WHERE name = '${role}'`);
+    await queryRunner.manager.query(`INSERT INTO users_roles("userId", "roleId") VALUES(${userId}, ${roleObj[0].id})`);
+  }
+
+  async addFav(req : Request) {
+    const {userId, hotelId} = req.query;
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    try {
+      await queryRunner.startTransaction();
+    
+      const isExisted = await queryRunner.manager.query(`
+        SELECT *
+        FROM "user_favouriteHotel"
+        WHERE "userId" = $1 AND "hotelId" = $2
+      `, [userId, hotelId]);
+    
+      if (isExisted.length > 0) {
+        throw new BadRequestException("Fav hotel has existed");
+      }
+    
+      const inserted = await queryRunner.manager.query(`
+        INSERT INTO "user_favouriteHotel"("userId", "hotelId")
+        VALUES ($1, $2)
+      `, [userId, hotelId]);
+      
+      await queryRunner.commitTransaction();
+
+      return {
+        message: "Successfully"
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
 }

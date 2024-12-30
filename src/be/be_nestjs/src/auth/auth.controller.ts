@@ -20,15 +20,21 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
+  @Get('renew_token/:refreshToken')
+  @Public()
+  async renewToken(@Param('refreshToken') refreshToken : string) {
+    return await this.authService.refreshAccessToken(refreshToken);
+  }
+
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
   }
 
-  @Post('register')
+  @Post('register/:role')
   @Public()
-  async register(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.register(createAuthDto);
+  async register(@Body() createAuthDto: CreateAuthDto, @Param('role') role : string) {
+    return this.authService.register(createAuthDto, role);
   }
 
   @Get('forgetPassword/:email')

@@ -2,7 +2,7 @@ import axios from "axios";
 import axiosRetry from "axios-retry";
 
 const instance = axios.create({
-    baseURL: import.meta.env.VITE_BACKEND_URL,
+    baseURL: process.env.REACT_APP_API_URL,
     withCredentials: true,
 });
 
@@ -12,7 +12,7 @@ const instance = axios.create({
 axiosRetry(instance, {
     retries: 3,
     retryCondition: (error) => {
-        return error.response.status === 500 || error.response.status === 419;
+        return true;
     },
     retryDelay: (retryCount, error) => {
         return retryCount * 1000;

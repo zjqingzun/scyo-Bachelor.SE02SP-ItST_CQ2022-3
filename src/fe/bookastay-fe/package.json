@@ -69,9 +69,11 @@
         ]
     },
     "devDependencies": {
+        "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
         "babel-plugin-module-resolver": "^5.0.2",
         "customize-cra": "^1.0.0",
         "react-app-rewired": "^2.2.1",
-        "sass": "^1.80.5"
+        "sass": "^1.83.0",
+        "sass-loader": "^16.0.4"
     }
 }

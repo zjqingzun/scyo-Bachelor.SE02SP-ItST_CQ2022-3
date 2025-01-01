@@ -1,7 +1,7 @@
 import { Booking } from "@/module/booking/entities/booking.entity";
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity({name: "booking_detail"})
+@Entity({ name: "booking_detail" })
 export class BookingDetail {
     @PrimaryGeneratedColumn()
     id: number;
@@ -15,7 +15,7 @@ export class BookingDetail {
     @Column()
     price: number;
 
-    @OneToOne(() => Booking, (booking) => booking.detail)
-    @JoinColumn({name: "bookingId"})
+    @ManyToOne(() => Booking, (booking) => booking.bookingDetails)
+    @JoinColumn({ name: "bookingId" }) 
     booking: Booking;
 }

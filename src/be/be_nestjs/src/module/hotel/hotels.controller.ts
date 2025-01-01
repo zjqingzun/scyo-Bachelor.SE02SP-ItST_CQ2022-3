@@ -12,13 +12,6 @@ import { SearchHotelDto } from './dto/search-hotel.dto';
 export class HotelsController {
   constructor(private readonly hotelsService: HotelsService) { }
 
-  // API search khách sạn
-  @Get('search')
-  @Public()
-  async findAvailableHotels(@Query() searchHotelDto: SearchHotelDto) {
-    return await this.hotelsService.findAvailableHotels(searchHotelDto);
-  }
-
   @Post()
   create(@Body() createHotelDto: CreateHotelDto) {
     return this.hotelsService.create(createHotelDto);
@@ -29,20 +22,6 @@ export class HotelsController {
     return this.hotelsService.findAll();
   }
 
-  // [GET]: /hotels/recommend-hotel
-  @Get('recommended-hotel')
-  @Public()
-  async recommendedHotel() {
-    return await this.hotelsService.getTopTenRatingHotel();
-  }
-
-  // [GET]: /hotels/:id
-  @Get(':id')
-  @Public()
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return await this.hotelsService.findOne(id);
-  }
-
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateHotelDto: UpdateHotelDto) {
     return this.hotelsService.update(+id, updateHotelDto);
@@ -51,5 +30,26 @@ export class HotelsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.hotelsService.remove(+id);
+  }
+  
+  // [GET]: /hotels/recommend-hotel
+  @Get('recommended-hotel')
+  @Public()
+  async recommendedHotel() {
+    return await this.hotelsService.getTopTenRatingHotel();
+  }
+
+  // API search khách sạn
+  @Get('search')
+  @Public()
+  async findAvailableHotels(@Query() searchHotelDto: SearchHotelDto) {
+    return await this.hotelsService.findAvailableHotels(searchHotelDto);
+  }
+
+  // [GET]: /hotels/:id
+  @Get(':id')
+  @Public()
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.hotelsService.findOne(id);
   }
 }

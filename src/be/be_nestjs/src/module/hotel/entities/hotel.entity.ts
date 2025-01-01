@@ -1,4 +1,5 @@
 import { Booking } from "@/module/booking/entities/booking.entity";
+import { BookingDetail } from "@/module/booking_detail/entities/booking_detail.entity";
 import { Image } from "@/module/image/entities/image.entity";
 import { Location } from "@/module/location/entities/location.entity";
 import { Report } from "@/module/report/entities/report.entity";
@@ -8,7 +9,7 @@ import { RoomType } from "@/module/room_type/entites/room_type.entity";
 import { User } from "@/module/user/entities/user.entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity({name: "hotel"})
+@Entity({ name: "hotel" })
 export class Hotel {
     @PrimaryGeneratedColumn()
     id: number;
@@ -31,11 +32,11 @@ export class Hotel {
     @Column()
     star: number;
 
-    @OneToMany(() => Room, (room) => room.hotel )
+    @OneToMany(() => Room, (room) => room.hotel)
     rooms: Room[];
 
     @ManyToOne(() => User, (user) => user.hotels)
-    @JoinColumn({name: "ownerId"})
+    @JoinColumn({ name: "ownerId" })
     owner: User;
 
     @ManyToMany(() => User, (user) => user.hotelFavourite)
@@ -56,7 +57,7 @@ export class Hotel {
     @OneToMany(() => Image, (image) => image.hotel)
     images: Image[];
 
-    @OneToMany(() => RoomType, (roomType) => roomType.hotel )
+    @OneToMany(() => RoomType, (roomType) => roomType.hotel)
     roomTypes: RoomType[];
 
     @OneToMany(() => Booking, (booking) => booking.hotel)

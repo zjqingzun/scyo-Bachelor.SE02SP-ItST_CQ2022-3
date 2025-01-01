@@ -5,7 +5,7 @@ import { Service } from "@/module/service/entities/service.entity";
 import { User } from "@/module/user/entities/user.entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity({name: "room"})
+@Entity({ name: "room" })
 export class Room {
     @PrimaryGeneratedColumn()
     id: number;
@@ -20,6 +20,11 @@ export class Room {
     status: string;
 
     @ManyToOne(() => Hotel, (hotel) => hotel.rooms)
-    @JoinColumn({name: "hotelId"})
+    @JoinColumn({ name: "hotelId" })
     hotel: Hotel;
+
+    // Quan hệ với RoomType (Một phòng thuộc một loại phòng)
+    @ManyToOne(() => RoomType, (roomType) => roomType.rooms)
+    @JoinColumn({ name: "roomTypeId" }) // Tạo khóa ngoại để liên kết với RoomType
+    roomType: RoomType;
 }

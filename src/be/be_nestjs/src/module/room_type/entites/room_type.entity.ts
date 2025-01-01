@@ -1,7 +1,8 @@
 import { Hotel } from "@/module/hotel/entities/hotel.entity";
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Room } from "@/module/room/entities/room.entity";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity({name: "room_type"})
+@Entity({ name: "room_type" })
 export class RoomType {
     @PrimaryGeneratedColumn()
     id: number;
@@ -24,4 +25,8 @@ export class RoomType {
 
     @Column({ nullable: true })
     nums: number;
+
+    // Quan hệ một-nhiều với Room (một loại phòng có thể có nhiều phòng)
+    @OneToMany(() => Room, (room) => room.roomType)
+    rooms: Room[];
 }

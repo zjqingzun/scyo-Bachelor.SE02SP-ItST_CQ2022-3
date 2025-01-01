@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { Hotel } from './entities/hotel.entity';
+import { RoomType } from '../room_type/entites/room_type.entity';
 import { Room } from '../room/entities/room.entity';
 import { Review } from '../review/entities/review.entity';
 import { MinioService } from '@/minio/minio.service';
@@ -37,7 +38,13 @@ export class HotelsService {
     return `This action returns all hotels`;
   }
 
-  // HOME - TOP DESTINATION
+  update(id: number, updateHotelDto: UpdateHotelDto) {
+    return `This action updates a #${id} hotel`;
+  }
+
+  remove(id: number) {
+    return `This action removes a #${id} hotel`;
+  }
 
   // HOME - TOP 10 RATING HOTEL BY REVIEW
   async getTopTenRatingHotel() {
@@ -46,7 +53,7 @@ export class HotelsService {
       .leftJoinAndSelect('hotel.images', 'image')
       .leftJoinAndSelect('hotel.locations', 'location')
       .leftJoin('hotel.reviews', 'review')
-      .leftJoin('hotel.rooms', 'room')
+      .leftJoin('hotel.roomTypes', 'roomType')
       .select([
         'hotel.id AS id',
         'hotel.name AS name',
@@ -55,7 +62,7 @@ export class HotelsService {
         'ARRAY_AGG(image.url) AS images',
         'AVG(review.rating) AS averageRating',
         'COUNT(review.id) AS totalReviews',
-        'MIN(room.price) AS minRoomPrice',
+        'MIN(roomType.price) AS minPrice',
       ])
       .groupBy('hotel.id')
       .addGroupBy('location.id')
@@ -63,14 +70,21 @@ export class HotelsService {
       .limit(10) // Lấy top 10 khách sạn
 
     const hotels = await queryBuilder.getRawMany();
-    console.log('HOTEL: ', hotels);
+    // console.log('HOTEL: ', hotels);
 
     return Promise.all(
       hotels.map(async (hotel) => {
         const presignedImages = await Promise.all(
-          hotel.images.map((url) => this.minioService.getPresignedUrl("hotel_image/" + url))
+          hotel.images.map((url) => {
+            // Kiểm tra nếu URL bắt đầu bằng "https://cf.bstatic.com/xdata"
+            if (url.startsWith("https://cf.bstatic.com/xdata")) {
+              return url; // Nếu có, trả về URL gốc
+            } else {
+              return this.minioService.getPresignedUrl("hotel_image/" + url); // Nếu không, lấy presigned URL
+            }
+          })
         );
-        // console.log(presignedImages);
+
         return {
           id: hotel.id,
           name: hotel.name,
@@ -85,39 +99,133 @@ export class HotelsService {
     );
   }
 
-  // SEARCH - SEARCH RESULT
+  // SEARCH - SEARCH HOTEL 
   async findAvailableHotels(searchHotelDto: SearchHotelDto) {
-    const { city, checkInDate, checkOutDate, roomType2, roomType4 } = searchHotelDto;
+    const { city, checkInDate, checkOutDate, roomType2, roomType4, minRating, minStar, minPrice, maxPrice } = searchHotelDto;
+    console.log('DTO: ', searchHotelDto);
 
-    // Lấy ra toàn bộ khách sạn 
     const hotelQueryBuilder = this.hotelRepository
       .createQueryBuilder('hotel')
       .leftJoinAndSelect('hotel.locations', 'location')
       .leftJoin('hotel.images', 'image')
-      .leftJoin('hotel.rooms', 'room')
+      .leftJoin('hotel.reviews', 'review')
+      .leftJoin('hotel.roomTypes', 'roomType')
+      .leftJoin('roomType.rooms', 'room')
+      .leftJoin('hotel.bookings', 'booking', 'booking.status = :status', { status: 'confirmed' })
+      .leftJoin('booking.bookingDetails', 'bookingDetail')
       .select([
         'hotel.id AS id',
         'hotel.name AS name',
         'hotel.star AS star',
         'location.city AS city',
         'location.detailAddress AS address',
-        'MIN(room.price) AS minPrice', 
-        'ARRAY_AGG(image.url) AS images'
+        'MIN(roomType.price) AS minPrice',
+        'ARRAY_AGG(image.url) AS images',
+        'AVG(review.rating) AS averageRating',
+        'COUNT(review.id) AS totalReviews',
+        `
+          COUNT(CASE 
+            WHEN room.type = 2 
+              AND (room.status = 'available' 
+              OR NOT EXISTS (
+                SELECT 1
+                FROM booking b
+                JOIN booking_detail bd
+                ON b.id = bd."bookingId"
+                WHERE b."hotelId" = hotel.id
+                  AND bd.type = 2
+                  AND (
+                    b."checkinTime" < :checkOutDate
+                    AND b."checkoutTime" > :checkInDate
+                  )
+              ))
+            THEN 1 
+          END) AS roomType2Count
+        `,
+        `
+          COUNT(CASE 
+            WHEN room.type = 4 
+              AND (room.status = 'available' 
+              OR NOT EXISTS (
+                SELECT 1
+                FROM booking b
+                JOIN booking_detail bd
+                ON b.id = bd."bookingId"
+                WHERE b."hotelId" = hotel.id
+                  AND bd.type = 4
+                  AND (
+                    b."checkinTime" < :checkOutDate 
+                    AND b."checkoutTime" > :checkInDate
+                  )
+          ))
+            THEN 1 
+          END) AS roomType4Count
+        `
       ])
       .groupBy('hotel.id')
-      .addGroupBy('location.id');
+      .addGroupBy('location.id')
+      .setParameters({ checkInDate, checkOutDate, city });
 
-      // Nếu có city thì duyệt qua city
-      if(city){
-        hotelQueryBuilder.andWhere('location.city =: city', { city });
-      }
+    // Các điều kiện tìm kiếm
+    if (city) {
+      hotelQueryBuilder.andWhere('location.city = :city', { city });
+    }
 
-      // Nếu có CheckIn và CheckOut date thì duyệt qua
-      if(checkInDate && checkOutDate){
-        
-      }
+    // console.log('HOTEL QUERY', await hotelQueryBuilder.getRawMany());
 
-      return 'Test';
+    if (roomType2) {
+      hotelQueryBuilder.andHaving('roomType2Count >= :roomType2', { roomType2 });
+    }
+
+    if (roomType4) {
+      hotelQueryBuilder.andHaving('roomType4Count >= :roomType4', { roomType4 });
+    }
+
+    // Lọc theo số sao tối thiểu
+    if (minStar) {
+      hotelQueryBuilder.andWhere('hotel.star >= :minStar', { minStar });
+    }
+
+    // Lọc theo đánh giá trung bình tối thiểu
+    if (minRating) {
+      hotelQueryBuilder.having('AVG(review.rating) >= :minRating', { minRating });
+    }
+
+    // Lọc theo giá thấp nhất và lớn nhất
+    if (minPrice) {
+      hotelQueryBuilder.having('MIN(roomType.price) >= :minPrice', { minPrice });
+    }
+    if(maxPrice) {
+      hotelQueryBuilder.having('MIN(roomType.price) <= :maxPrice', { maxPrice });
+    }
+
+    const hotels = await hotelQueryBuilder.getRawMany();
+    console.log('HOTEL AFTER SEARCH AND FILTER: ', hotels);
+
+    return Promise.all(
+      hotels.map(async (hotel) => {
+        const presignedImages = await Promise.all(
+          hotel.images.map((url) => {
+            if (url.startsWith("https://cf.bstatic.com/xdata")) {
+              return url;
+            } else {
+              return this.minioService.getPresignedUrl("hotel_image/" + url);
+            }
+          })
+        );
+
+        return {
+          id: hotel.id,
+          name: hotel.name,
+          star: hotel.star,
+          address: hotel.address,
+          images: presignedImages,
+          averageRating: hotel.averagerating ?? 0,
+          totalReviews: Number(hotel.totalreviews) || 0,
+          minRoomPrice: hotel.minprice ?? 0
+        };
+      })
+    );
   }
 
   // DETAIL - DETAIL HOTEL
@@ -229,13 +337,5 @@ export class HotelsService {
       console.error('Error in findOne method:', error);
       throw error;
     }
-  }
-
-  update(id: number, updateHotelDto: UpdateHotelDto) {
-    return `This action updates a #${id} hotel`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} hotel`;
   }
 }

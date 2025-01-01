@@ -4,9 +4,9 @@ import { Hotel } from "@/module/hotel/entities/hotel.entity";
 import { Payment } from "@/module/payment/entities/payment.entity";
 import { Room } from "@/module/room/entities/room.entity";
 import { User } from "@/module/user/entities/user.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity({name: "booking"})
+@Entity({ name: "booking" })
 export class Booking {
     @PrimaryGeneratedColumn()
     id: number;
@@ -39,16 +39,16 @@ export class Booking {
     note: string;
 
     @ManyToOne(() => User, (user) => user.bookings)
-    @JoinColumn({name: "userId"})
+    @JoinColumn({ name: "userId" })
     user: User;
 
     @ManyToOne(() => Hotel, (hotel) => hotel.bookings)
-    @JoinColumn({name: "hotelId"})
+    @JoinColumn({ name: "hotelId" })
     hotel: Hotel;
 
     @OneToOne(() => Bill, (bill) => bill.booking)
     bill: Bill;
 
-    @OneToOne(() => BookingDetail, (bookingDetail) => bookingDetail.booking)
-    detail: BookingDetail;
+    @OneToMany(() => BookingDetail, (bookingDetail) => bookingDetail.booking)
+    bookingDetails: BookingDetail[];
 }

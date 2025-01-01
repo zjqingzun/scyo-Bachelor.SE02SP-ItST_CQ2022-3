@@ -3,11 +3,22 @@ import "./utils/i18n";
 
 import { publicRoutes } from "./routes";
 import DefaultLayout from "./components/Layout/DefaultLayout";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { Suspense } from "react";
 import { ToastContainer } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { doGetAccount } from "./redux/action/accountAction";
 
 function App() {
+    const dispatch = useDispatch();
+    const userInfo = useSelector((state) => state.account.userInfo);
+
+    useEffect(() => {
+        if (userInfo && !userInfo.email) {
+            dispatch(doGetAccount());
+        }
+    }, []);
+
     return (
         <Router>
             <Suspense fallback="...is loading">

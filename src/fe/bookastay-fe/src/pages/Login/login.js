@@ -2,12 +2,16 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./login.css";
 import { userLogin } from "~/services/apiService";
+import { useDispatch } from "react-redux";
+import { doLogin } from "~/redux/action/accountAction";
 
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
+
+    const dispatch = useDispatch();
 
     const isValidEmail = (email) => {
         // Regex kiểm tra email hợp lệ
@@ -41,7 +45,8 @@ function Login() {
         };
 
         // Gọi API login
-        const res = await userLogin(data);
+        // const res = await userLogin(data);
+        const res = dispatch(doLogin(email, password));
 
         console.log(">>> login res", res);
 

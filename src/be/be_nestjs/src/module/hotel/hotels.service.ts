@@ -101,7 +101,7 @@ export class HotelsService {
 
   // SEARCH - SEARCH HOTEL 
   async findAvailableHotels(searchHotelDto: SearchHotelDto) {
-    const { city, checkInDate, checkOutDate, roomType2, roomType4, minRating, minStar, minPrice, maxPrice } = searchHotelDto;
+    const { city, checkInDate, checkOutDate, roomType2, roomType4, minRating, minStar, minPrice, maxPrice, page, per_page } = searchHotelDto;
     console.log('DTO: ', searchHotelDto);
 
     const hotelQueryBuilder = this.hotelRepository
@@ -195,14 +195,24 @@ export class HotelsService {
     if (minPrice) {
       hotelQueryBuilder.having('MIN(roomType.price) >= :minPrice', { minPrice });
     }
-    if(maxPrice) {
+    if (maxPrice) {
       hotelQueryBuilder.having('MIN(roomType.price) <= :maxPrice', { maxPrice });
     }
 
-    const hotels = await hotelQueryBuilder.getRawMany();
-    console.log('HOTEL AFTER SEARCH AND FILTER: ', hotels);
+    const offset = (page - 1) * per_page;
+    const [hotels, totalHotels] = await Promise.all([
+      hotelQueryBuilder
+        .skip(offset) // Tính toán bắt đầu từ khách sạn nào
+        .take(per_page) // Lấy số lượng khách sạn per_page
+        .getRawMany(),
+      hotelQueryBuilder.getCount() // Tổng số khách sạn
+    ]);
+    const totalPages = Math.ceil(totalHotels / per_page);
 
-    return Promise.all(
+    // console.log('HOTEL AFTER SEARCH AND FILTER: ', hotels);
+
+    // Quá trình lấy URL hình ảnh đã ký tên và trả về kết quả theo yêu cầu
+    const data = await Promise.all(
       hotels.map(async (hotel) => {
         const presignedImages = await Promise.all(
           hotel.images.map((url) => {
@@ -226,6 +236,14 @@ export class HotelsService {
         };
       })
     );
+
+    return {
+      page,
+      per_page,
+      total: totalHotels,
+      total_pages: totalPages,
+      data
+    };
   }
 
   // DETAIL - DETAIL HOTEL

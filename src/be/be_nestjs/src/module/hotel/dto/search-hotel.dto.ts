@@ -28,7 +28,7 @@ export class SearchHotelDto {
     @IsNumber()
     @IsOptional()
     @Min(0)
-    minPrice?: number; 
+    minPrice?: number;
 
     @Transform(({ value }) => (value ? parseFloat(value) : undefined))
     @IsNumber()
@@ -47,4 +47,16 @@ export class SearchHotelDto {
     @IsOptional()
     @Min(0)
     minStar?: number;
+
+    // Trường page, mặc định là 1 nếu không có giá trị
+    @Transform(({ value }) => (value ? parseInt(value, 10) : 1))
+    @IsInt()
+    @IsOptional()
+    page: number = 1;
+
+    // Trường per_page, mặc định là 6 nếu không có giá trị
+    @Transform(({ value }) => (value ? parseInt(value, 10) : 6))
+    @IsInt()
+    @IsOptional()
+    per_page: number = 6;
 }

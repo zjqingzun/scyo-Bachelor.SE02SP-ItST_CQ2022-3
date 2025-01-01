@@ -41,13 +41,13 @@ export const doLogin = (email, password) => {
             } else {
                 dispatch({
                     type: USER_LOGIN_FAIL,
-                    error: response.error,
+                    error: response?.error?.message || "Login failed",
                     isDoLogin: true,
                 });
 
                 return {
                     EC: -1,
-                    EM: response.error,
+                    EM: response?.error?.message || "Login failed",
                     DT: {
                         user,
                         accessToken: "",
@@ -59,13 +59,13 @@ export const doLogin = (email, password) => {
             console.log(">>> error: ", error);
             dispatch({
                 type: USER_LOGIN_FAIL,
-                error: error,
+                error: error.message || error || "Login failed",
                 isDoLogin: true,
             });
 
             return {
                 EC: -1,
-                EM: error,
+                EM: error.message || error || "Login failed",
                 DT: {
                     user: {},
                     accessToken: "",

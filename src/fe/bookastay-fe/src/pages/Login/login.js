@@ -4,6 +4,7 @@ import "./login.css";
 import { userLogin } from "~/services/apiService";
 import { useDispatch } from "react-redux";
 import { doLogin } from "~/redux/action/accountAction";
+import { toast } from "react-toastify";
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -46,12 +47,17 @@ function Login() {
 
         // Gọi API login
         // const res = await userLogin(data);
-        const res = dispatch(doLogin(email, password));
+        const res = await dispatch(doLogin(email, password));
 
         console.log(">>> login res", res);
 
+        if (res && res.EC === 0) {
+            toast.success("Login successfully!");
+            navigate("/");
+        } else {
+            toast.error(`Login failed: ${res?.EM}`);
+        }
         // Nếu email và mật khẩu hợp lệ, chuyển hướng tới Dashboard
-        navigate("/");
     };
 
     return (

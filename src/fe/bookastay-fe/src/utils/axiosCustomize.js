@@ -26,7 +26,7 @@ axiosRetry(instance, {
             }
         }
 
-        return true;
+        return false;
     },
     retryDelay: (retryCount, error) => {
         return retryCount * 1000;

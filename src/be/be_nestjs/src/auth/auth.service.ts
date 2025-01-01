@@ -1,5 +1,8 @@
-
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from '@/module/user/user.service';
 import { comparePassword } from '@/helpers/utils';
 import { JwtService } from '@nestjs/jwt';
@@ -9,13 +12,12 @@ import { MailService } from '@/mail/mail.service';
 import { ResetpassAuthDto } from './dto/resetpassword-auth.dto';
 import moment from 'moment';
 
-
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UserService, 
+    private usersService: UserService,
     private jwtService: JwtService,
-    private mailService: MailService
+    private mailService: MailService,
   ) {}
 
   async validateUser(email: string, pass: string) {
@@ -27,7 +29,7 @@ export class AuthService {
     if (!isValidPassword) {
       throw new UnauthorizedException('Password is incorrect');
     }
-    const {password, ...res} = user;
+    const { password, ...res } = user;
     return res;
   }
 
@@ -35,7 +37,7 @@ export class AuthService {
     const payload = { email: user.email, sub: user.username };
     return {
       access_token: this.jwtService.sign(payload),
-      refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' })
+      refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
     };
   }
 
@@ -62,13 +64,13 @@ export class AuthService {
     }
   }
 
-  async register(createAuthDto : CreateAuthDto, role: string) {
+  async register(createAuthDto: CreateAuthDto, role: string) {
     const user = await this.usersService.registerUser(createAuthDto, role);
     this.mailService.sendUserActivation(user);
     return user;
   }
 
-  async forgetPassword(email : string) {
+  async forgetPassword(email: string) {
     const user = await this.usersService.setupResetPassword(email);
     this.mailService.sendResetPassword(user);
     return user.codeId;

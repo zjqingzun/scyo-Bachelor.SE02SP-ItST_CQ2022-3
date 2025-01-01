@@ -2,12 +2,17 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./login.css";
 import { userLogin } from "~/services/apiService";
+import { useDispatch } from "react-redux";
+import { doLogin } from "~/redux/action/accountAction";
+import { toast } from "react-toastify";
 
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
+
+    const dispatch = useDispatch();
 
     const isValidEmail = (email) => {
         // Regex kiểm tra email hợp lệ
@@ -41,12 +46,18 @@ function Login() {
         };
 
         // Gọi API login
-        const res = await userLogin(data);
+        // const res = await userLogin(data);
+        const res = await dispatch(doLogin(email, password));
 
         console.log(">>> login res", res);
 
+        if (res && res.EC === 0) {
+            toast.success("Login successfully!");
+            navigate("/");
+        } else {
+            toast.error(`Login failed: ${res?.EM}`);
+        }
         // Nếu email và mật khẩu hợp lệ, chuyển hướng tới Dashboard
-        navigate("/");
     };
 
     return (

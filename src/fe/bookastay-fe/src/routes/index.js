@@ -99,7 +99,7 @@ const publicRoutes = [
     {
         path: "/review",
         component: Review,
-    }
+    },
 ];
 
 const hotelOwnerRoutes = [

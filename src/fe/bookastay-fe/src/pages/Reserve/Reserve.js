@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import DatePicker from "rsuite/DatePicker";
+import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -13,6 +14,13 @@ import "rsuite/DatePicker/styles/index.css";
 import images from "~/assets/image";
 import icons from "~/assets/icon";
 import { toast } from "react-toastify";
+
+const StyledStepLabel = styled.div`
+    font-size: 2.8rem;
+    text-align: center;
+    font-weight: 600;
+    color: #1a4870;
+`;
 
 const Reserve = () => {
     const { t } = useTranslation();
@@ -131,13 +139,20 @@ const Reserve = () => {
 
     return (
         <div className="reserve-page">
-            <Stepper
-                stepsConfig={stepsConfig}
-                currentStep={currentStep}
-                setCurrentStep={setCurrentStep}
-                isComplete={isComplete}
-                setIsComplete={setIsComplete}
-            />
+            <div className="d-none d-md-flex">
+                <Stepper
+                    stepsConfig={stepsConfig}
+                    currentStep={currentStep}
+                    setCurrentStep={setCurrentStep}
+                    isComplete={isComplete}
+                    setIsComplete={setIsComplete}
+                />
+            </div>
+
+            <div className="d-md-none">
+                {currentStep === 2 && <StyledStepLabel>{stepsConfig[1].title}</StyledStepLabel>}
+                {currentStep === 3 && <StyledStepLabel>{stepsConfig[2].title}</StyledStepLabel>}
+            </div>
 
             <div className="reserve-page__content">
                 <div className="row gy-4 gx-2 gx-lg-3">

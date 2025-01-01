@@ -5,6 +5,18 @@
 
     &__content {
         margin-top: 60px;
+
+        @include screen(lg) {
+            margin-top: 50px;
+        }
+
+        @include screen(md) {
+            margin-top: 40px;
+        }
+
+        @include screen(sm) {
+            margin-top: 30px;
+        }
     }
 
     .red-dot {

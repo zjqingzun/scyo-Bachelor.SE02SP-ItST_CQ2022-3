@@ -146,7 +146,7 @@ const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () 
     return (
         <div>
             <form onSubmit={formik.handleSubmit}>
-                <div className="row">
+                <div className="row row-cols-1 row-cols-md-2 gy-3">
                     <div className="col">
                         <div className="mb-3">
                             <label htmlFor="hotelName" className="form-label">

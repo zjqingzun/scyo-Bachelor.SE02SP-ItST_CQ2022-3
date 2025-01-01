@@ -30,7 +30,7 @@ const accountReducer = (state = initialState, action) => {
             console.log(">>> action: ", action);
             return {
                 ...state,
-                isLoading: true,
+                isLoading: action.isLoading !== undefined ? action.isLoading : true,
                 errorMessage: "",
                 isDoLogin: action.isDoLogin || false,
             };
@@ -41,7 +41,7 @@ const accountReducer = (state = initialState, action) => {
                 userInfo: action.user,
                 accessToken: action.accessToken,
                 refreshToken: action.refreshToken,
-                isLoading: false,
+                isLoading: action.isLoading !== undefined ? action.isLoading : false,
                 errorMessage: "",
                 isDoLogin: action.isDoLogin || false,
             };
@@ -49,7 +49,7 @@ const accountReducer = (state = initialState, action) => {
             console.log(">>> action: ", action);
             return {
                 ...state,
-                isLoading: false,
+                isLoading: action.isLoading !== undefined ? action.isLoading : false,
                 errorMessage: action.error,
                 isDoLogin: action.isDoLogin || false,
             };

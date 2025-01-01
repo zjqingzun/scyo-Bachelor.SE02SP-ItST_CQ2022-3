@@ -182,7 +182,7 @@ const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () 
                             />
                             <div className="invalid-feedback">{formik.errors.hotelAddress}</div>
                         </div>
-                        <div className="row row-cols-3 mb-3">
+                        <div className="row row-cols-2 row-cols-md-3 mb-3">
                             <div className="col">
                                 <label htmlFor="hotelCity" className="form-label">
                                     City <span className="red-dot">*</span>

@@ -329,37 +329,37 @@ export class HotelsService {
       }
 
       // Lấy ra review của khách sạn
-      let reviews = [];
-      try {
-        reviews = await this.hotelRepository
-          .createQueryBuilder('hotel')
-          .leftJoin('hotel.reviews', 'review')
-          .leftJoin('review.user', 'user')
-          .select([
-            'review.id AS review_id',
-            'user.avatar AS review_ava',
-            'user.name AS review_user',
-            'review.rating AS review_rate',
-            'review.comment AS review_cmt',
-            'review.createdAt AS review_date'
-          ])
-          .where('hotel.id = :hotelId', { hotelId: id })
-          .getRawMany();
+      // let reviews = [];
+      // try {
+      //   reviews = await this.hotelRepository
+      //     .createQueryBuilder('hotel')
+      //     .leftJoin('hotel.reviews', 'review')
+      //     .leftJoin('review.user', 'user')
+      //     .select([
+      //       'review.id AS review_id',
+      //       'user.avatar AS review_ava',
+      //       'user.name AS review_user',
+      //       'review.rating AS review_rate',
+      //       'review.comment AS review_cmt',
+      //       'review.createdAt AS review_date'
+      //     ])
+      //     .where('hotel.id = :hotelId', { hotelId: id })
+      //     .getRawMany();
 
-        // Xử lý hình ảnh avatar người review
-        for (const review of reviews) {
-          if (review.review_ava) {
-            if (review.review_ava.startsWith("https://img.freepik.com")) {
-              continue;
-            } else {
-              review.review_ava = await this.minioService.getPresignedUrl('user_avatar/' + review.review_ava);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching rooms:', error);
-        throw new Error('Internal server error');
-      }
+      //   // Xử lý hình ảnh avatar người review
+      //   for (const review of reviews) {
+      //     if (review.review_ava) {
+      //       if (review.review_ava.startsWith("https://img.freepik.com")) {
+      //         continue;
+      //       } else {
+      //         review.review_ava = await this.minioService.getPresignedUrl('user_avatar/' + review.review_ava);
+      //       }
+      //     }
+      //   }
+      // } catch (error) {
+      //   console.error('Error fetching rooms:', error);
+      //   throw new Error('Internal server error');
+      // }
 
       return {
         status_code: 200,
@@ -372,6 +372,10 @@ export class HotelsService {
           address: hotel.address,
           city: hotel.city,
           images: presignedImages,
+          checkInDate: checkInDate,
+          checkOutDate: checkOutDate,
+          roomType2: roomType2,
+          roomType4: roomType4,
           numberOfRoom2: Number(hotel.roomtype2count),
           numberOfRoom4: Number(hotel.roomtype4count),
           room_types: roomTypes.map(room => ({
@@ -380,15 +384,15 @@ export class HotelsService {
             price: room.price,
             weekend_price: room.weekend_price,
             flexible_price: room.flexible_price
-          })),
-          reviews: reviews.map(review => ({
-            id: review.review_id,
-            avatar: review.review_ava,
-            user: review.review_user,
-            rate: review.review_rate,
-            date: review.review_date,
-            comment: review.review_cmt
           }))
+          // reviews: reviews.map(review => ({
+          //   id: review.review_id,
+          //   avatar: review.review_ava,
+          //   user: review.review_user,
+          //   rate: review.review_rate,
+          //   date: review.review_date,
+          //   comment: review.review_cmt
+          // }))
         }
       };
     } catch (error) {

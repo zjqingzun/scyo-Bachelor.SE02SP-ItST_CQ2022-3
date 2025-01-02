@@ -85,7 +85,7 @@ export class ReviewService {
           reviews: reviews.map(review => ({
             id: review.review_id,
             avatar: review.review_ava,
-            user: review.review_user,
+            name: review.review_user,
             rate: review.review_rate,
             date: review.review_date,
             comment: review.review_cmt,

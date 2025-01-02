@@ -163,7 +163,7 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
       await queryRunner.query(`
         CREATE TABLE "review" (
           "id" SERIAL PRIMARY KEY,
-          "comment" VARCHAR(255) NOT NULL,
+          "comment" TEXT NOT NULL,
           "rating" INT NOT NULL,
           "createdAt" TIMESTAMP DEFAULT now(),
           "userId" INT NOT NULL,

@@ -477,8 +477,9 @@ INSERT INTO "user" (
 );
 
 
-INSERT INTO "user" (id, name, "dob", "cccd", email, password, phone, "accountType", "codeId", "codeExpired", avatar) VALUES 
-(3, 'Thao000001', '1954-01-17', '0000000000', 'lmfadapm6f1n@outlook.com', 'qL@6oKJaUrxqo', '(+86)081997684', 'google', '', '2024-12-30 00:15:30', 'https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3485.jpg?w=826'),
+    INSERT INTO "user" (id, name, "dob", "cccd", email, password, phone, "accountType", "codeId", "codeExpired", avatar) VALUES 
+    (2, 'An0001', '1954-01-17', '0000000000', 'lmfadapm6f1n@outlook.com', 'qL@6oKJaUrxqo', '(+86)081997684', 'google', '', '2024-12-30 00:15:30', 'https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3485.jpg?w=826'),
+    (3, 'Thao000001', '1954-01-17', '0000000000', 'lmfadapm6f1n@outlook.com', 'qL@6oKJaUrxqo', '(+86)081997684', 'google', '', '2024-12-30 00:15:30', 'https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3485.jpg?w=826'),
 (4, 'Quỳnh000002', '1957-01-16', '0000000000', 'npzyizhg@outlook.com', 'krA3L4oMqQkFmn@0', '(+50)007928729', 'google', '', '2024-12-30 00:15:30', 'https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3485.jpg?w=826'),
 (5, 'Tín000003', '1992-01-08', '0000000000', '7xy76xlr0oq@yahoo.com', 'GI%bj$E#H1ET', '(+79)058791822', 'google', '', '2024-12-30 00:15:30', 'https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3485.jpg?w=826'),
 (6, 'Ánh000004', '1986-01-09', '0000000000', 'dfyiiye@gmail.com', 'M1Udy84vsn$', '(+71)016964445', 'google', '', '2024-12-30 00:15:30', 'https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3485.jpg?w=826'),

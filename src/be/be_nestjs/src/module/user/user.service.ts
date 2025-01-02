@@ -224,6 +224,19 @@ export class UserService {
     await queryRunner.manager.query(`INSERT INTO users_roles("userId", "roleId") VALUES(${userId}, ${roleObj[0].id})`);
   }
 
+  async getRole(userId: number) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    const role = await queryRunner.manager.query(`
+      SELECT r.name
+      FROM (
+            SELECT *
+            FROM users_roles
+            WHERE "userId" = ${userId}
+          ) ur JOIN role r ON ur."roleId" = r.id
+    `);
+    return role[0].name;
+  }
+
   async addFav(req : Request) {
     const {userId, hotelId} = req.query;
     const queryRunner = this.dataSource.createQueryRunner();

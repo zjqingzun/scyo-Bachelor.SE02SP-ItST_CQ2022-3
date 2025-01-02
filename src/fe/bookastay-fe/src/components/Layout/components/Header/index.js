@@ -4,39 +4,13 @@ import { useSelector, useDispatch } from "react-redux";
 import { Dropdown as BDropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { Drawer, Avatar, Dropdown } from "antd";
-import { DownOutlined, SettingOutlined } from "@ant-design/icons";
+import { DownOutlined, LoginOutlined, SettingOutlined } from "@ant-design/icons";
 
 import icons from "~/assets/icon";
 import { setCurrency } from "~/redux/action/currencyAction";
 
 import "./Header.scss";
-
-const items = [
-    {
-        key: "1",
-        label: "My Account",
-        disabled: true,
-    },
-    {
-        type: "divider",
-    },
-    {
-        key: "2",
-        label: "Profile",
-        extra: "⌘P",
-    },
-    {
-        key: "3",
-        label: "Billing",
-        extra: "⌘B",
-    },
-    {
-        key: "4",
-        label: "Settings",
-        icon: <SettingOutlined />,
-        extra: "⌘S",
-    },
-];
+import { doLogout } from "~/redux/action/accountAction";
 
 const CustomToggleForCurrency = React.forwardRef(({ children, onClick }, ref) => (
     <span
@@ -66,6 +40,7 @@ const CustomToggleForCurrency = React.forwardRef(({ children, onClick }, ref) =>
 const Header = () => {
     const { t, i18n } = useTranslation();
     const currency = useSelector((state) => state.currency.currency);
+    const userInfo = useSelector((state) => state.account.userInfo);
 
     const dispatch = useDispatch();
 
@@ -95,6 +70,51 @@ const Header = () => {
 
     // console.log("currency", currency);
     // console.log("baseCurrency", baseCurrency);
+
+    const items = [
+        {
+            key: "1",
+            label: (userInfo && userInfo.email) || "My Account",
+            disabled: true,
+        },
+        {
+            type: "divider",
+        },
+        {
+            key: "2",
+            label: "Profile",
+            extra: "⌘P",
+        },
+        {
+            key: "3",
+            label: "Billing",
+            extra: "⌘B",
+        },
+        {
+            key: "4",
+            label: "Settings",
+            icon: <SettingOutlined />,
+            extra: "⌘S",
+        },
+        {
+            type: "divider",
+        },
+        {
+            key: "5",
+            icon: <LoginOutlined />,
+            label: (
+                <span
+                    onClick={() => {
+                        dispatch(doLogout());
+                    }}
+                    style={{ color: "#f5222d" }}
+                >
+                    Logout
+                </span>
+            ),
+            extra: "⌘L",
+        },
+    ];
 
     return (
         <>
@@ -194,9 +214,27 @@ const Header = () => {
                         />
                     </a>
 
-                    <a href="/login" className="header__sign-in-btn">
+                    {/* <a href="/login" className="header__sign-in-btn">
                         {t("header.signIn")}
-                    </a>
+                    </a> */}
+
+                    {userInfo && userInfo.email ? (
+                        <Dropdown menu={{ items }}>
+                            <Avatar
+                                style={{ cursor: "pointer" }}
+                                src={
+                                    userInfo.avatar ||
+                                    "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                                }
+                            >
+                                Nam
+                            </Avatar>
+                        </Dropdown>
+                    ) : (
+                        <a href="/login" className="header__sign-in-btn">
+                            {t("header.signIn")}
+                        </a>
+                    )}
 
                     {/* <Dropdown menu={{ items }}>
                         <Avatar

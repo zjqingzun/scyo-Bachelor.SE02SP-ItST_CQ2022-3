@@ -1,6 +1,8 @@
 import axios from "axios";
 import axiosRetry from "axios-retry";
 
+import { getRefreshToken } from "~/services/apiService";
+
 const instance = axios.create({
     baseURL: process.env.REACT_APP_API_URL,
     withCredentials: true,
@@ -11,8 +13,20 @@ const instance = axios.create({
 
 axiosRetry(instance, {
     retries: 3,
-    retryCondition: (error) => {
-        return true;
+    retryCondition: async (error) => {
+        if (error && error.response && error.response.status === 401) {
+            // call to refresh token
+            const refreshToken = localStorage.getItem("refresh_token");
+            if (refreshToken) {
+                const res = await getRefreshToken();
+
+                localStorage.setItem("access_token", res.access_token);
+
+                return true;
+            }
+        }
+
+        return false;
     },
     retryDelay: (retryCount, error) => {
         return retryCount * 1000;
@@ -23,6 +37,11 @@ axiosRetry(instance, {
 instance.interceptors.request.use(
     function (config) {
         // Do something before request is sent
+        const token = localStorage.getItem("access_token");
+        if (token) {
+            config.headers["Authorization"] = `Bearer ${token}`;
+        }
+
         return config;
     },
     function (error) {
@@ -44,6 +63,8 @@ instance.interceptors.response.use(
         // Do something with response error
 
         if (error && error.response && error.response.data) {
+            // call to refresh token
+
             return error.response.data;
         }
 

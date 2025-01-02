@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Req, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Request,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
@@ -22,7 +34,7 @@ export class AuthController {
 
     response.cookie('auth_token', token, {
       httpOnly: true,
-      maxAge: 3600000, 
+      maxAge: 3600000,
     });
 
     return token;
@@ -30,7 +42,7 @@ export class AuthController {
 
   @Get('renew_token/:refreshToken')
   @Public()
-  async renewToken(@Param('refreshToken') refreshToken : string) {
+  async renewToken(@Param('refreshToken') refreshToken: string) {
     return await this.authService.refreshAccessToken(refreshToken);
   }
 
@@ -41,19 +53,22 @@ export class AuthController {
 
   @Post('register/:role')
   @Public()
-  async register(@Body() createAuthDto: CreateAuthDto, @Param('role') role : string) {
+  async register(
+    @Body() createAuthDto: CreateAuthDto,
+    @Param('role') role: string,
+  ) {
     return this.authService.register(createAuthDto, role);
   }
 
   @Get('forgetPassword/:email')
   @Public()
-  async forgetPassword(@Param('email') email : string) {
+  async forgetPassword(@Param('email') email: string) {
     return await this.authService.forgetPassword(email);
   }
 
   @Post('resetPassword')
   @Public()
-  async resetPassword(@Body() resetInfo : ResetpassAuthDto) {
+  async resetPassword(@Body() resetInfo: ResetpassAuthDto) {
     return await this.authService.resetPassword(resetInfo);
   }
 
@@ -61,7 +76,7 @@ export class AuthController {
   @Public()
   @UseGuards(GoogleAuthGuard)
   async googleAuth(@Req() req) {
-    return "successfully";
+    return 'successfully';
   }
 
   @Get('google/redirect')

@@ -1,60 +1,91 @@
-import React, { useState } from 'react';
-import './register.css';
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import "./register.css";
+import { useNavigate } from "react-router-dom";
+
+const { userRegister } = require("~/services/apiService");
 
 function RegisterForm() {
+    const navigate = useNavigate();
+
     const [formData, setFormData] = useState({
-        name: '',
-        dob: '',
-        identifiedNumber: '',
-        contact: '',
-        phoneNumber: '',
-        password: '',
-        confirmPassword: '',
+        name: "",
+        dob: "",
+        identifiedNumber: "",
+        contact: "",
+        phoneNumber: "",
+        password: "",
+        confirmPassword: "",
         agree: false,
     });
 
-    const [alertMessage, setAlertMessage] = useState('');
-    const [alertType, setAlertType] = useState(''); // 'success' or 'danger'
+    const [alertMessage, setAlertMessage] = useState("");
+    const [alertType, setAlertType] = useState(""); // 'success' or 'danger'
 
     // Handle input changes
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         setFormData({
             ...formData,
-            [name]: type === 'checkbox' ? checked : value,
+            [name]: type === "checkbox" ? checked : value,
         });
     };
 
     // Handle form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!formData.agree) {
-            setAlertType('danger');
-            setAlertMessage('Please agree to the privacy policy to sign up.');
+            setAlertType("danger");
+            setAlertMessage("Please agree to the privacy policy to sign up.");
             return;
         }
 
         if (formData.password !== formData.confirmPassword) {
-            setAlertType('danger');
-            setAlertMessage('Passwords do not match!');
+            setAlertType("danger");
+            setAlertMessage("Passwords do not match!");
             return;
         }
 
         // Clear alert messages
-        setAlertMessage('');
-        setAlertType('');
+        setAlertMessage("");
+        setAlertType("");
 
         // Simulate successful registration
-        setAlertType('success');
-        setAlertMessage('Registration successful!');
-        console.log('Form submitted:', formData);
+        setAlertType("success");
+        setAlertMessage("Registration successful!");
+        console.log("Form submitted:", formData);
+
+        // yyyy-mm-dd to dd-mm-yyyy
+        const date = formData.dob.split("-");
+        formData.dob = `${date[2]}-${date[1]}-${date[0]}`;
+
+        const data = {
+            name: formData.name,
+            dob: formData.dob,
+            cccd: formData.identifiedNumber,
+            email: formData.contact,
+            password: formData.password,
+            phone: formData.phoneNumber,
+        };
+
+        try {
+            const response = await userRegister(data, "user");
+
+            if (response && response.email === data.email) {
+                toast.success("Registration successful!");
+                navigate("/login");
+            }
+        } catch (error) {
+            toast.error("Registration failed!");
+            console.error("Registration failed:", error);
+        }
     };
 
     return (
         <div className="p-4 d-flex justify-content-center align-items-center body">
             <div className="register-container my-4 pt-5 pb-2 shadow-lg">
-                <h1 className='text-center mt-3 mb-3 fs-1'>Create account!</h1>
+                <h1 className="text-center mt-3 mb-3 fs-1">Create account!</h1>
 
                 {/* Alert Section */}
                 {alertMessage && (
@@ -63,10 +94,10 @@ function RegisterForm() {
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} id="registerForm" className='d-flex flex-column py-3'>
+                <form onSubmit={handleSubmit} id="registerForm" className="d-flex flex-column py-3">
                     <input
                         type="text"
-                        className='form-control my-2 py-3 fs-4'
+                        className="form-control my-2 py-3 fs-4"
                         name="name"
                         placeholder="Full name"
                         pattern="^[A-Za-zÀ-ÖØ-ÿ' -]{2,}( [A-Za-zÀ-ÖØ-ÿ' -]{2,}){1,2}$"
@@ -78,7 +109,7 @@ function RegisterForm() {
                     <div className="row g-2">
                         <div className="col-5">
                             <input
-                                className='form-control my-2 py-3 fs-4'
+                                className="form-control my-2 py-3 fs-4"
                                 type="date"
                                 name="dob"
                                 required
@@ -91,7 +122,7 @@ function RegisterForm() {
                         <div className="col-7">
                             <input
                                 type="text"
-                                className='form-control my-2 py-3 fs-4'
+                                className="form-control my-2 py-3 fs-4"
                                 name="identifiedNumber"
                                 placeholder="Identified Number"
                                 pattern="^\d{9}|\d{12}$"
@@ -104,7 +135,7 @@ function RegisterForm() {
                     </div>
                     <input
                         type="text"
-                        className='form-control my-2 py-3 fs-4'
+                        className="form-control my-2 py-3 fs-4"
                         name="contact"
                         placeholder="Email"
                         pattern="^(\+?\d{1,3}[-.\s]?)?(\(?\d{1,4}\)?[-.\s]?)?\d{1,4}[-.\s]?\d{1,9}$|^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
@@ -114,7 +145,7 @@ function RegisterForm() {
                     />
                     <input
                         type="text"
-                        className='form-control my-2 py-3 fs-4'
+                        className="form-control my-2 py-3 fs-4"
                         name="phoneNumber"
                         placeholder="Phone number"
                         pattern="^(\+?\d{1,3}[-.\s]?)?(\(?\d{1,4}\)?[-.\s]?)?\d{1,4}[-.\s]?\d{1,9}$"
@@ -124,7 +155,7 @@ function RegisterForm() {
                     />
                     <input
                         type="password"
-                        className='form-control my-2 py-3 fs-4'
+                        className="form-control my-2 py-3 fs-4"
                         name="password"
                         placeholder="Password"
                         pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$"
@@ -135,7 +166,7 @@ function RegisterForm() {
                     />
                     <input
                         type="password"
-                        className='form-control my-2 py-3 fs-4'
+                        className="form-control my-2 py-3 fs-4"
                         name="confirmPassword"
                         placeholder="Confirm Password"
                         required
@@ -145,7 +176,7 @@ function RegisterForm() {
                     <div className="form-agreement d-flex justify-content-start align-items-center">
                         <input
                             type="checkbox"
-                            className='me-2 mt-1 py-3 fs-4'
+                            className="me-2 mt-1 py-3 fs-4"
                             name="agree"
                             id="agree"
                             checked={formData.agree}
@@ -155,9 +186,14 @@ function RegisterForm() {
                             I agree with your <a href="#">privacy</a>.
                         </label>
                     </div>
-                    <input type="submit" className="mb-4 mt-5 py-3" value="Sign up" id="submitBtn" />
+                    <input
+                        type="submit"
+                        className="mb-4 mt-5 py-3"
+                        value="Sign up"
+                        id="submitBtn"
+                    />
                 </form>
-                <p className='text-center'>
+                <p className="text-center">
                     Have an account? <a href="/login">Login</a>
                 </p>
             </div>

@@ -6,6 +6,7 @@ import { HotelsService } from './hotels.service';
 import { CreateHotelDto } from './dto/create-hotel.dto';
 import { UpdateHotelDto } from './dto/update-hotel.dto';
 import { SearchHotelDto } from './dto/search-hotel.dto';
+import { DetailHotelDto } from './dto/detail-hotel.dto';
 
 
 @Controller('hotels')
@@ -39,17 +40,20 @@ export class HotelsController {
     return await this.hotelsService.getTopTenRatingHotel();
   }
 
-  // API search khách sạn
+  // [GET]: /hotels?city=...&checkInDate=...&checkOutDate=...&roomType2=...&roomType4=...&minPrice=...&maxPrice=...&minRating=...&minStar=...&page=...&perPage=...
   @Get('search')
   @Public()
   async findAvailableHotels(@Query() searchHotelDto: SearchHotelDto) {
     return await this.hotelsService.findAvailableHotels(searchHotelDto);
   }
 
-  // [GET]: /hotels/:id
+  // [GET]: /hotels/:id?checkInDate=...&checkOutDate=...&roomType2=...&roomType4=...
   @Get(':id')
   @Public()
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return await this.hotelsService.findOne(id);
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Query() detailHotelDto: DetailHotelDto
+  ) {
+    return await this.hotelsService.findOne(id, detailHotelDto);
   }
 }

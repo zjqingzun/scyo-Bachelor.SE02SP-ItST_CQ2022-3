@@ -7,11 +7,11 @@ import { Repository } from 'typeorm';
 import { Hotel } from './entities/hotel.entity';
 import { RoomType } from '../room_type/entites/room_type.entity';
 import { Room } from '../room/entities/room.entity';
-import { Review } from '../review/entities/review.entity';
 import { MinioService } from '@/minio/minio.service';
 
 import { NotFoundException } from '@nestjs/common';
 import { SearchHotelDto } from './dto/search-hotel.dto';
+import { DetailHotelDto } from './dto/detail-hotel.dto';
 
 
 @Injectable()
@@ -23,9 +23,6 @@ export class HotelsService {
 
     @InjectRepository(Room)
     private readonly roomRepository: Repository<Room>,
-
-    @InjectRepository(Review)
-    private readonly reviewRepository: Repository<Review>,
 
     @InjectRepository(RoomType)
     private readonly roomTypeRepository: Repository<RoomType>,
@@ -222,7 +219,9 @@ export class HotelsService {
             images: presignedImages,
             averageRating: hotel.averagerating ?? 0,
             totalReviews: Number(hotel.totalreviews) || 0,
-            minRoomPrice: hotel.minprice ?? 0
+            minRoomPrice: hotel.minprice ?? 0,
+            numberOfRoom2: Number(hotel.roomtype2count),
+            numberOfRoom4: Number(hotel.roomtype4count)
           };
         })
       );
@@ -250,24 +249,46 @@ export class HotelsService {
   }
 
   // DETAIL - DETAIL HOTEL
-  async findOne(id: number) {
+  async findOne(id: number, detailHotelDto: DetailHotelDto) {
+    const { checkInDate, checkOutDate, roomType2, roomType4 } = detailHotelDto;
     try {
       // console.log(`Finding hotel with ID: ${id}`);
       const hotel = await this.hotelRepository
         .createQueryBuilder('hotel')
         .leftJoin('hotel.locations', 'location')
         .leftJoin('hotel.images', 'image')
+        .leftJoin('hotel.roomTypes', 'roomType')
+        .leftJoin('roomType.rooms', 'room')
+        .leftJoin('hotel.bookings', 'booking', 'booking.status = :status', { status: 'confirmed' })
+        .leftJoin('booking.bookingDetails', 'bookingDetail')
         .select([
           'hotel.id AS id',
           'hotel.name AS name',
           'hotel.star AS star',
           'hotel.description AS description',
           'location.detailAddress AS address',
-          'ARRAY_AGG(image.url) AS images'
+          'ARRAY_AGG(image.url) AS images',
+          `COUNT(CASE WHEN room.type = 2 AND (room.status = 'available' OR NOT EXISTS (
+            SELECT 1
+            FROM booking b
+            JOIN booking_detail bd ON b.id = bd."bookingId"
+            WHERE b."hotelId" = hotel.id
+            AND bd.type = 2
+            AND (b."checkinTime" < :checkOutDate AND b."checkoutTime" > :checkInDate)
+          )) THEN 1 END) AS roomType2Count`,
+          `COUNT(CASE WHEN room.type = 4 AND (room.status = 'available' OR NOT EXISTS (
+            SELECT 1
+            FROM booking b
+            JOIN booking_detail bd ON b.id = bd."bookingId"
+            WHERE b."hotelId" = hotel.id
+            AND bd.type = 4
+            AND (b."checkinTime" < :checkOutDate AND b."checkoutTime" > :checkInDate)
+          )) THEN 1 END) AS roomType4Count`
         ])
         .where('hotel.id = :id', { id })
         .groupBy('hotel.id')
         .addGroupBy('location.id')
+        .setParameters({ checkInDate, checkOutDate })
         .getRawOne();
 
       // Bắt lỗi không tìm thấy khách sạn
@@ -298,11 +319,9 @@ export class HotelsService {
             'room_type.price AS price',
             'room_type.weekend_price AS weekend_price',
             'room_type.flexible_price AS flexible_price',
-            'COUNT(CASE WHEN room.status = :status THEN 1 END) AS availableRoom',
           ])
           .where('room.hotelId = :hotelId', { hotelId: id })
           .groupBy('room_type.id, room_type.type, room_type.price, room_type.weekend_price, room_type.flexible_price')
-          .setParameter('status', 'available')
           .getRawMany();
       } catch (error) {
         console.error('Error fetching rooms:', error);
@@ -353,13 +372,14 @@ export class HotelsService {
           address: hotel.address,
           city: hotel.city,
           images: presignedImages,
+          numberOfRoom2: Number(hotel.roomtype2count),
+          numberOfRoom4: Number(hotel.roomtype4count),
           room_types: roomTypes.map(room => ({
             id: room.id,
             type: room.type,
             price: room.price,
             weekend_price: room.weekend_price,
-            flexible_price: room.flexible_price,
-            availableRoom: room.availableRoom
+            flexible_price: room.flexible_price
           })),
           reviews: reviews.map(review => ({
             id: review.review_id,

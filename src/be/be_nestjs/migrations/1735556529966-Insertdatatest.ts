@@ -479,6 +479,9 @@ export class InsertDataTest1735556529966 implements MigrationInterface {
             "id", "name", "dob", "cccd", "email", "password", "phone", "accountType", "codeId", "codeExpired", "avatar"
         ) VALUES (
             1, 'admin', '1999-09-09', '0000000000', 'admin@bookastay.net', 'admin', '88882244', 'google', '', now(), 'https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3485.jpg?w=826'
+        ),
+        (
+            2, 'admin2', '1999-09-09', '0000000000', 'admin@bookastay.net', 'admin', '88882244', 'google', '', now(), 'https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3485.jpg?w=826'
         );
 
 

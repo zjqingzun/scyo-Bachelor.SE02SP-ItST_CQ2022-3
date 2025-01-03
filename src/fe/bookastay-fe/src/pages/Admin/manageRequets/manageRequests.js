@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './manageRequests.css';
+import icons from "~/assets/icon";
 
 function ManageRequests() {
   const [applications, setApplications] = useState([
@@ -46,10 +48,10 @@ function ManageRequests() {
   };
 
   return (
-    <div className="mx-5 my-4">
-      <h1 className="mt-4 mb-5">Applications</h1>
-      <table className="table">
-        <thead>
+    <div className="d-flex flex-column px-5 py-3 m-5 reqs">
+      <h1 className="title mb-4">Requests</h1>
+      <table className="table table-hover">
+        <thead className='table-dark fs-3'>
           <tr>
             <th>ID</th>
             <th>Mail</th>
@@ -80,23 +82,24 @@ function ManageRequests() {
           ))}
         </tbody>
       </table>
-      <div className="d-flex justify-content-between align-items-center mt-5">
+
+      <div className="d-flex justify-content-evenly align-items-center mt-5">
         <button
-          className="btn btn-primary"
+          className="btn" style={{ backgroundColor: '#1C2D6E' }}
           disabled={currentPage === 1}
           onClick={() => handlePageChange(currentPage - 1)}
         >
-          Previous
+          <img src={icons.chevronLeftPinkIcon} class="left-icon icon m-2"/>
         </button>
         <span>
           Page {currentPage} of {totalPages}
         </span>
         <button
-          className="btn btn-primary"
+          className="btn" style={{ backgroundColor: '#1C2D6E' }}
           disabled={currentPage === totalPages}
           onClick={() => handlePageChange(currentPage + 1)}
         >
-          Next
+          <img src={icons.chevronRightPinkIcon} class="right-icon icon m-2"/>
         </button>
       </div>
     </div>

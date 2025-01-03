@@ -6,8 +6,8 @@ function Sidebar() {
     const location = useLocation();
     return (
         <div className="sidebar d-flex flex-column text-center text-white p-3 py-5" style={{ height: '100vh', width: '250px' }}>
-            <h2 className="my-4">BookaStay</h2>
-            <ul className="nav flex-column mt-4">
+            <div className="my-5 title">BookaStay</div>
+            <ul className="nav flex-column mt-5 fs-3">
                 <li
                     className={`nav-item mb-3 ${location.pathname === '/admin/dashboard' ? 'active' : ''
                         }`}
@@ -21,7 +21,7 @@ function Sidebar() {
                         }`}
                 >
                     <Link to="/admin/manage-users" className="nav-link">
-                        Manage Users
+                        Users
                     </Link>
                 </li>
                 <li
@@ -29,7 +29,7 @@ function Sidebar() {
                         }`}
                 >
                     <Link to="/admin/manage-hotel-owners" className="nav-link">
-                        Manage Owners
+                        Owners
                     </Link>
                 </li>
                 <li
@@ -37,7 +37,7 @@ function Sidebar() {
                         }`}
                 >
                     <Link to="/admin/manage-hotels" className="nav-link">
-                        Manage Hotels
+                        Hotels
                     </Link>
                 </li>
                 <li
@@ -45,14 +45,14 @@ function Sidebar() {
                         }`}
                 >
                     <Link to="/admin/manage-requests" className="nav-link">
-                        Manage Requests
+                        Requests
                     </Link>
                 </li>
                 <li 
                     className={`nav-item last-nav ${location.pathname === '/' ? 'active' : ''
                         }`}
                 >
-                    <Link to="/admin" className="nav-link">
+                    <Link to="/admin" className="nav-link fw-bold">
                         Logout
                     </Link>
                 </li>

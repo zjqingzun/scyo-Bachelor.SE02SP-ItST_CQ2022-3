@@ -10,18 +10,19 @@ function Dashboard() {
     { id: 4, mail: 'owner4@example.com', name: 'Hotel ABB', location: 'City A', time: '08:15 29/12/2024', read: true },
     { id: 5, mail: 'owner5@example.com', name: 'Hotel BMM', location: 'City B', time: '10:30 28/12/2024', read: false },
     { id: 6, mail: 'owner6@example.com', name: 'Hotel XYS', location: 'City C', time: '14:00 27/12/2024', read: true },
+    { id: 7, mail: 'owner7@example.com', name: 'Hotel XYS', location: 'City C', time: '14:00 27/12/2024', read: true },
   ]);
 
   const navigate = useNavigate();
 
   const handleRowClick = (app) => {
-    navigate(`/request/details/${app.id}`);
+    navigate(`/admin/request/${app.id}`);
   };
 
   return (
-    <div>
-      <h1 className="mx-5 my-3">Dashboard</h1>
-      <div className="mx-5 d-flex justify-content-between my-4">
+    <div className='dashboard d-flex flex-column px-5 py-3 m-5'>
+      <div className="title mb-4">Dashboard</div>
+      <div className="d-flex justify-content-between mb-5">
         <div className="text-white p-4 rounded text-center box" style={{ width: '20%' }}>
           <h3>Total Hotels</h3>
           <h1>100</h1>
@@ -39,10 +40,10 @@ function Dashboard() {
           <h1>1203</h1>
         </div>
       </div>
-      <div className="mx-5 my-4">
-        <h3 className='mb-3 mt-5'>New Applications</h3>
-        <table className="table">
-          <thead>
+      <div className="applications">
+        <h3>New Requests</h3>
+        <table className='table table-hover'>
+          <thead className='table-dark fs-3'>
             <tr>
               <th>Mail</th>
               <th>Name</th>
@@ -67,7 +68,7 @@ function Dashboard() {
             ))}
           </tbody>
         </table>
-        <button className="px-3 mt-2" onClick={() => navigate('/manage-requests')}>See more</button>
+        <button className="px-4 mt-4" onClick={() => navigate('/admin/manage-requests')}>See more</button>
       </div>
     </div>
   );

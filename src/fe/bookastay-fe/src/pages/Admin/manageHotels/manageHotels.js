@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './manageHotels.css';
+import icons from "~/assets/icon";
 
 function ManageHotels() {
   const [applications, setApplications] = useState([
@@ -35,17 +37,33 @@ function ManageHotels() {
     setCurrentPage(newPage);
   };
 
+  const [showModal, setShowModal] = useState(false);
+
+  const handleDeleteClick = () => {
+    setShowModal(true); // Hiện modal
+  };
+
+  const handleConfirmDelete = () => {
+    // Xử lý logic xóa tại đây
+    console.log('Item deleted!');
+    setShowModal(false); // Ẩn modal
+  };
+
+  const handleCancelDelete = () => {
+    setShowModal(false); // Đóng modal
+  };
+
   return (
-    <div className="mx-5 my-4">
-      <h1 className="mt-4 mb-5">Hotels List</h1>
-      <table className="table">
-        <thead>
+    <div className="d-flex flex-column px-5 py-3 m-5 hotels">
+      <h1 className="title mb-4">Hotels List</h1>
+      <table className="table table-hover">
+        <thead className='table-dark fs-3'>
           <tr>
             <th>ID</th>
             <th>Hotel name</th>
             <th>Owner name</th>
             <th>Location</th>
-            <th>Actions</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -62,35 +80,70 @@ function ManageHotels() {
               <td>{app.owner}</td>
               <td>{app.location}</td>
               <td>
-                <a style={{ cursor: 'pointer' }} >
-                 🗑️
+                <a style={{ cursor: 'pointer' }} onClick={handleDeleteClick}>
+                  <img src={icons.trashIcon} alt='Delete' class='icon trash-icon' />
                 </a>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <div className="d-flex justify-content-between align-items-center mt-5">
+
+      {showModal && (
+        <div style={styles.modal}>
+          <div style={styles.modalContent}>
+            <p className='fs-3 mb-4 fw-semibold'>Are you sure to delete it?</p>
+            <button onClick={handleConfirmDelete} className='btn btn-danger me-3 mb-2 px-3 fs-3'>
+              Yes
+            </button>
+            <button onClick={handleCancelDelete} className='btn btn-primary mb-2 px-3 fs-3'>
+              No
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="d-flex justify-content-evenly align-items-center mt-5">
         <button
-          className="btn btn-primary"
+          className="btn" style={{ backgroundColor: '#1C2D6E' }}
           disabled={currentPage === 1}
           onClick={() => handlePageChange(currentPage - 1)}
         >
-          Previous
+          <img src={icons.chevronLeftPinkIcon} class="left-icon icon m-2" />
         </button>
-        <span>
-          Page {currentPage} of {totalPages}
+        <span className="fs-2">
+          {currentPage} / {totalPages}
         </span>
         <button
-          className="btn btn-primary"
+          className="btn" style={{ backgroundColor: '#1C2D6E' }}
           disabled={currentPage === totalPages}
           onClick={() => handlePageChange(currentPage + 1)}
         >
-          Next
+          <img src={icons.chevronRightPinkIcon} class="right-icon icon m-2" />
         </button>
       </div>
     </div>
   );
 }
+
+const styles = {
+  modal: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: '25px 35px',
+    borderRadius: '8px',
+    textAlign: 'center',
+  },
+};
 
 export default ManageHotels;

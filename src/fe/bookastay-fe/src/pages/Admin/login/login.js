@@ -14,17 +14,17 @@ function Login() {
   };
 
   return (
-    <div className="login-container d-flex justify-content-center align-items-center">
-      <div className="card shadow-lg py-5 px-4" style={{ width: '400px' }}>
-        <h2 className="text-center mb-4">Login</h2>
+    <div className="login-container d-flex justify-content-center align-items-center shadow-lg">
+      <div className="py-5 px-2" style={{ width: '500px' }}>
+        <div className="text-center login-text">LOGIN</div>
         <form onSubmit={handleSubmit}>
-          <div className="mb-3">
+          <div className="my-5">
             <label htmlFor="email" className="form-label">
               Email address
             </label>
             <input
               type="email"
-              className="form-control"
+              className="form-control p-3 fs-4"
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -38,7 +38,7 @@ function Login() {
             </label>
             <input
               type="password"
-              className="form-control"
+              className="form-control p-3 fs-4 mb-5"
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -54,5 +54,7 @@ function Login() {
     </div>
   );
 }
+
+
 
 export default Login;

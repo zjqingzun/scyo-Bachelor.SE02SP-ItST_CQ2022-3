@@ -1,8 +1,18 @@
+.dashboard .title {
+    font-size: 40px;
+    font-weight: bold;
+}
+
 .box {
     background-color: #1C2D6E;
 }
 
-button {
+.dashboard .applications h3 {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.applications button {
     background-color: #1C2D6E;
     color: white;
     border: none;

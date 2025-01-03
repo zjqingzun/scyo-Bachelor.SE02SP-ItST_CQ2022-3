@@ -150,7 +150,7 @@ const HotelImages = ({
                 <h1>What does your hotel look like?</h1>
 
                 <div className="row">
-                    <div className="col-6 col-lg-12">
+                    <div className="col-12">
                         <div
                             className="hotel-images__drag-area"
                             onDragOver={onDragOver}
@@ -182,7 +182,7 @@ const HotelImages = ({
                         </div>
                     </div>
 
-                    <div className="col-6 col-lg-12">
+                    <div className="col-12">
                         {images.length > 0 && (
                             <SortableContext items={images.map((image) => image.name)}>
                                 <div className="hotel-images__container mt-0">

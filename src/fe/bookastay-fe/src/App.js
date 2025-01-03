@@ -11,6 +11,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { Flex, Spin } from "antd";
 
 import { doGetAccount } from "./redux/action/accountAction";
+import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 
 function App() {
     const dispatch = useDispatch();
@@ -75,6 +76,24 @@ function App() {
                                     Layout = Fragment;
                                 }
 
+                                // Kiểm tra xem route có yêu cầu role không
+                                if (route.requiredRole) {
+                                    return (
+                                        <Route
+                                            key={index}
+                                            path={route.path}
+                                            element={
+                                                <PrivateRoute requiredRole={route.requiredRole}>
+                                                    <Layout>
+                                                        <Page />
+                                                    </Layout>
+                                                </PrivateRoute>
+                                            }
+                                        />
+                                    );
+                                }
+
+                                // Nếu không yêu cầu role thì render ra bình thường
                                 return (
                                     <Route
                                         key={index}

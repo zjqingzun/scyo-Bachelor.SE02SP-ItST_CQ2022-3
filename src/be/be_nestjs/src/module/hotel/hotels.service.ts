@@ -61,14 +61,15 @@ export class HotelsService {
           'hotel.star AS star',
           'location.detailAddress AS address',
           'ARRAY_AGG(image.url) AS images',
-          'AVG(review.rating) AS averageRating',
-          'COUNT(review.id) AS totalReviews',
-          'MIN(roomType.price) AS minPrice',
+          'SUM(review.rating) AS totalrating',
+          'AVG(CASE WHEN review.rating IS NOT NULL THEN review.rating ELSE NULL END) AS averagerating',
+          'COUNT(review.id) AS totalreviews',
+          'MIN(roomType.price) AS minprice',
         ])
         .groupBy('hotel.id')
         .addGroupBy('location.id')
-        .orderBy('averageRating', 'DESC')
-        .limit(10); // Lấy top 10 khách sạn chấm theo rating trung bình của người dùng 
+        .orderBy('COALESCE(AVG(review.rating), 0)', 'DESC')
+        .limit(10) // Lấy top 10 khách sạn chấm theo rating trung bình của người dùng 
 
       const hotels = await queryBuilder.getRawMany();
 
@@ -90,7 +91,7 @@ export class HotelsService {
             star: hotel.star,
             address: hotel.address,
             images: presignedImages,
-            averageRating: hotel.averagerating ?? 0,
+            averageRating: hotel.averagerating,
             totalReviews: Number(hotel.totalreviews) || 0,
             minRoomPrice: hotel.minroomprice
           };

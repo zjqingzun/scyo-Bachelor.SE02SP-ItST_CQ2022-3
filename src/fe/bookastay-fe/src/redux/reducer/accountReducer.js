@@ -16,6 +16,7 @@ const initialState = {
         email: "",
         phone: "",
         avatar: null,
+        role: "",
     },
     accessToken: "",
     refreshToken: "",

@@ -22,7 +22,7 @@ function App() {
         if (userInfo && !userInfo.email) {
             dispatch(doGetAccount());
         }
-    }, []);
+    }, [dispatch]);
 
     return (
         <>
@@ -81,18 +81,21 @@ function App() {
                                     return (
                                         <Route
                                             key={index}
-                                            path={route.path}
                                             element={
-                                                <PrivateRoute requiredRole={route.requiredRole}>
+                                                <PrivateRoute requiredRole={route.requiredRole} />
+                                            }
+                                        >
+                                            <Route
+                                                path={route.path}
+                                                element={
                                                     <Layout>
                                                         <Page />
                                                     </Layout>
-                                                </PrivateRoute>
-                                            }
-                                        />
+                                                }
+                                            />
+                                        </Route>
                                     );
                                 }
-
                                 // Nếu không yêu cầu role thì render ra bình thường
                                 return (
                                     <Route

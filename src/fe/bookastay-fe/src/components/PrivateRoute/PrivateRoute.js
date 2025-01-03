@@ -1,20 +1,20 @@
-const { useSelector } = require("react-redux");
-const { useNavigate } = require("react-router-dom");
+import { useSelector } from "react-redux";
+import { Navigate, Outlet } from "react-router-dom";
 
-const PrivateRoute = ({ children, requiredRole, ...rest }) => {
-    const navigate = useNavigate();
+const PrivateRoute = ({ requiredRole }) => {
+    const userInfo = useSelector((state) => state.account.userInfo);
 
-    const userRole = useSelector((state) => state.account.user.role);
-
-    if (!userRole) {
-        return navigate("/login");
+    if (!userInfo || !userInfo.role) {
+        console.log("userInfo", userInfo);
+        console.log("userInfo.role", userInfo.role);
+        return <Navigate to="/login" />;
     }
 
-    if (requiredRole && requiredRole !== userRole) {
-        return navigate("/");
+    if (requiredRole && requiredRole !== userInfo.role) {
+        return <Navigate to="/unauthorized" />;
     }
 
-    return children;
+    return <Outlet />;
 };
 
 export default PrivateRoute;

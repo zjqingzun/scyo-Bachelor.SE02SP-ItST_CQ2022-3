@@ -80,6 +80,7 @@ export const doGetAccount = () => {
     return async (dispatch, getState) => {
         dispatch({
             type: USER_LOGIN_REQUEST,
+            isLoading: false,
         });
 
         try {
@@ -96,6 +97,7 @@ export const doGetAccount = () => {
                     user: response || {},
                     accessToken,
                     refreshToken,
+                    isLoading: false,
                 });
 
                 return {
@@ -111,6 +113,7 @@ export const doGetAccount = () => {
                 dispatch({
                     type: USER_LOGIN_FAIL,
                     error: "Access token or refresh token is invalid",
+                    isLoading: false,
                 });
 
                 return {
@@ -128,6 +131,7 @@ export const doGetAccount = () => {
             dispatch({
                 type: USER_LOGIN_FAIL,
                 error: error,
+                isLoading: false,
             });
 
             return {

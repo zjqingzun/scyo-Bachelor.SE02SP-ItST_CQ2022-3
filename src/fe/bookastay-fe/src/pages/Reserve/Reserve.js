@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import DatePicker from "rsuite/DatePicker";
+import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -13,6 +14,13 @@ import "rsuite/DatePicker/styles/index.css";
 import images from "~/assets/image";
 import icons from "~/assets/icon";
 import { toast } from "react-toastify";
+
+const StyledStepLabel = styled.div`
+    font-size: 2.8rem;
+    text-align: center;
+    font-weight: 600;
+    color: #1a4870;
+`;
 
 const Reserve = () => {
     const { t } = useTranslation();
@@ -131,24 +139,31 @@ const Reserve = () => {
 
     return (
         <div className="reserve-page">
-            <Stepper
-                stepsConfig={stepsConfig}
-                currentStep={currentStep}
-                setCurrentStep={setCurrentStep}
-                isComplete={isComplete}
-                setIsComplete={setIsComplete}
-            />
+            <div className="d-none d-md-flex">
+                <Stepper
+                    stepsConfig={stepsConfig}
+                    currentStep={currentStep}
+                    setCurrentStep={setCurrentStep}
+                    isComplete={isComplete}
+                    setIsComplete={setIsComplete}
+                />
+            </div>
+
+            <div className="d-md-none">
+                {currentStep === 2 && <StyledStepLabel>{stepsConfig[1].title}</StyledStepLabel>}
+                {currentStep === 3 && <StyledStepLabel>{stepsConfig[2].title}</StyledStepLabel>}
+            </div>
 
             <div className="reserve-page__content">
-                <div className="row">
-                    <div className="col-7">
+                <div className="row gy-4 gx-2 gx-lg-3">
+                    <div className="col-md-6 col-lg-7">
                         <div className="reserve-container">
                             {currentStep === 2 && (
                                 <>
                                     <h2>Enter your details</h2>
 
                                     <form className="mt-5" onSubmit={formik.handleSubmit}>
-                                        <div className="row row-cols-2">
+                                        <div className="row row-cols-1 row-cols-lg-2">
                                             <div className="col">
                                                 <div className="mb-4">
                                                     <label
@@ -163,7 +178,7 @@ const Reserve = () => {
                                                         name="firstName"
                                                         value={formik.values.firstName}
                                                         onChange={formik.handleChange}
-                                                        className={`form-control form-control-lg fs-2 ${
+                                                        className={`form-control form-control-lg fs-4  ${
                                                             formik.errors.firstName &&
                                                             formik.touched.firstName
                                                                 ? "is-invalid"
@@ -191,7 +206,7 @@ const Reserve = () => {
                                                         name="lastName"
                                                         value={formik.values.lastName}
                                                         onChange={formik.handleChange}
-                                                        className={`form-control form-control-lg fs-2 ${
+                                                        className={`form-control form-control-lg fs-4  ${
                                                             formik.errors.lastName &&
                                                             formik.touched.lastName
                                                                 ? "is-invalid"
@@ -219,7 +234,7 @@ const Reserve = () => {
                                                 name="email"
                                                 value={formik.values.email}
                                                 onChange={formik.handleChange}
-                                                className={`form-control form-control-lg fs-2 ${
+                                                className={`form-control form-control-lg fs-4  ${
                                                     formik.errors.email && formik.touched.email
                                                         ? "is-invalid"
                                                         : ""
@@ -232,7 +247,7 @@ const Reserve = () => {
                                             </div>
                                         </div>
 
-                                        <div className="row row-cols-2">
+                                        <div className="row row-cols-1 row-cols-lg-2">
                                             <div className="col">
                                                 <div className="mb-4">
                                                     <label
@@ -246,7 +261,7 @@ const Reserve = () => {
                                                         name="phone"
                                                         value={formik.values.phone}
                                                         onChange={formik.handleChange}
-                                                        className={`form-control form-control-lg fs-2 ${
+                                                        className={`form-control form-control-lg fs-4  ${
                                                             formik.errors.phone &&
                                                             formik.touched.phone
                                                                 ? "is-invalid"
@@ -260,7 +275,7 @@ const Reserve = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="col">
+                                            {/* <div className="col">
                                                 <div className="mb-4">
                                                     <label
                                                         htmlFor="reserveDiscountInput"
@@ -273,15 +288,15 @@ const Reserve = () => {
                                                         name="discount"
                                                         value={formik.values.discount}
                                                         onChange={formik.handleChange}
-                                                        className={`form-control form-control-lg fs-2`}
+                                                        className={`form-control form-control-lg fs-4 `}
                                                         id="reserveDiscountInput"
                                                         placeholder="Enter your discount code"
                                                     />
                                                 </div>
-                                            </div>
+                                            </div> */}
                                         </div>
 
-                                        <div className="form-check">
+                                        {/* <div className="form-check">
                                             <input
                                                 className="form-check-input"
                                                 type="checkbox"
@@ -294,7 +309,7 @@ const Reserve = () => {
                                             >
                                                 Agree to our privacy
                                             </label>
-                                        </div>
+                                        </div> */}
 
                                         <div className="separate"></div>
 
@@ -306,7 +321,7 @@ const Reserve = () => {
                                                 Special request (optional):
                                             </label>
                                             <textarea
-                                                className="form-control fs-2"
+                                                className="form-control fs-4 "
                                                 placeholder="Enter your special request"
                                                 id="reserveSpecialRequestTextarea"
                                                 value={formik.values.specialRequest}
@@ -315,7 +330,7 @@ const Reserve = () => {
                                             ></textarea>
                                         </div>
 
-                                        <div className="row row-cols-2">
+                                        {/* <div className="row row-cols-2">
                                             <div className="col">
                                                 <label className="form-label">
                                                     Your estimated arrival time (optional):
@@ -342,7 +357,7 @@ const Reserve = () => {
                                                     style={{ width: "100%" }}
                                                 />
                                             </div>
-                                        </div>
+                                        </div> */}
                                     </form>
                                 </>
                             )}
@@ -427,7 +442,7 @@ const Reserve = () => {
                         </div>
                     </div>
 
-                    <div className="col-5">
+                    <div className="col-md-6 col-lg-5">
                         <div className="row row-cols-1 gy-4">
                             <div className="col">
                                 <div className="reserve-container">
@@ -482,7 +497,7 @@ const Reserve = () => {
                                     <div>
                                         <div className="d-flex align-items-center justify-content-between">
                                             <div>
-                                                <span className="fs-4 fw-medium">Bạn đã chọn</span>
+                                                <span className="fs-4  fw-medium">Bạn đã chọn</span>
                                                 <p className="fs-3 fw-bold">
                                                     3 phòng cho 2 người lớn
                                                 </p>
@@ -533,7 +548,7 @@ const Reserve = () => {
                                         <span className="ms-3">-40,000VND</span>
                                     </div>
 
-                                    <div className="d-flex justify-content-between mt-5 fs-2 fw-bold">
+                                    <div className="d-flex justify-content-between mt-5 fs-4  fw-bold">
                                         <span>Total</span>
                                         <span className="ms-3">500,000VND</span>
                                     </div>

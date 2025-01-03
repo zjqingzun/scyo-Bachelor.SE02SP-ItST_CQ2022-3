@@ -1,0 +1,33 @@
+.sidebar {
+  height: 100vh;
+  width: 250px;
+  background-color: #1C2D6E;
+  color: white;
+  padding: 1rem;
+}
+
+.sidebar h2 {
+  margin-bottom: 2rem;
+}
+
+.sidebar .nav-link {
+  color: white;
+  text-decoration: none;
+  font-weight: normal;
+  padding: 0.5rem 1rem;
+  display: block;
+}
+
+.sidebar .nav-item.active .nav-link {
+  font-weight: bold;
+  /* In đậm */
+  background-color: #16254D;
+  /* Màu nền đậm hơn */
+  border-radius: 5px;
+  /* Tùy chỉnh góc bo cho đẹp */
+}
+
+.last-nav {
+  margin-top: 200px;
+  font-size: larger;
+}

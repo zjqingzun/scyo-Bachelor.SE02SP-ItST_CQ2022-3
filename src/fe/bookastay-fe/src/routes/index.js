@@ -1,5 +1,5 @@
 // Layouts
-import { HeaderOnly, HotelOwnerLayout } from "../components/Layout";
+import { HeaderOnly, HotelOwnerLayout, AdminLayout } from "../components/Layout";
 
 // Pages
 import Home from "../pages/Home";
@@ -17,6 +17,15 @@ import Review from "~/pages/Review";
 // Hotel Owner Pages
 import RegisterHotel from "~/pages/HotelOwner/RegisterHotel/RegisterHotel";
 import { Dashboard, Room, Guest, AddRoom, RoomType } from "~/pages/HotelOwner";
+
+// Admin Pages
+import AdminDashboard from '../pages/Admin/dashboard/dashboard';
+import ManageUsers from '../pages/Admin/manageUsers/manageUsers';
+import ManageHotelOwners from '../pages/Admin/manageHotelOwners/manageHotelOwners';
+import ManageHotels from '../pages/Admin/manageHotels/manageHotels';
+import ManageRequests from '../pages/Admin/manageRequets/manageRequests';
+import AdminLogin from '../pages/Admin/login/login';
+import RequestDetails from '../pages/Admin/RequestDetails/requestDetails';
 
 const publicRoutes = [
     {
@@ -44,6 +53,22 @@ const publicRoutes = [
         path: "/register",
         component: Register,
         layout: HeaderOnly,
+    },
+    {
+        path: "/history",
+        component: History,
+    },
+    {
+        path: "/favorite",
+        component: Favorite,
+    },
+    {
+        path: "/account-setting",
+        component: AccountSetting,
+    },
+    {
+        path: "/review",
+        component: Review,
     },
     {
         path: "/hotel-details",
@@ -85,32 +110,34 @@ const publicRoutes = [
         layout: HotelOwnerLayout,
     },
     {
-        path: "/history",
-        component: History,
+        path: "/admin",
+        layout: AdminLayout,
+        component: AdminLogin,
     },
     {
-        path: "/favorite",
-        component: Favorite,
+        path: "/admin/dashboard",
+        layout: AdminLayout,
+        component: AdminDashboard,
     },
     {
-        path: "/account-setting",
-        component: AccountSetting,
+        path: "/admin/manage-users",
+        layout: AdminLayout,
+        component: ManageUsers,
     },
     {
-        path: "/review",
-        component: Review,
-    }
-];
-
-const hotelOwnerRoutes = [
-    {
-        path: "/hotel-owner/register-hotel",
-        component: RegisterHotel,
-        layout: HeaderOnly,
+        path: "/admin/manage-hotel-owners",
+        layout: AdminLayout,
+        component: ManageHotelOwners,
     },
     {
-        path: "/hotel-details",
-        component: HotelDetails,
+        path: "/admin/manage-hotels",
+        layout: AdminLayout,
+        component: ManageHotels,
+    },
+    {
+        path: "/admin/manage-requests",
+        layout: AdminLayout,
+        component: ManageRequests,
     },
 ];
 

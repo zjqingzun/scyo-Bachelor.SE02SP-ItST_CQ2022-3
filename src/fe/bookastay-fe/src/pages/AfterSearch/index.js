@@ -73,9 +73,29 @@ const MockRecommend = [
         id: 4,
         name: "Apina Saigon - Truong Dinh",
         address: "Quận 1, TP. Hồ Chí Minh",
-        image: "https://cf.bstatic.com/xdata/images/hotel/square600/596644761.webp?k=e146b7295510455911929c4fc7e26ea69228075e46195df169989d59705c6db1&o=",
+        image: "https://cf.bstatic.com/xdata/images/hotel/max1280x900/627961646.jpg?k=fcfe1652c85b804653cb8647c3735dba4d0c1073d39c837949902d202569f83e&o=&hp=1",
         price: 4288680,
         rating: 9.5,
+        review: 70,
+        star: 5,
+    },
+    {
+        id: 5,
+        name: "3Bedroom - Icon56 Building - Hana Apart",
+        address: "Quận 4, TP. Hồ Chí Minh",
+        image: "https://cf.bstatic.com/xdata/images/hotel/max1024x768/629676872.jpg?k=fde6bd191057f745d622c97a6c6680ebfa036d330404d50ce577f380d8731701&o=&hp=1",
+        price: 4288680,
+        rating: 9.5,
+        review: 50,
+        star: 4,
+    },
+    {
+        id: 6,
+        name: "Halo Hotel",
+        address: "Quận 1, TP. Hồ Chí Minh",
+        image: "https://cf.bstatic.com/xdata/images/hotel/max1024x768/481411027.jpg?k=2a164ab4e60b9dcaf84e6c09d4db23752402717cf6d837f512eed337c5955ff9&o=",
+        price: 2488680,
+        rating: 7.5,
         review: 100,
         star: 5,
     },
@@ -195,7 +215,7 @@ const AfterSearch = () => {
     console.log(">>> render afterserch");
 
     return (
-        <div className="after-search">
+        <div className="after-search my-5 pb-5">
             <Modal size="xl" centered show={showMapModal} onHide={handleCloseMapModel}>
                 <Modal.Body>
                     <Modal.Header closeButton></Modal.Header>

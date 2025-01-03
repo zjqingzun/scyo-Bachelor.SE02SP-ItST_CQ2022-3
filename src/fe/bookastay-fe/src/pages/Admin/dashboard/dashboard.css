@@ -1,0 +1,11 @@
+.box {
+    background-color: #1C2D6E;
+}
+
+button {
+    background-color: #1C2D6E;
+    color: white;
+    border: none;
+    padding: 8px 25px;
+    border-radius: 5px;
+}

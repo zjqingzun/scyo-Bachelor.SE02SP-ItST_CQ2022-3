@@ -27,6 +27,8 @@ import { join } from 'path';
 import { RoleModule } from './module/role/role.module';
 import { ImageModule } from './module/image/image.module';
 import { MinioService } from './minio/minio.service';
+import { RoomTypeModule } from './module/room_type/room_type.module';
+import { BookingDetailModule } from './module/booking_detail/booking_detail.module';
 
 @Module({
   imports: [
@@ -87,7 +89,10 @@ import { MinioService } from './minio/minio.service';
     ReportModule,
     ServiceModule,
     RoleModule,
-    ImageModule],
+    ImageModule,
+    RoomTypeModule,
+    BookingDetailModule
+  ],
   controllers: [AppController],
   providers: [
     AppService,

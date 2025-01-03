@@ -9,12 +9,11 @@ export class MailService {
   async sendUserActivation(user: any) {
     await this.mailerService.sendMail({
       to: user.email,
-      // from: '"Support Team" <support@example.com>', // override default from
-      subject: 'Activation your account',
-      template: './register', // `.hbs` extension is appended automatically
-      context: { // ✏️ filling curly brackets with content
+      // from: '"Support Team" <support@example.com>',
+      subject: 'Successfully Registered',
+      template: './register',
+      context: {
         name: user.name,
-        activationCode: user.codeId
       },
     });
   }
@@ -22,10 +21,10 @@ export class MailService {
   async sendResetPassword(user : any) {
     await this.mailerService.sendMail({
       to: user.email,
-      // from: '"Support Team" <support@example.com>', // override default from
+      // from: '"Support Team" <support@example.com>',
       subject: 'Reset your password',
-      template: './register', // `.hbs` extension is appended automatically
-      context: { // ✏️ filling curly brackets with content
+      template: './resetpass',
+      context: {
         name: user.name,
         activationCode: user.codeId
       },

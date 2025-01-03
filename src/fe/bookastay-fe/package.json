@@ -11,6 +11,7 @@
         "@testing-library/user-event": "^13.5.0",
         "antd": "^5.22.5",
         "axios": "^1.7.7",
+        "axios-retry": "^4.5.0",
         "bookastay-fe": "file:",
         "bootstrap": "^5.3.3",
         "bootstrap-icons": "^1.11.3",
@@ -68,9 +69,11 @@
         ]
     },
     "devDependencies": {
+        "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
         "babel-plugin-module-resolver": "^5.0.2",
         "customize-cra": "^1.0.0",
         "react-app-rewired": "^2.2.1",
-        "sass": "^1.80.5"
+        "sass": "^1.83.0",
+        "sass-loader": "^16.0.4"
     }
 }

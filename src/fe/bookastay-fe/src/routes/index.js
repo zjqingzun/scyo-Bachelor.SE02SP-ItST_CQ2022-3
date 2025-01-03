@@ -1,5 +1,5 @@
 // Layouts
-import { HeaderOnly, HotelOwnerLayout, AdminLayout } from "../components/Layout";
+import { HeaderOnly, HotelOwnerLayout, AdminLayout, NoneLayout } from "../components/Layout";
 
 // Pages
 import Home from "../pages/Home";
@@ -111,8 +111,8 @@ const publicRoutes = [
     },
     {
         path: "/admin",
-        layout: AdminLayout,
         component: AdminLogin,
+        layout: NoneLayout,
     },
     {
         path: "/admin/dashboard",

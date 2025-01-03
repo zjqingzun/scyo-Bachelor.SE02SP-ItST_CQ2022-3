@@ -1,36 +1,30 @@
 import { Booking } from "@/module/booking/entities/booking.entity";
 import { Hotel } from "@/module/hotel/entities/hotel.entity";
+import { RoomType } from "@/module/room_type/entites/room_type.entity";
 import { Service } from "@/module/service/entities/service.entity";
 import { User } from "@/module/user/entities/user.entity";
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity({name: "room"})
+@Entity({ name: "room" })
 export class Room {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
-    roomType: string;
+    name: string;
 
     @Column()
-    nums: number;
-
-    @Column()
-    price: number;
+    type: number;
 
     @Column()
     status: string;
 
-    @OneToOne(() => Booking, (booking) => booking.room)
-    booking: Booking;
-
     @ManyToOne(() => Hotel, (hotel) => hotel.rooms)
-    @JoinColumn({name: "hotelId"})
+    @JoinColumn({ name: "hotelId" })
     hotel: Hotel;
 
-    @ManyToMany(() => Service, (service) => service.rooms)
-    @JoinTable({
-        name: "rooms_services"
-    })
-    services: Service[];
+    // Quan hệ với RoomType (Một phòng thuộc một loại phòng)
+    @ManyToOne(() => RoomType, (roomType) => roomType.rooms)
+    @JoinColumn({ name: "roomTypeId" }) // Tạo khóa ngoại để liên kết với RoomType
+    roomType: RoomType;
 }

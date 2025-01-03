@@ -1,10 +1,12 @@
 import { Bill } from "@/module/bill/entities/bill.entity";
+import { BookingDetail } from "@/module/booking_detail/entities/booking_detail.entity";
+import { Hotel } from "@/module/hotel/entities/hotel.entity";
 import { Payment } from "@/module/payment/entities/payment.entity";
 import { Room } from "@/module/room/entities/room.entity";
 import { User } from "@/module/user/entities/user.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity({name: "booking"})
+@Entity({ name: "booking" })
 export class Booking {
     @PrimaryGeneratedColumn()
     id: number;
@@ -37,14 +39,16 @@ export class Booking {
     note: string;
 
     @ManyToOne(() => User, (user) => user.bookings)
-    @JoinColumn({name: "userId"})
+    @JoinColumn({ name: "userId" })
     user: User;
 
-    @OneToOne(() => Room, (room) => room.booking)
-    @JoinColumn({name: "roomId"})
-    room: Room;
+    @ManyToOne(() => Hotel, (hotel) => hotel.bookings)
+    @JoinColumn({ name: "hotelId" })
+    hotel: Hotel;
 
     @OneToOne(() => Bill, (bill) => bill.booking)
-    @JoinColumn()
     bill: Bill;
+
+    @OneToMany(() => BookingDetail, (bookingDetail) => bookingDetail.booking)
+    bookingDetails: BookingDetail[];
 }

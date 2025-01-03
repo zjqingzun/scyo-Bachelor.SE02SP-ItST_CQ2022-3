@@ -1,5 +1,6 @@
 import { useEffect, useReducer, useState } from "react";
 import { Button, Result } from "antd";
+import styled from "styled-components";
 
 import Stepper from "~/components/Stepper/Stepper";
 import {
@@ -9,6 +10,13 @@ import {
     FinalStep,
 } from "~/components/HotelOwner/HotelRegister";
 import "./RegisterHotel.scss";
+
+const StyledStepLabel = styled.div`
+    font-size: 2.8rem;
+    text-align: center;
+    font-weight: 600;
+    color: #1a4870;
+`;
 
 const formReducer = (state, action) => {
     switch (action.type) {
@@ -99,7 +107,21 @@ const RegisterHotel = () => {
                 />
             ) : (
                 <>
-                    <Stepper stepsConfig={stepsConfig} currentStep={currentStep} />
+                    <div className="d-none d-md-flex">
+                        <Stepper stepsConfig={stepsConfig} currentStep={currentStep} />
+                    </div>
+
+                    <div className="d-md-none">
+                        {currentStep === 1 && (
+                            <StyledStepLabel>{stepsConfig[0].title}</StyledStepLabel>
+                        )}
+                        {currentStep === 2 && (
+                            <StyledStepLabel>{stepsConfig[1].title}</StyledStepLabel>
+                        )}
+                        {currentStep === 3 && (
+                            <StyledStepLabel>{stepsConfig[2].title}</StyledStepLabel>
+                        )}
+                    </div>
 
                     <div className="register-hotel__content mt-5">
                         <div className="register-hotel__form">

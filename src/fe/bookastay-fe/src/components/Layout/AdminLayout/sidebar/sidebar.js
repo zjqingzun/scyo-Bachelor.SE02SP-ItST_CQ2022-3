@@ -9,42 +9,42 @@ function Sidebar() {
             <h2 className="my-4">BookaStay</h2>
             <ul className="nav flex-column mt-4">
                 <li
-                    className={`nav-item mb-3 ${location.pathname === '/dashboard' ? 'active' : ''
+                    className={`nav-item mb-3 ${location.pathname === '/admin/dashboard' ? 'active' : ''
                         }`}
                 >
-                    <Link to="/dashboard" className="nav-link">
+                    <Link to="/admin/dashboard" className="nav-link">
                         Dashboard
                     </Link>
                 </li>
                 <li
-                    className={`nav-item mb-3 ${location.pathname === '/manage-users' ? 'active' : ''
+                    className={`nav-item mb-3 ${location.pathname === '/admin/manage-users' ? 'active' : ''
                         }`}
                 >
-                    <Link to="/manage-users" className="nav-link">
+                    <Link to="/admin/manage-users" className="nav-link">
                         Manage Users
                     </Link>
                 </li>
                 <li
-                    className={`nav-item mb-3 ${location.pathname === '/manage-hotel-owners' ? 'active' : ''
+                    className={`nav-item mb-3 ${location.pathname === '/admin/manage-hotel-owners' ? 'active' : ''
                         }`}
                 >
-                    <Link to="/manage-hotel-owners" className="nav-link">
+                    <Link to="/admin/manage-hotel-owners" className="nav-link">
                         Manage Owners
                     </Link>
                 </li>
                 <li
-                    className={`nav-item mb-3 ${location.pathname === '/manage-hotels' ? 'active' : ''
+                    className={`nav-item mb-3 ${location.pathname === '/admin/manage-hotels' ? 'active' : ''
                         }`}
                 >
-                    <Link to="/manage-hotels" className="nav-link">
+                    <Link to="/admin/manage-hotels" className="nav-link">
                         Manage Hotels
                     </Link>
                 </li>
                 <li
-                    className={`nav-item mb-5 ${location.pathname === '/manage-requests' ? 'active' : ''
+                    className={`nav-item mb-5 ${location.pathname === '/admin/manage-requests' ? 'active' : ''
                         }`}
                 >
-                    <Link to="/manage-requests" className="nav-link">
+                    <Link to="/admin/manage-requests" className="nav-link">
                         Manage Requests
                     </Link>
                 </li>
@@ -52,7 +52,7 @@ function Sidebar() {
                     className={`nav-item last-nav ${location.pathname === '/' ? 'active' : ''
                         }`}
                 >
-                    <Link to="/login" className="nav-link">
+                    <Link to="/admin" className="nav-link">
                         Logout
                     </Link>
                 </li>

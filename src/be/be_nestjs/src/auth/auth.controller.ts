@@ -1,4 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Request,
+  Req,
+  Res,
+} from '@nestjs/common';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
@@ -16,8 +29,21 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Public()
   @Post('login')
-  async login(@Request() req) {
-    return this.authService.login(req.user);
+  async login(@Request() req, @Res({ passthrough: true }) response: Response) {
+    const token = await this.authService.login(req.user);
+
+    response.cookie('auth_token', token, {
+      httpOnly: true,
+      maxAge: 3600000,
+    });
+
+    return token;
+  }
+
+  @Get('renew_token/:refreshToken')
+  @Public()
+  async renewToken(@Param('refreshToken') refreshToken: string) {
+    return await this.authService.refreshAccessToken(refreshToken);
   }
 
   @Get('profile')
@@ -25,21 +51,24 @@ export class AuthController {
     return req.user;
   }
 
-  @Post('register')
+  @Post('register/:role')
   @Public()
-  async register(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.register(createAuthDto);
+  async register(
+    @Body() createAuthDto: CreateAuthDto,
+    @Param('role') role: string,
+  ) {
+    return this.authService.register(createAuthDto, role);
   }
 
   @Get('forgetPassword/:email')
   @Public()
-  async forgetPassword(@Param('email') email : string) {
+  async forgetPassword(@Param('email') email: string) {
     return await this.authService.forgetPassword(email);
   }
 
   @Post('resetPassword')
   @Public()
-  async resetPassword(@Body() resetInfo : ResetpassAuthDto) {
+  async resetPassword(@Body() resetInfo: ResetpassAuthDto) {
     return await this.authService.resetPassword(resetInfo);
   }
 
@@ -47,7 +76,7 @@ export class AuthController {
   @Public()
   @UseGuards(GoogleAuthGuard)
   async googleAuth(@Req() req) {
-    return "successfully";
+    return 'successfully';
   }
 
   @Get('google/redirect')

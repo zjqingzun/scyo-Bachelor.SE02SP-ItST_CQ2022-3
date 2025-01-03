@@ -1,3 +1,5 @@
+@import "../../components/GlobalStyles/mixins.scss";
+
 .homepage__slider {
     padding-top: 50%;
 
@@ -83,6 +85,10 @@
     align-items: center;
     gap: 5px;
 
+    @include screen(sm) {
+        bottom: 30px;
+    }
+
     &-item {
         display: inline-block;
 
@@ -114,6 +120,32 @@
     font-size: 5.6rem;
     color: #fff;
     font-weight: 800;
+
+    @include screen(xxl) {
+        font-size: 4.8rem;
+    }
+
+    @include screen(xl) {
+        font-size: 4.2rem;
+    }
+
+    @include screen(lg) {
+        font-size: 3.6rem;
+    }
+
+    @include screen(md) {
+        font-size: 3rem;
+    }
+
+    @include screen(sm) {
+        font-size: 2.4rem;
+
+        max-width: 80%;
+    }
+
+    @include make-responsive(576px) {
+        font-size: 2rem;
+    }
 }
 
 .homepage__search-bar {
@@ -125,6 +157,14 @@
 
     border-radius: 15px;
     box-shadow: 0 0 0 10px rgba(91, 153, 194, 0.15), 0 2px 48px 0 rgba(91, 153, 194, 0.04);
+
+    @include screen(xxl) {
+        width: 90%;
+    }
+
+    @include screen(xl) {
+        width: 95%;
+    }
 }
 
 .homepage__top-destination {
@@ -173,6 +213,14 @@
         width: calc((100% - 30px * 2) / 2);
     }
 
+    @include screen(md) {
+        width: calc((100% - 30px * 2) / 2) !important;
+    }
+
+    @include screen(sm) {
+        width: 100% !important;
+    }
+
     &__image-wrap {
         position: relative;
 
@@ -201,9 +249,9 @@
 
         transition: transform 0.3s ease;
 
-        // &:hover {
-        //     transform: scale(1.1);
-        // }
+        &:hover {
+            transform: scale(1.1);
+        }
     }
 }
 
@@ -214,6 +262,16 @@
 
     width: 100%;
     background: #1a4870;
+
+    border-radius: 15px;
+
+    @include screen(xl) {
+        padding: 30px;
+    }
+
+    @include screen(lg) {
+        padding: 20px;
+    }
 
     &-title {
         color: #fff;
@@ -237,6 +295,10 @@
         justify-content: space-between;
         align-items: center;
         gap: 20px;
+
+        @include screen(lg) {
+            display: none;
+        }
     }
 
     &-btn {
@@ -301,6 +363,21 @@
         scroll-snap-type: x mandatory;
         -webkit-backface-visibility: hidden;
         backface-visibility: hidden;
+
+        @include screen(xl) {
+            gap: 20px;
+        }
+
+        @include screen(lg) {
+            // flex-direction: column;
+            overflow: hidden;
+            flex-wrap: wrap;
+        }
+
+        @include screen(md) {
+            overflow-x: scroll;
+            flex-wrap: nowrap;
+        }
     }
 
     &-item {
@@ -308,6 +385,20 @@
         // flex-shrink: 0;
         width: calc((100% - 30px * 2) / 3);
         height: 500px;
+
+        @include screen(xl) {
+            width: calc((100% - 20px * 2) / 3);
+        }
+
+        @include screen(lg) {
+            // two items per row
+            width: calc((100% - 20px) / 2);
+        }
+
+        @include screen(md) {
+            // one item per row
+            width: 100%;
+        }
     }
 }
 

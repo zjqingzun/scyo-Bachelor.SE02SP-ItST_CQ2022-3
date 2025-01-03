@@ -6,6 +6,7 @@ import NavLinksGroup from "./NavLinksGroup";
 import "./Sidebar.scss";
 import Backdrop from "./Backdrop";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const breakpoints = {
     sm: "576px",
@@ -85,7 +86,9 @@ const Sidebar = (props) => {
             <Backdrop visible={props.visible} onClick={props.close} />
             <StyledSidebar compact={compact} visible={props.visible}>
                 <StyledHeader compact={compact}>
-                    B<span>ookaStay</span>
+                    <Link to="/hotel-owner">
+                        B<span>ookaStay</span>
+                    </Link>
                 </StyledHeader>
 
                 <NavLinksGroup compact={compact} />

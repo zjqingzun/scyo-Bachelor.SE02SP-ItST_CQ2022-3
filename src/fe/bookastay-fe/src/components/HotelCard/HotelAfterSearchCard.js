@@ -110,7 +110,7 @@ const HotelAfterSearchCard = ({
                     <span className="hotel-card__price">{formatCurrency(nowPrice, currency)}</span>
                 </div>
 
-                <div className="hotel-card__row gap-3 mt-3">
+                <div className="hotel-card__row hotel-card__bottom gap-3 mt-3">
                     <div className="hotel-card__score">
                         <div className="hotel-card__rating">{rating.toFixed(1)}</div>
                     </div>

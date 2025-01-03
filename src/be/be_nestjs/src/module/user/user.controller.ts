@@ -21,6 +21,7 @@ export class UserController {
   }
 
   @Get('getAll')
+  @Public()
   async getAllUsers(@Req() req ) {
     return await this.userService.findAll(req);
   }
@@ -70,5 +71,15 @@ export class UserController {
   @Delete('delete/:id')
   async delete(@Param('id') id : number) {
     return await this.userService.remove(+id);
+  }
+
+  @Get('fav')
+  async getFavs(@Req() req ) {
+    return await this.userService.findAllFav(req);
+  }
+
+  @Get('addFav')
+  async addFav(@Req() req) {
+    return await this.userService.addFav(req);
   }
 }

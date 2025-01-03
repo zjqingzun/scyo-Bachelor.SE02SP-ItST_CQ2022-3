@@ -3,31 +3,32 @@ import { MigrationInterface, QueryRunner } from "typeorm";
 export class InitialDatabase1730864137298 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+      // Tạo bảng "user"
       await queryRunner.query(`
-          CREATE TABLE "user" (
-            "id" SERIAL PRIMARY KEY,
-            "name" VARCHAR NOT NULL,
-            "dob" DATE NOT NULL DEFAULT CURRENT_DATE,
-            "cccd" VARCHAR NOT NULL DEFAULT '0000000000',
-            "email" VARCHAR NOT NULL,
-            "password" VARCHAR NOT NULL,
-            "phone" VARCHAR NOT NULL,
-            "accountType" VARCHAR NOT NULL DEFAULT 'google',
-            "codeId" VARCHAR NOT NULL DEFAULT '',
-            "codeExpired" TIMESTAMP NOT NULL DEFAULT now(),
-            "avatar" VARCHAR
-          );
-        `);
+        CREATE TABLE "user" (
+          "id" SERIAL PRIMARY KEY,
+          "name" VARCHAR(255) NOT NULL,
+          "dob" DATE NOT NULL DEFAULT CURRENT_DATE,
+          "cccd" VARCHAR(20) NOT NULL DEFAULT '0000000000',
+          "email" VARCHAR(255) NOT NULL,
+          "password" VARCHAR(255) NOT NULL,
+          "phone" VARCHAR(20) NOT NULL,
+          "accountType" VARCHAR(50) NOT NULL DEFAULT 'google',
+          "codeId" VARCHAR(255) DEFAULT NULL,
+          "codeExpired" TIMESTAMP NOT NULL DEFAULT now(),
+          "avatar" VARCHAR(255)
+        );
+      `);
 
       // Tạo bảng "role"
       await queryRunner.query(`
         CREATE TABLE "role" (
           "id" SERIAL PRIMARY KEY,
-          "name" VARCHAR
+          "name" VARCHAR(100)
         );
       `);
 
-      // Tạo bảng "user_role" (mối quan hệ giữa user và role)
+      // Tạo bảng "user_role"
       await queryRunner.query(`
         CREATE TABLE "users_roles" (
           "userId" INT NOT NULL,
@@ -42,12 +43,12 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
       await queryRunner.query(`
         CREATE TABLE "hotel" (
           "id" SERIAL PRIMARY KEY,
-          "name" VARCHAR NOT NULL,
-          "description" VARCHAR NOT NULL,
+          "name" VARCHAR(255) NOT NULL,
+          "description" TEXT NOT NULL,
           "discount" INT NOT NULL,
           "ownerId" INT NOT NULL,
-          "phone" VARCHAR NOT NULL,
-          "email" VARCHAR NOT NULL,
+          "phone" VARCHAR(20) NOT NULL,
+          "email" VARCHAR(255) NOT NULL,
           "star" INT,
           FOREIGN KEY ("ownerId") REFERENCES "user"("id") ON DELETE CASCADE
         );
@@ -57,8 +58,23 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
       await queryRunner.query(`
         CREATE TABLE "image" (
           "id" SERIAL PRIMARY KEY,
-          "url" VARCHAR NOT NULL,
+          "url" VARCHAR(255) NOT NULL,
           "hotelId" INT,
+          FOREIGN KEY ("hotelId") REFERENCES "hotel"("id") ON DELETE CASCADE
+        );
+      `);
+
+      // Tạo bảng "room_type"
+      await queryRunner.query(`
+        CREATE TABLE "room_type" (
+          "id" SERIAL,
+          "type" INT NOT NULL,
+          "price" INT NOT NULL,
+          "weekend_price" INT NOT NULL,
+          "flexible_price" INT NOT NULL,
+          "hotelId" INT NOT NULL,
+          "nums" INT,
+          PRIMARY KEY ("id", "hotelId"),
           FOREIGN KEY ("hotelId") REFERENCES "hotel"("id") ON DELETE CASCADE
         );
       `);
@@ -66,13 +82,14 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
       // Tạo bảng "room"
       await queryRunner.query(`
         CREATE TABLE "room" (
-          "id" SERIAL PRIMARY KEY,
-          "name" VARCHAR NOT NULL,
-          "roomType" INT NOT NULL,
-          "nums" INT NOT NULL,
-          "price" INT NOT NULL,
-          "status" VARCHAR NOT NULL,
+          "id" SERIAL,
+          "name" VARCHAR(255) NOT NULL,  
+          "type" INT NOT NULL,
+          "status" VARCHAR(50) NOT NULL,
           "hotelId" INT NOT NULL,
+          "roomTypeId" INT NOT NULL,
+          PRIMARY KEY ("id"),
+          FOREIGN KEY ("roomTypeId", "hotelId") REFERENCES "room_type"("id", "hotelId") ON DELETE CASCADE,
           FOREIGN KEY ("hotelId") REFERENCES "hotel"("id") ON DELETE CASCADE
         );
       `);
@@ -82,15 +99,26 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
         CREATE TABLE "booking" (
           "id" SERIAL PRIMARY KEY,
           "userId" INT NOT NULL,
-          "roomId" INT NOT NULL,
-          "nums" INT NOT NULL,
+          "hotelId" INT NOT NULL,
           "createdAt" TIMESTAMP DEFAULT now(),
-          "checkinTime" TIMESTAMP DEFAULT now(),
-          "checkoutTime" TIMESTAMP DEFAULT now(),
-          "status" VARCHAR NOT NULL,
-          "note" VARCHAR,
+          "checkinTime" TIMESTAMP NOT NULL,
+          "checkoutTime" TIMESTAMP NOT NULL,
+          "status" VARCHAR(50) NOT NULL,
+          "note" VARCHAR(255),
           FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE,
-          FOREIGN KEY ("roomId") REFERENCES "room"("id") ON DELETE CASCADE
+          FOREIGN KEY ("hotelId") REFERENCES "hotel"("id") ON DELETE CASCADE
+        );
+      `);
+
+      // Tạo bảng "booking_detail"
+      await queryRunner.query(`
+        CREATE TABLE "booking_detail" (
+          "id" SERIAL PRIMARY KEY,
+          "bookingId" INT NOT NULL,
+          "type" INT NOT NULL,
+          "nums" INT NOT NULL,
+          "price" NUMERIC NOT NULL,
+          FOREIGN KEY ("bookingId") REFERENCES "booking"("id") ON DELETE CASCADE
         );
       `);
 
@@ -98,12 +126,10 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
       await queryRunner.query(`
         CREATE TABLE "bill" (
           "id" SERIAL PRIMARY KEY,
-          "userId" INT NOT NULL,
           "bookingId" INT NOT NULL,
           "numOfDay" INT NOT NULL,
           "createdAt" TIMESTAMP DEFAULT now(),
           "totalCost" NUMERIC NOT NULL,
-          FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE,
           FOREIGN KEY ("bookingId") REFERENCES "booking"("id") ON DELETE CASCADE
         );
       `);
@@ -114,8 +140,22 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
           "id" SERIAL PRIMARY KEY,
           "billId" INT NOT NULL,
           "date" TIMESTAMP DEFAULT now(),
-          "method" VARCHAR,
+          "method" VARCHAR(50) NOT NULL,
+          "status" VARCHAR(50) NOT NULL,
           FOREIGN KEY ("billId") REFERENCES "bill"("id") ON DELETE CASCADE
+        );
+      `);
+
+      // Tạo bảng "report"
+      await queryRunner.query(`
+        CREATE TABLE "report" (
+          "id" SERIAL PRIMARY KEY,
+          "hotelId" INT NOT NULL,
+          "startDate" TIMESTAMP NOT NULL,
+          "endDate" TIMESTAMP NOT NULL,
+          "totalProfit" NUMERIC DEFAULT 0,
+          "createdAt" TIMESTAMP DEFAULT now(),
+          FOREIGN KEY ("hotelId") REFERENCES "hotel"("id") ON DELETE CASCADE
         );
       `);
 
@@ -123,7 +163,7 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
       await queryRunner.query(`
         CREATE TABLE "review" (
           "id" SERIAL PRIMARY KEY,
-          "comment" VARCHAR NOT NULL,
+          "comment" TEXT NOT NULL,
           "rating" INT NOT NULL,
           "createdAt" TIMESTAMP DEFAULT now(),
           "userId" INT NOT NULL,
@@ -133,26 +173,14 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
         );
       `);
 
-      // Tạo bảng "report"
-      await queryRunner.query(`
-        CREATE TABLE "report" (
-          "id" SERIAL PRIMARY KEY,
-          "hotelId" INT NOT NULL,
-          "startDate" TIMESTAMP DEFAULT now(),
-          "endDate" TIMESTAMP DEFAULT now(),
-          "totalProfit" NUMERIC,
-          FOREIGN KEY ("hotelId") REFERENCES "hotel"("id") ON DELETE CASCADE
-        );
-      `);
-
       // Tạo bảng "location"
       await queryRunner.query(`
         CREATE TABLE "location" (
           "id" SERIAL PRIMARY KEY,
-          "name" VARCHAR NOT NULL,
-          "district" VARCHAR NOT NULL,
-          "detailAddress" VARCHAR NOT NULL,
-          "city" VARCHAR NOT NULL
+          "name" VARCHAR(255) NOT NULL,
+          "district" VARCHAR(255) NOT NULL,
+          "detailAddress" VARCHAR(255) NOT NULL,
+          "city" VARCHAR(255) NOT NULL
         );
       `);
 
@@ -160,8 +188,8 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
       await queryRunner.query(`
         CREATE TABLE "service" (
           "id" SERIAL PRIMARY KEY,
-          "name" VARCHAR NOT NULL,
-          "icon" VARCHAR NOT NULL
+          "name" VARCHAR(255) NOT NULL,
+          "icon" VARCHAR(255) NOT NULL
         );
       `);
 

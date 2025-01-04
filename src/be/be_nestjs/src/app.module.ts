@@ -47,6 +47,13 @@ import { BookingDetailModule } from './module/booking_detail/booking_detail.modu
         database: configService.get<string>('DATABASE_NAME'),
         autoLoadEntities: true,
         synchronize: false,
+        logging: ['query', 'error'],
+        extra: {
+          max: 50,
+          min: 2,
+          idleTimeoutMillis: 15000, 
+          query_timeout: 10000,
+        },
       }),
       inject: [ConfigService],
     }),

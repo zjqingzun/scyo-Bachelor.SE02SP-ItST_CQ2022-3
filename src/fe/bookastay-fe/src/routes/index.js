@@ -17,6 +17,7 @@ import Review from "~/pages/Review";
 // Hotel Owner Pages
 import RegisterHotel from "~/pages/HotelOwner/RegisterHotel/RegisterHotel";
 import { Dashboard, Room, Guest, AddRoom, RoomType } from "~/pages/HotelOwner";
+import Unauthorized from "~/pages/Unauthorized/Unauthorized";
 
 // Admin Pages
 import AdminDashboard from '../pages/Admin/dashboard/dashboard';
@@ -31,6 +32,10 @@ const publicRoutes = [
     {
         path: "/",
         component: Home,
+    },
+    {
+        path: "/unauthorized",
+        component: Unauthorized,
     },
     {
         path: "/about",
@@ -48,11 +53,13 @@ const publicRoutes = [
         path: "/login",
         component: Login,
         layout: HeaderOnly,
+        restricted: true,
     },
     {
         path: "/register",
         component: Register,
         layout: HeaderOnly,
+        restricted: true,
     },
     {
         path: "/history",
@@ -83,31 +90,37 @@ const publicRoutes = [
         path: "/hotel-owner/dashboard",
         component: Dashboard,
         layout: HotelOwnerLayout,
+        requiredRole: "hotelier",
     },
     {
         path: "/hotel-owner/room",
         component: Room,
         layout: HotelOwnerLayout,
+        requiredRole: "hotelier",
     },
     {
         path: "/hotel-owner/guest",
         component: Guest,
         layout: HotelOwnerLayout,
+        requiredRole: "hotelier",
     },
     {
         path: "/hotel-owner",
         component: Dashboard,
         layout: HotelOwnerLayout,
+        requiredRole: "hotelier",
     },
     {
         path: "/hotel-owner/room/add-room",
         component: AddRoom,
         layout: HotelOwnerLayout,
+        requiredRole: "hotelier",
     },
     {
         path: "/hotel-owner/room-type",
         component: RoomType,
         layout: HotelOwnerLayout,
+        requiredRole: "hotelier",
     },
     {
         path: "/admin",

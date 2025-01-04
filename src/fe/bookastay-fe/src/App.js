@@ -11,6 +11,8 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { Flex, Spin } from "antd";
 
 import { doGetAccount } from "./redux/action/accountAction";
+import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
+import RestrictedRoute from "./components/RestrictedRoute/RestrictedRoute";
 
 function App() {
     const dispatch = useDispatch();
@@ -21,7 +23,7 @@ function App() {
         if (userInfo && !userInfo.email) {
             dispatch(doGetAccount());
         }
-    }, []);
+    }, [dispatch, userInfo]);
 
     return (
         <>
@@ -75,6 +77,43 @@ function App() {
                                     Layout = Fragment;
                                 }
 
+                                // if (route.restricted === true) {
+                                //     console.log("path", route.path);
+                                //     return (
+                                //         <Route key={index} element={<RestrictedRoute />}>
+                                //             <Route
+                                //                 path={route.path}
+                                //                 element={
+                                //                     <Layout>
+                                //                         <Page />
+                                //                     </Layout>
+                                //                 }
+                                //             />
+                                //         </Route>
+                                //     );
+                                // }
+
+                                // Kiểm tra xem route có yêu cầu role không
+                                if (route.requiredRole) {
+                                    return (
+                                        <Route
+                                            key={index}
+                                            element={
+                                                <PrivateRoute requiredRole={route.requiredRole} />
+                                            }
+                                        >
+                                            <Route
+                                                path={route.path}
+                                                element={
+                                                    <Layout>
+                                                        <Page />
+                                                    </Layout>
+                                                }
+                                            />
+                                        </Route>
+                                    );
+                                }
+                                // Nếu không yêu cầu role thì render ra bình thường
                                 return (
                                     <Route
                                         key={index}

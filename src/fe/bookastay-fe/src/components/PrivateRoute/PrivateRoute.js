@@ -1,12 +1,30 @@
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
+import { doGetAccount } from "~/redux/action/accountAction";
 
 const PrivateRoute = ({ requiredRole }) => {
+    const dispatch = useDispatch();
+    const [isLoading, setIsLoading] = useState(true);
     const userInfo = useSelector((state) => state.account.userInfo);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            if (userInfo && !userInfo.email) {
+                await dispatch(doGetAccount());
+            }
+            setIsLoading(false);
+        };
+
+        fetchData();
+    }, []);
+
+    // Đợi cho đến khi fetch xong
+    if (isLoading) {
+        return null; // hoặc return loading spinner
+    }
+
     if (!userInfo || !userInfo.role) {
-        console.log("userInfo", userInfo);
-        console.log("userInfo.role", userInfo.role);
         return <Navigate to="/login" />;
     }
 

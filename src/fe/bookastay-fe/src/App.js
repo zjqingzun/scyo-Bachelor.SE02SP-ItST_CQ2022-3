@@ -12,6 +12,7 @@ import { Flex, Spin } from "antd";
 
 import { doGetAccount } from "./redux/action/accountAction";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
+import RestrictedRoute from "./components/RestrictedRoute/RestrictedRoute";
 
 function App() {
     const dispatch = useDispatch();
@@ -22,7 +23,7 @@ function App() {
         if (userInfo && !userInfo.email) {
             dispatch(doGetAccount());
         }
-    }, [dispatch]);
+    }, [dispatch, userInfo]);
 
     return (
         <>
@@ -75,6 +76,22 @@ function App() {
                                 } else if (route.layout === null) {
                                     Layout = Fragment;
                                 }
+
+                                // if (route.restricted === true) {
+                                //     console.log("path", route.path);
+                                //     return (
+                                //         <Route key={index} element={<RestrictedRoute />}>
+                                //             <Route
+                                //                 path={route.path}
+                                //                 element={
+                                //                     <Layout>
+                                //                         <Page />
+                                //                     </Layout>
+                                //                 }
+                                //             />
+                                //         </Route>
+                                //     );
+                                // }
 
                                 // Kiểm tra xem route có yêu cầu role không
                                 if (route.requiredRole) {

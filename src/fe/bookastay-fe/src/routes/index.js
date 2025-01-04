@@ -44,11 +44,13 @@ const publicRoutes = [
         path: "/login",
         component: Login,
         layout: HeaderOnly,
+        restricted: true,
     },
     {
         path: "/register",
         component: Register,
         layout: HeaderOnly,
+        restricted: true,
     },
     {
         path: "/hotel-details",

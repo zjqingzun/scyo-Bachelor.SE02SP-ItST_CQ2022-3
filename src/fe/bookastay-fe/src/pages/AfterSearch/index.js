@@ -116,6 +116,8 @@ const AfterSearch = () => {
             return;
         }
 
+        console.log(">>> search data", location.state);
+
         let data = MockRecommend.filter((hotel) => {
             return toLowerCaseNonAccentVietnamese(hotel.address).includes(
                 toLowerCaseNonAccentVietnamese(location.state.destination)

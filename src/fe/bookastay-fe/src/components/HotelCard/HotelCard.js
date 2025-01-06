@@ -5,7 +5,14 @@ import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 
-const HotelCard = ({ name, address, image, price, rating, review }) => {
+const HotelCard = ({
+    name,
+    address,
+    images,
+    minRoomPrice: price,
+    averageRating: rating,
+    totalReviews: review,
+}) => {
     const { t } = useTranslation();
 
     const currency = useSelector((state) => state.currency.currency);
@@ -18,9 +25,9 @@ const HotelCard = ({ name, address, image, price, rating, review }) => {
     const nowCurrency = useRef("VND");
 
     const getTextRating = () => {
-        if (rating > 8) {
+        if (Number(rating) > 8) {
             return "Great";
-        } else if (rating > 6) {
+        } else if (Number(rating) > 6) {
             return "Good";
         } else {
             return "Average";
@@ -47,7 +54,7 @@ const HotelCard = ({ name, address, image, price, rating, review }) => {
         <div className="hotel-card">
             <div className="hotel-card__image-wrap">
                 <a href="#!">
-                    <img src={image} alt={name} className="hotel-card__image" />
+                    <img src={images[0]} alt={name} className="hotel-card__image" />
                 </a>
 
                 <button onClick={() => setIsFavorite(!isFavorite)} className="hotel-card__favorite">
@@ -88,7 +95,7 @@ const HotelCard = ({ name, address, image, price, rating, review }) => {
                 </div>
                 <div className="hotel-card__row gap-3 mt-5">
                     <div className="hotel-card__score">
-                        <div className="hotel-card__rating">{rating.toFixed(1)}</div>
+                        <div className="hotel-card__rating">{Number(rating).toFixed(1)}</div>
                     </div>
 
                     <div className="hotel-card__row gap-2 h-100">

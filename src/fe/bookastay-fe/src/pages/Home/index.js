@@ -124,51 +124,67 @@ const Home = () => {
     const [isAtStart, setIsAtStart] = useState(true);
     const [isAtEnd, setIsAtEnd] = useState(false);
 
+    const handleScroll = () => {
+        if (!listRef.current) return;
+
+        setIsAtStart(listRef.current.scrollLeft === 0);
+
+        const isAtEnd =
+            Math.ceil(listRef.current.scrollLeft + listRef.current.clientWidth) >=
+            listRef.current.scrollWidth;
+        setIsAtEnd(isAtEnd);
+    };
+
     useEffect(() => {
-        if (MockRecommend.length <= itemPerView) {
-            setIsAtEnd(true);
+        if (recommendHotels.length <= itemPerView) {
             setIsAtStart(true);
+            setIsAtEnd(true);
+            return;
         }
-    }, []);
+
+        const list = listRef.current;
+        if (!list) return;
+
+        list.addEventListener("scroll", handleScroll);
+        handleScroll();
+
+        return () => {
+            list.removeEventListener("scroll", handleScroll);
+        };
+    }, [recommendHotels.length]);
+
+    const [scrollInProgress, setScrollInProgress] = useState(false);
 
     const handlePrev = () => {
-        const gap = getComputedStyle(listRef.current).gap.replace("px", "") * 1;
+        if (!listRef.current || scrollInProgress) return;
 
-        const scrollWidth =
-            (listRef.current.offsetWidth - gap * (itemPerView - 1)) / itemPerView + gap;
-        listRef.current.scrollLeft -=
-            (listRef.current.offsetWidth - gap * (itemPerView - 1)) / itemPerView + gap;
+        setScrollInProgress(true);
+        const gap = parseInt(getComputedStyle(listRef.current).gap);
+        const itemWidth = (listRef.current.offsetWidth - gap * (itemPerView - 1)) / itemPerView;
+        const scrollAmount = itemWidth + gap;
 
-        if (Math.ceil(listRef.current.scrollLeft) === Math.ceil(scrollWidth)) {
-            setIsAtStart(true);
-        }
+        listRef.current.scrollBy({
+            left: -scrollAmount,
+            behavior: "smooth",
+        });
 
-        if (
-            Math.ceil(listRef.current.scrollLeft) <=
-            Math.ceil((MockRecommend.length - itemPerView) * scrollWidth)
-        ) {
-            setIsAtEnd(false);
-        }
+        setTimeout(() => setScrollInProgress(false), 500);
     };
 
     const handleNext = () => {
-        const gap = getComputedStyle(listRef.current).gap.replace("px", "") * 1;
+        if (!listRef.current || scrollInProgress) return;
 
-        const scrollWidth =
-            (listRef.current.offsetWidth - gap * (itemPerView - 1)) / itemPerView + gap;
+        setScrollInProgress(true);
+        const gap = parseInt(getComputedStyle(listRef.current).gap);
+        const itemWidth = (listRef.current.offsetWidth - gap * (itemPerView - 1)) / itemPerView;
+        const scrollAmount = itemWidth + gap;
 
-        listRef.current.scrollLeft += scrollWidth;
+        listRef.current.scrollBy({
+            left: scrollAmount,
+            behavior: "smooth",
+        });
 
-        if (listRef.current.scrollLeft >= 0) {
-            setIsAtStart(false);
-        }
-
-        if (
-            Math.ceil(listRef.current.scrollLeft) >=
-            Math.ceil((MockRecommend.length - itemPerView - 1) * scrollWidth)
-        ) {
-            setIsAtEnd(true);
-        }
+        setTimeout(() => setScrollInProgress(false), 500);
     };
 
     useEffect(() => {
@@ -179,7 +195,9 @@ const Home = () => {
                 if (response.status_code === 200 && response.data) {
                     setRecommendHotels(response.data);
                 }
-            } catch (error) {}
+            } catch (error) {
+                console.log(error);
+            }
         };
 
         fetchRecommendHotels();
@@ -283,9 +301,9 @@ const Home = () => {
 
                 <div className="homepage__recommend-list-wrap">
                     <div className="homepage__recommend-list" ref={listRef}>
-                        {MockRecommend &&
-                            MockRecommend.length > 0 &&
-                            MockRecommend.map((hotel, index) => {
+                        {recommendHotels &&
+                            recommendHotels.length > 0 &&
+                            recommendHotels.map((hotel, index) => {
                                 return (
                                     <div
                                         key={`recommend-${hotel.id}`}

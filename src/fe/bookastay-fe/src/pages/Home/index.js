@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import "./Home.scss";
 import SearchBar from "../../components/SearchBar";
 import HotelCard from "../../components/HotelCard/HotelCard";
+import { useNavigate } from "react-router-dom";
+import { getRecommendHotels } from "~/services/apiService";
 
 const MockData = [
     {
@@ -93,7 +95,9 @@ const MockRecommend = [
 
 const Home = () => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
 
+    const [recommendHotels, setRecommendHotels] = useState([]);
     const [images, setImages] = useState(MockData);
     const [index, setIndex] = useState(0);
 
@@ -167,6 +171,20 @@ const Home = () => {
         }
     };
 
+    useEffect(() => {
+        const fetchRecommendHotels = async () => {
+            try {
+                const response = await getRecommendHotels();
+
+                if (response.status_code === 200 && response.data) {
+                    setRecommendHotels(response.data);
+                }
+            } catch (error) {}
+        };
+
+        fetchRecommendHotels();
+    }, []);
+
     return (
         <section className="homepage">
             <div className="homepage__top">
@@ -231,7 +249,21 @@ const Home = () => {
                         MockDestination.length > 0 &&
                         MockDestination.map((destination, index) => {
                             return (
-                                <a href="#!" key={destination.id} className="destination-item">
+                                <a
+                                    href="#!"
+                                    key={destination.id}
+                                    className="destination-item"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        navigate(`/after-search`, {
+                                            state: {
+                                                destination: destination.title,
+                                                startDate: "2025-01-01",
+                                                endDate: "2025-01-02",
+                                            },
+                                        });
+                                    }}
+                                >
                                     <div className="destination-item__image-wrap">
                                         <img
                                             className="destination-item__image"

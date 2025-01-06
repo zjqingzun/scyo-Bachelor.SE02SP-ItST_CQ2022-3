@@ -15,7 +15,6 @@ const Grid = styled.div`
 
 const GridNav = styled.div`
     grid-area: nav;
-    height: 100vh;
     z-index: 100;
 `;
 

@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { Public } from '@/helpers/decorator/public';
 
 import { HotelsService } from './hotels.service';
@@ -8,10 +18,9 @@ import { UpdateHotelDto } from './dto/update-hotel.dto';
 import { SearchHotelDto } from './dto/search-hotel.dto';
 import { DetailHotelDto } from './dto/detail-hotel.dto';
 
-
 @Controller('hotels')
 export class HotelsController {
-  constructor(private readonly hotelsService: HotelsService) { }
+  constructor(private readonly hotelsService: HotelsService) {}
 
   @Post()
   create(@Body() createHotelDto: CreateHotelDto) {
@@ -32,7 +41,7 @@ export class HotelsController {
   remove(@Param('id') id: string) {
     return this.hotelsService.remove(+id);
   }
-  
+
   // [GET]: /hotels/recommended-hotel
   @Get('recommended-hotel')
   @Public()
@@ -52,7 +61,7 @@ export class HotelsController {
   @Public()
   async findOne(
     @Param('id', ParseIntPipe) id: number,
-    @Query() detailHotelDto: DetailHotelDto
+    @Query() detailHotelDto: DetailHotelDto,
   ) {
     return await this.hotelsService.findOne(id, detailHotelDto);
   }

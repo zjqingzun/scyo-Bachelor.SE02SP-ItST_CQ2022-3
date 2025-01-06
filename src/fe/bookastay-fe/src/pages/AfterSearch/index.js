@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
-import { Collapse } from "antd";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Collapse, Empty, Flex, Spin, Pagination } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 
 import "./AfterSearch.scss";
 
@@ -102,71 +103,143 @@ const AfterSearch = () => {
     const location = useLocation();
 
     const [searchedHotel, setSearchedHotel] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPage, setTotalPage] = useState(0);
+
+    const filteredHotels = useMemo(() => {
+        if (!searchedHotel?.length) return [];
+        return searchedHotel;
+    }, [searchedHotel]);
 
     const backup = useRef([]);
 
-    useEffect(() => {
-        // console.log(">>> first render AfterSearch");
-        // Cuộn lên đầu trang
-        window.scrollTo(0, 0);
+    const [isLoaded, setIsLoaded] = useState(true);
+    const [filterData, setFilterData] = useState({});
 
+    const fetchHotels = useCallback(async () => {
         if (!location.state) {
             return;
         }
 
-        let data = [];
+        setIsLoaded(true);
 
-        const fetchHotels = async () => {
-            try {
-                const response = await getHotels({
-                    city: location?.state?.destination ?? "",
-                    checkInDate: location?.state?.startDate ?? "",
-                    checkOutDate: location?.state?.endDate ?? "",
-                    roomType2: location?.state?.numOfPeople?.roomType23 ?? 0,
-                    roomType4: location?.state?.numOfPeople?.roomType43 ?? 0,
-                });
+        try {
+            const response = await getHotels({
+                city: location.state.destination ?? "",
+                checkInDate: location.state.startDate ?? "",
+                checkOutDate: location.state.endDate ?? "",
+                roomType2: location.state.numOfPeople?.roomType2 ?? 0,
+                roomType4: location.state.numOfPeople?.roomType4 ?? 0,
+                page: currentPage,
+                minPrice: filterData.minPrice || 0,
+                maxPrice: filterData.maxPrice || 0,
+                minRating: filterData.minRating || 0,
+                minStar: filterData.minStar || 0,
+            });
 
-                if (response.status_code === 200 && response.data) {
-                    data = response.data;
-
-                    backup.current = data;
-                    setSearchedHotel(data);
-                } else {
-                    toast.error("Error when fetching hotels");
-                    return [];
-                }
-
-                return response;
-            } catch (error) {
-                console.log(error);
+            if (response.status_code === 200 && response.data) {
+                const data = response.data;
+                backup.current = data;
+                setSearchedHotel(data);
+                setTotalPage(response.total_pages);
+                setCurrentPage(response.page);
+            } else {
                 toast.error("Error when fetching hotels");
-                return [];
             }
-        };
+        } catch (error) {
+            console.error("Error fetching hotels:", error);
+            toast.error("Error when fetching hotels");
+        } finally {
+            setIsLoaded(false);
+        }
+    }, [location.state, currentPage, filterData]);
 
-        fetchHotels();
+    // useEffect(() => {
+    //     // console.log(">>> first render AfterSearch");
+    //     // Cuộn lên đầu trang
+    //     window.scrollTo(0, 0);
 
-        // let data = MockRecommend.filter((hotel) => {
-        //     return toLowerCaseNonAccentVietnamese(hotel.address).includes(
-        //         toLowerCaseNonAccentVietnamese(location.state.destination)
-        //     );
-        // });
+    //     if (!location.state) {
+    //         return;
+    //     }
 
-        // backup.current = data;
-    }, []);
+    //     let data = [];
+
+    //     const fetchHotels = async () => {
+    //         setIsLoaded(true);
+
+    //         try {
+    //             const response = await getHotels({
+    //                 city: location?.state?.destination ?? "",
+    //                 checkInDate: location?.state?.startDate ?? "",
+    //                 checkOutDate: location?.state?.endDate ?? "",
+    //                 roomType2: location?.state?.numOfPeople?.roomType2 ?? 0,
+    //                 roomType4: location?.state?.numOfPeople?.roomType4 ?? 0,
+    //                 page: currentPage,
+    //                 minPrice: filterData.minPrice || 0,
+    //                 maxPrice: filterData.maxPrice || 0,
+    //                 minRating: filterData.minRating || 0,
+    //                 minStar: filterData.minStar || 0,
+    //             });
+
+    //             if (response.status_code === 200 && response.data) {
+    //                 data = response.data;
+
+    //                 backup.current = data;
+    //                 setSearchedHotel(data);
+
+    //                 setTotalPage((prev) => response.total_pages);
+    //                 setCurrentPage((prev) => response.page);
+    //             } else {
+    //                 toast.error("Error when fetching hotels");
+    //                 return [];
+    //             }
+
+    //             return response;
+    //         } catch (error) {
+    //             console.log(error);
+    //             toast.error("Error when fetching hotels");
+    //             return [];
+    //         } finally {
+    //             setIsLoaded(false);
+    //         }
+    //     };
+
+    //     fetchHotels();
+
+    //     // let data = MockRecommend.filter((hotel) => {
+    //     //     return toLowerCaseNonAccentVietnamese(hotel.address).includes(
+    //     //         toLowerCaseNonAccentVietnamese(location.state.destination)
+    //     //     );
+    //     // });
+
+    //     // backup.current = data;
+    // }, [
+    //     location.state,
+    //     currentPage,
+    //     totalPage,
+    //     filterData?.minPrice,
+    //     filterData?.maxPrice,
+    //     filterData?.minRating,
+    //     filterData?.minStar,
+    // ]);
 
     // console.log(">>> render AfterSearch");
 
-    const handleSearch = (searchData) => {
-        let data = MockRecommend.filter((hotel) => {
-            // console.log(hotel.address.includes(searchData.destination));
-            return toLowerCaseNonAccentVietnamese(hotel.address).includes(
-                toLowerCaseNonAccentVietnamese(searchData.destination)
-            );
-        });
+    useEffect(() => {
+        window.scrollTo(0, 0); // Scroll to top
+        fetchHotels();
+    }, [fetchHotels]);
 
-        setSearchedHotel(data);
-    };
+    const handleSearch = useCallback((searchData) => {
+        location.state = {
+            destination: searchData.destination,
+            startDate: searchData.startDate,
+            endDate: searchData.endDate,
+            numOfPeople: searchData.numOfPeople,
+        };
+        fetchHotels(); // Refetch when search data changes
+    }, []);
 
     const textToScore = {
         checkboxExcellent: 9,
@@ -183,101 +256,148 @@ const AfterSearch = () => {
         checkboxFiveStar: 5,
     };
 
-    const handleFilter = (filterData) => {
-        console.log(">>> do filter");
+    const handleFilter = useCallback((filterData) => {
+        const { price, selectedScores, selectedStars } = filterData;
 
-        const price = filterData.price;
-        const selectedScores = filterData.selectedScores;
-        const selectedStars = filterData.selectedStars;
+        const minPrice = price?.[0] || 0;
+        const maxPrice = price?.[1] || 0;
 
-        let _data = [...backup.current];
+        let minRating = selectedScores
+            ? Math.min(
+                  ...Object.keys(selectedScores)
+                      .filter((key) => selectedScores[key])
+                      .map((key) => textToScore[key])
+              )
+            : 0;
 
-        if (price && price.length === 2 && price[1] !== 0) {
-            _data = _data.filter((hotel) => {
-                return hotel.price >= price[0] && hotel.price <= price[1];
-            });
+        let minStar = selectedStars
+            ? Math.min(
+                  ...Object.keys(selectedStars)
+                      .filter((key) => selectedStars[key])
+                      .map((key) => textToStar[key])
+              )
+            : 0;
+
+        if (minRating === Infinity) {
+            minRating = 0;
         }
 
-        if (selectedScores) {
-            const selectedScoresToArray = [];
-            for (const key in selectedScores) {
-                if (selectedScores[key]) {
-                    selectedScoresToArray.push(textToScore[key]);
-                }
-            }
-
-            if (selectedScoresToArray.length > 0) {
-                _data = _data.filter((hotel) => {
-                    return selectedScoresToArray.some((score) => score <= hotel.rating);
-                });
-            }
+        if (minStar === Infinity) {
+            minStar = 0;
         }
 
-        if (selectedStars) {
-            const selectedStarsToArray = [];
-            for (const key in selectedStars) {
-                if (selectedStars[key]) {
-                    selectedStarsToArray.push(textToStar[key]);
-                }
-            }
-
-            if (selectedStarsToArray.length > 0) {
-                _data = _data.filter((hotel) => selectedStarsToArray.includes(hotel.star));
-            }
-        }
-
-        setSearchedHotel((prev) => [..._data]);
-    };
+        setFilterData({
+            minPrice,
+            maxPrice,
+            minRating,
+            minStar,
+        });
+    }, []);
 
     return (
-        <div className="after-search my-5 pb-5">
-            <div className="after-search__search-bar">
-                <SearchBar
-                    handleSearch={handleSearch}
-                    border-radius={12}
-                    searchData={location.state}
-                />
-            </div>
+        <>
+            <div className="after-search my-5 pb-5">
+                <div className="after-search__search-bar">
+                    <SearchBar
+                        handleSearch={handleSearch}
+                        border-radius={12}
+                        searchData={location.state}
+                    />
+                </div>
 
-            <div className="after-search__body mt-4">
-                <div className="row gx-4">
-                    <div className="col-12 col-lg-3">
-                        <div className="after-search__filter d-none d-lg-block">
-                            <Filter handleFilter={handleFilter} />
-                        </div>
+                <div className="after-search__body mt-4">
+                    <div className="row gx-4">
+                        <div className="col-12 col-lg-3">
+                            <div className="after-search__filter d-none d-lg-block">
+                                <Filter handleFilter={handleFilter} />
+                            </div>
 
-                        <div className="d-lg-none">
-                            <Collapse
-                                style={{ padding: "0", marginBottom: "1rem" }}
-                                items={[
-                                    {
-                                        key: "1",
-                                        label: "Filter",
-                                        children: (
-                                            <div className="after-search__filter">
-                                                <Filter handleFilter={handleFilter} />
-                                            </div>
-                                        ),
-                                        styles: {
-                                            body: { padding: "0" },
+                            <div className="d-lg-none">
+                                <Collapse
+                                    style={{ padding: "0", marginBottom: "1rem" }}
+                                    items={[
+                                        {
+                                            key: "1",
+                                            label: "Filter",
+                                            children: (
+                                                <div className="after-search__filter">
+                                                    <Filter handleFilter={handleFilter} />
+                                                </div>
+                                            ),
+                                            styles: {
+                                                body: { padding: "0" },
+                                            },
                                         },
-                                    },
-                                ]}
-                            />
+                                    ]}
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div className="col-12 col-lg-9">
-                        <div className="row row-cols-1 gy-5">
-                            {searchedHotel.map((hotel) => (
-                                <div key={hotel.id} className="col">
-                                    <HotelCard {...hotel} />
+                        <div className="col-12 col-lg-9 position-relative">
+                            <div className="row row-cols-1 gy-5">
+                                {filteredHotels.length > 0 ? (
+                                    filteredHotels.map((hotel) => (
+                                        <div key={hotel.id} className="col">
+                                            <HotelCard {...hotel} />
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="col my-5">
+                                        <Empty
+                                            image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                            description={<span>No hotels found</span>}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                            {isLoaded && (
+                                <Flex
+                                    gap="middle"
+                                    vertical
+                                    align="center"
+                                    justify="center"
+                                    style={{
+                                        height: "100%",
+                                        position: "absolute",
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: "rgba(0, 0, 0, 0.05)",
+                                        zIndex: 9999,
+                                    }}
+                                >
+                                    <Flex gap="middle">
+                                        <Spin
+                                            indicator={
+                                                <LoadingOutlined
+                                                    style={{
+                                                        fontSize: 50,
+                                                        fontWeight: "bold",
+                                                    }}
+                                                    spin
+                                                />
+                                            }
+                                            size="large"
+                                        ></Spin>
+                                    </Flex>
+                                </Flex>
+                            )}
+
+                            {filteredHotels.length > 0 && (
+                                <div className="pagination mt-5 d-flex justify-content-center">
+                                    <Pagination
+                                        showQuickJumper
+                                        defaultCurrent={currentPage}
+                                        total={totalPage * 10}
+                                        onChange={(page) => setCurrentPage(page)}
+                                    />
                                 </div>
-                            ))}
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

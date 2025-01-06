@@ -12,7 +12,6 @@ const data = [
         key: "1",
         reservationID: "1",
         guestName: "John Doe",
-        roomNumber: "#101",
         checkInDate: "2021-09-01",
         checkOutDate: "2021-09-02",
         totalPrice: "1000",
@@ -22,7 +21,6 @@ const data = [
         key: "2",
         reservationID: "2",
         guestName: "Jane Doe",
-        roomNumber: "#102",
         checkInDate: "2021-09-01",
         checkOutDate: "2021-09-02",
         totalPrice: "1000",
@@ -32,7 +30,6 @@ const data = [
         key: "3",
         reservationID: "3",
         guestName: "John Doe",
-        roomNumber: "#103",
         checkInDate: "2021-09-01",
         checkOutDate: "2021-09-02",
         totalPrice: "1000",
@@ -41,6 +38,8 @@ const data = [
 ];
 
 const Guest = () => {
+    const navigate = useNavigate();
+
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
     const searchInput = useRef(null);
@@ -166,13 +165,6 @@ const Guest = () => {
             ...getColumnSearchProps("guestName"),
         },
         {
-            title: "Room Number",
-            dataIndex: "roomNumber",
-            key: "roomNumber",
-            sorter: true,
-            ...getColumnSearchProps("roomNumber"),
-        },
-        {
             title: "Check-in Date",
             key: "checkInDate",
             dataIndex: "checkInDate",
@@ -233,6 +225,16 @@ const Guest = () => {
             fixed: "right",
             render: (_, record) => (
                 <Space size="middle">
+                    <Button
+                        type="primary"
+                        onClick={() => {
+                            // Handle view action
+                            navigate("/hotel-owner/order-detail", { state: record });
+                        }}
+                    >
+                        View
+                    </Button>
+
                     <Popconfirm
                         onConfirm={() => {
                             // Handle delete action

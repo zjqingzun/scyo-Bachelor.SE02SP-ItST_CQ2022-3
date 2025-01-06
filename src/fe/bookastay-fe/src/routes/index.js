@@ -16,17 +16,17 @@ import Review from "~/pages/Review";
 
 // Hotel Owner Pages
 import RegisterHotel from "~/pages/HotelOwner/RegisterHotel/RegisterHotel";
-import { Dashboard, Room, Guest, AddRoom, RoomType } from "~/pages/HotelOwner";
+import { Dashboard, Room, Guest, AddRoom, RoomType, OrderDetail } from "~/pages/HotelOwner";
 import Unauthorized from "~/pages/Unauthorized/Unauthorized";
 
 // Admin Pages
-import AdminDashboard from '../pages/Admin/dashboard/dashboard';
-import ManageUsers from '../pages/Admin/manageUsers/manageUsers';
-import ManageHotelOwners from '../pages/Admin/manageHotelOwners/manageHotelOwners';
-import ManageHotels from '../pages/Admin/manageHotels/manageHotels';
-import ManageRequests from '../pages/Admin/manageRequets/manageRequests';
-import AdminLogin from '../pages/Admin/login/login';
-import RequestDetails from '../pages/Admin/RequestDetails/requestDetails';
+import AdminDashboard from "../pages/Admin/dashboard/dashboard";
+import ManageUsers from "../pages/Admin/manageUsers/manageUsers";
+import ManageHotelOwners from "../pages/Admin/manageHotelOwners/manageHotelOwners";
+import ManageHotels from "../pages/Admin/manageHotels/manageHotels";
+import ManageRequests from "../pages/Admin/manageRequets/manageRequests";
+import AdminLogin from "../pages/Admin/login/login";
+import RequestDetails from "../pages/Admin/RequestDetails/requestDetails";
 
 const publicRoutes = [
     {
@@ -101,6 +101,12 @@ const publicRoutes = [
     {
         path: "/hotel-owner/guest",
         component: Guest,
+        layout: HotelOwnerLayout,
+        requiredRole: "hotelier",
+    },
+    {
+        path: "/hotel-owner/order-detail",
+        component: OrderDetail,
         layout: HotelOwnerLayout,
         requiredRole: "hotelier",
     },

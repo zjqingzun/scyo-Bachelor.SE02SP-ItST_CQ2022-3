@@ -5,17 +5,23 @@ import { useTranslation } from "react-i18next";
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 import icons from "~/assets/icon";
 
+import { Modal } from "react-bootstrap";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import L from "leaflet";
+
+import geocodeAddress from "~/utils/geocodeAddress";
+import staticImages from "~/assets/image";
+import "leaflet/dist/leaflet.css";
 import "./HotelCard.scss";
 
 const HotelAfterSearchCard = ({
     name,
     address,
-    image,
-    price,
-    rating,
-    review,
+    images,
+    minRoomPrice: price,
+    averageRating: rating,
+    totalReviews: review,
     star,
-    handleShowMapModel = () => {},
 }) => {
     const { t } = useTranslation();
 
@@ -50,11 +56,47 @@ const HotelAfterSearchCard = ({
         }
     }, [currency]);
 
+    const [showMapModal, setShowMapModal] = useState(false);
+    const mapPositionRef = useRef([10.5279716, 107.3921728]);
+
+    const handleCloseMapModel = () => setShowMapModal(false);
+    const handleShowMapModel = async (address) => {
+        mapPositionRef.current = await geocodeAddress(address);
+
+        // console.log(mapPositionRef.current);
+
+        setShowMapModal(true);
+    };
+
     return (
         <div className="hotel-card hotel-card--after-search">
+            <Modal centered show={showMapModal} onHide={handleCloseMapModel}>
+                <Modal.Body>
+                    <Modal.Header closeButton></Modal.Header>
+                    <MapContainer center={mapPositionRef.current} zoom={13}>
+                        <TileLayer
+                            maxZoom={30}
+                            attribution="Google Maps"
+                            url="https://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}"
+                        />
+                        <Marker
+                            position={mapPositionRef.current}
+                            icon={L.divIcon({
+                                className: "custom-marker",
+                                html: `<img src="${staticImages.mapMarkerIcon}" alt="marker" />`,
+                                iconSize: [50, 30],
+                            })}
+                        >
+                            <Popup>
+                                <h2>{name}</h2>
+                            </Popup>
+                        </Marker>
+                    </MapContainer>
+                </Modal.Body>
+            </Modal>
             <div className="hotel-card__image-wrap">
                 <a href="#!" style={{ display: "block", height: "100%" }}>
-                    <img src={image} alt={name} className="hotel-card__image" />
+                    <img src={images[0]} alt={name} className="hotel-card__image" />
                 </a>
 
                 <button onClick={() => setIsFavorite(!isFavorite)} className="hotel-card__favorite">
@@ -101,7 +143,10 @@ const HotelAfterSearchCard = ({
                 <div className="hotel-card__row justify-content-between w-100 mt-auto">
                     <a
                         href="#!"
-                        onClick={() => handleShowMapModel(address)}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            handleShowMapModel(address);
+                        }}
                         className="hotel-card__open-map"
                     >
                         {t("hotelCard.OpenMap")}
@@ -112,7 +157,7 @@ const HotelAfterSearchCard = ({
 
                 <div className="hotel-card__row hotel-card__bottom gap-3 mt-3">
                     <div className="hotel-card__score">
-                        <div className="hotel-card__rating">{rating.toFixed(1)}</div>
+                        <div className="hotel-card__rating">{Number(rating)?.toFixed(1)}</div>
                     </div>
 
                     <div className="hotel-card__row gap-2 h-100">

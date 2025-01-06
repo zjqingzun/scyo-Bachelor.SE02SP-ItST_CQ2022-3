@@ -77,31 +77,9 @@ function App() {
                                     Layout = Fragment;
                                 }
 
-                                // if (route.restricted === true) {
-                                //     console.log("path", route.path);
-                                //     return (
-                                //         <Route key={index} element={<RestrictedRoute />}>
-                                //             <Route
-                                //                 path={route.path}
-                                //                 element={
-                                //                     <Layout>
-                                //                         <Page />
-                                //                     </Layout>
-                                //                 }
-                                //             />
-                                //         </Route>
-                                //     );
-                                // }
-
-                                // Kiểm tra xem route có yêu cầu role không
-                                if (route.requiredRole) {
+                                if (route.restricted === true) {
                                     return (
-                                        <Route
-                                            key={index}
-                                            element={
-                                                <PrivateRoute requiredRole={route.requiredRole} />
-                                            }
-                                        >
+                                        <Route key={index} element={<RestrictedRoute />}>
                                             <Route
                                                 path={route.path}
                                                 element={
@@ -113,6 +91,27 @@ function App() {
                                         </Route>
                                     );
                                 }
+
+                                // Kiểm tra xem route có yêu cầu role không
+                                // if (route.requiredRole) {
+                                //     return (
+                                //         <Route
+                                //             key={index}
+                                //             element={
+                                //                 <PrivateRoute requiredRole={route.requiredRole} />
+                                //             }
+                                //         >
+                                //             <Route
+                                //                 path={route.path}
+                                //                 element={
+                                //                     <Layout>
+                                //                         <Page />
+                                //                     </Layout>
+                                //                 }
+                                //             />
+                                //         </Route>
+                                //     );
+                                // }
                                 // Nếu không yêu cầu role thì render ra bình thường
                                 return (
                                     <Route

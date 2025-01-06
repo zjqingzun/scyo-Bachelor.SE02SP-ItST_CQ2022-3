@@ -19,4 +19,41 @@ const getRefreshToken = async () => {
     return await axios.get(`/auth/renew_token/${localStorage.getItem("refresh_token")}`);
 };
 
-export { userLogin, getProfile, getRefreshToken, userRegister };
+// Search
+const getHotels = async (
+    query = {
+        city: "",
+        checkInDate: "",
+        checkOutDate: "",
+        roomType2: 0,
+        roomType4: 0,
+        minPrice: 0,
+        maxPrice: 0,
+        minRating: 0,
+        minStar: 0,
+        page: 1,
+        per_page: 6,
+    }
+) => {
+    const params = new URLSearchParams({
+        city: query?.city || "",
+        checkInDate: query?.checkInDate || "",
+        checkOutDate: query?.checkOutDate || "",
+        roomType2: query?.roomType2 || 0,
+        roomType4: query?.roomType4 || 0,
+        minPrice: query?.minPrice || 0,
+        maxPrice: query?.maxPrice || 0,
+        minRating: query?.minRating || 0,
+        minStar: query?.minStar || 0,
+        page: query?.page || 1,
+        per_page: query?.per_page || 6,
+    });
+
+    return await axios.get(`/hotels/search?${params.toString()}`);
+};
+
+const getRecommendHotels = async () => {
+    return await axios.get(`/hotels/recommended-hotel`);
+};
+
+export { userLogin, getProfile, getRefreshToken, userRegister, getHotels, getRecommendHotels };

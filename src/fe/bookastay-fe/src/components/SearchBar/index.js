@@ -46,7 +46,7 @@ const SearchBar = (props) => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, "0");
         const day = String(date.getDate()).padStart(2, "0");
-        return `${day}/${month}/${year}`;
+        return `${year}-${month}-${day}`;
     }
 
     const [show, setShow] = useState("hide");
@@ -83,9 +83,9 @@ const SearchBar = (props) => {
     const [numOfPeople, setNumOfPeople] = useState(() => {
         return (
             props?.searchData?.numOfPeople || {
-                adult: 2,
+                roomType2: 1,
                 children: 0,
-                rooms: 1,
+                roomType4: 1,
             }
         );
     });
@@ -177,7 +177,7 @@ const SearchBar = (props) => {
                 >
                     <div className="search-bar__input">
                         <span>
-                            {numOfPeople.adult} {t("searchBar.adults")}
+                            {numOfPeople.roomType2} {t("searchBar.adults")}
                         </span>
                         {/* <div className="search-bar__input-separate"></div>
                         <span>
@@ -185,7 +185,7 @@ const SearchBar = (props) => {
                         </span> */}
                         <div className="search-bar__input-separate"></div>
                         <span>
-                            {numOfPeople.rooms} {t("searchBar.rooms")}
+                            {numOfPeople.roomType4} {t("searchBar.rooms")}
                         </span>
                     </div>
                     <img
@@ -206,13 +206,13 @@ const SearchBar = (props) => {
                                     onClick={() =>
                                         setNumOfPeople((prev) => ({
                                             ...prev,
-                                            adult: prev.adult > 1 ? prev.adult - 1 : 1,
+                                            roomType2: prev.roomType2 > 1 ? prev.roomType2 - 1 : 1,
                                         }))
                                     }
                                 >
                                     <svg
                                         style={{
-                                            fill: numOfPeople.adult === 1 ? "#ccc" : "",
+                                            fill: numOfPeople.roomType2 === 1 ? "#ccc" : "",
                                         }}
                                         className="number-select__btn-icon"
                                         xmlns="http://www.w3.org/2000/svg"
@@ -221,13 +221,13 @@ const SearchBar = (props) => {
                                         <path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z" />
                                     </svg>
                                 </button>
-                                <span>{numOfPeople.adult}</span>
+                                <span>{numOfPeople.roomType2}</span>
                                 <button
                                     className="number-select__btn"
                                     onClick={() =>
                                         setNumOfPeople((prev) => ({
                                             ...prev,
-                                            adult: Number(prev.adult) + 1,
+                                            roomType2: Number(prev.roomType2) + 1,
                                         }))
                                     }
                                 >
@@ -292,13 +292,13 @@ const SearchBar = (props) => {
                                     onClick={() =>
                                         setNumOfPeople((prev) => ({
                                             ...prev,
-                                            rooms: prev.rooms > 1 ? prev.rooms - 1 : 1,
+                                            roomType4: prev.roomType4 > 1 ? prev.roomType4 - 1 : 1,
                                         }))
                                     }
                                 >
                                     <svg
                                         style={{
-                                            fill: numOfPeople.rooms === 1 ? "#ccc" : "",
+                                            fill: numOfPeople.roomType4 === 1 ? "#ccc" : "",
                                         }}
                                         className="number-select__btn-icon"
                                         xmlns="http://www.w3.org/2000/svg"
@@ -307,13 +307,13 @@ const SearchBar = (props) => {
                                         <path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z" />
                                     </svg>
                                 </button>
-                                <span>{numOfPeople.rooms}</span>
+                                <span>{numOfPeople.roomType4}</span>
                                 <button
                                     className="number-select__btn"
                                     onClick={() =>
                                         setNumOfPeople((prev) => ({
                                             ...prev,
-                                            rooms: Number(prev.rooms) + 1,
+                                            roomType4: Number(prev.roomType4) + 1,
                                         }))
                                     }
                                 >

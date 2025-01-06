@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { Collapse } from "antd";
+import { Collapse, Empty, Flex, Spin, Pagination } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 
 import "./AfterSearch.scss";
 
@@ -102,8 +103,12 @@ const AfterSearch = () => {
     const location = useLocation();
 
     const [searchedHotel, setSearchedHotel] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPage, setTotalPage] = useState(0);
 
     const backup = useRef([]);
+
+    const [isLoaded, setIsLoaded] = useState(true);
 
     useEffect(() => {
         // console.log(">>> first render AfterSearch");
@@ -117,13 +122,16 @@ const AfterSearch = () => {
         let data = [];
 
         const fetchHotels = async () => {
+            setIsLoaded(true);
+
             try {
                 const response = await getHotels({
                     city: location?.state?.destination ?? "",
                     checkInDate: location?.state?.startDate ?? "",
                     checkOutDate: location?.state?.endDate ?? "",
-                    roomType2: location?.state?.numOfPeople?.roomType23 ?? 0,
-                    roomType4: location?.state?.numOfPeople?.roomType43 ?? 0,
+                    roomType2: location?.state?.numOfPeople?.roomType2 ?? 0,
+                    roomType4: location?.state?.numOfPeople?.roomType4 ?? 0,
+                    page: currentPage,
                 });
 
                 if (response.status_code === 200 && response.data) {
@@ -131,6 +139,9 @@ const AfterSearch = () => {
 
                     backup.current = data;
                     setSearchedHotel(data);
+
+                    setTotalPage((prev) => response.total_pages);
+                    setCurrentPage((prev) => response.page);
                 } else {
                     toast.error("Error when fetching hotels");
                     return [];
@@ -141,6 +152,8 @@ const AfterSearch = () => {
                 console.log(error);
                 toast.error("Error when fetching hotels");
                 return [];
+            } finally {
+                setIsLoaded(false);
             }
         };
 
@@ -153,7 +166,7 @@ const AfterSearch = () => {
         // });
 
         // backup.current = data;
-    }, []);
+    }, [location.state, currentPage, totalPage]);
 
     // console.log(">>> render AfterSearch");
 
@@ -229,55 +242,111 @@ const AfterSearch = () => {
         setSearchedHotel((prev) => [..._data]);
     };
 
+    console.log(">>> page", currentPage);
+    console.log(">>> total page", totalPage);
+
     return (
-        <div className="after-search my-5 pb-5">
-            <div className="after-search__search-bar">
-                <SearchBar
-                    handleSearch={handleSearch}
-                    border-radius={12}
-                    searchData={location.state}
-                />
-            </div>
+        <>
+            <div className="after-search my-5 pb-5">
+                <div className="after-search__search-bar">
+                    <SearchBar
+                        handleSearch={handleSearch}
+                        border-radius={12}
+                        searchData={location.state}
+                    />
+                </div>
 
-            <div className="after-search__body mt-4">
-                <div className="row gx-4">
-                    <div className="col-12 col-lg-3">
-                        <div className="after-search__filter d-none d-lg-block">
-                            <Filter handleFilter={handleFilter} />
-                        </div>
+                <div className="after-search__body mt-4">
+                    <div className="row gx-4">
+                        <div className="col-12 col-lg-3">
+                            <div className="after-search__filter d-none d-lg-block">
+                                <Filter handleFilter={handleFilter} />
+                            </div>
 
-                        <div className="d-lg-none">
-                            <Collapse
-                                style={{ padding: "0", marginBottom: "1rem" }}
-                                items={[
-                                    {
-                                        key: "1",
-                                        label: "Filter",
-                                        children: (
-                                            <div className="after-search__filter">
-                                                <Filter handleFilter={handleFilter} />
-                                            </div>
-                                        ),
-                                        styles: {
-                                            body: { padding: "0" },
+                            <div className="d-lg-none">
+                                <Collapse
+                                    style={{ padding: "0", marginBottom: "1rem" }}
+                                    items={[
+                                        {
+                                            key: "1",
+                                            label: "Filter",
+                                            children: (
+                                                <div className="after-search__filter">
+                                                    <Filter handleFilter={handleFilter} />
+                                                </div>
+                                            ),
+                                            styles: {
+                                                body: { padding: "0" },
+                                            },
                                         },
-                                    },
-                                ]}
-                            />
+                                    ]}
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div className="col-12 col-lg-9">
-                        <div className="row row-cols-1 gy-5">
-                            {searchedHotel.map((hotel) => (
-                                <div key={hotel.id} className="col">
-                                    <HotelCard {...hotel} />
-                                </div>
-                            ))}
+                        <div className="col-12 col-lg-9 position-relative">
+                            <div className="row row-cols-1 gy-5">
+                                {searchedHotel.length > 0 ? (
+                                    searchedHotel.map((hotel) => (
+                                        <div key={hotel.id} className="col">
+                                            <HotelCard {...hotel} />
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="col my-5">
+                                        <Empty
+                                            image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                            description={<span>No hotels found</span>}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                            {isLoaded && (
+                                <Flex
+                                    gap="middle"
+                                    vertical
+                                    align="center"
+                                    justify="center"
+                                    style={{
+                                        height: "100%",
+                                        position: "absolute",
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: "rgba(0, 0, 0, 0.05)",
+                                        zIndex: 9999,
+                                    }}
+                                >
+                                    <Flex gap="middle">
+                                        <Spin
+                                            indicator={
+                                                <LoadingOutlined
+                                                    style={{
+                                                        fontSize: 50,
+                                                        fontWeight: "bold",
+                                                    }}
+                                                    spin
+                                                />
+                                            }
+                                            size="large"
+                                        ></Spin>
+                                    </Flex>
+                                </Flex>
+                            )}
+
+                            <div className="pagination mt-5 d-flex justify-content-center">
+                                <Pagination
+                                    showQuickJumper
+                                    defaultCurrent={currentPage}
+                                    total={totalPage * 10}
+                                    onChange={(page) => setCurrentPage(page)}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

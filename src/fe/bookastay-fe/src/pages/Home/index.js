@@ -54,45 +54,6 @@ const MockDestination = [
     },
 ];
 
-const MockRecommend = [
-    {
-        id: 1,
-        name: "The Grand Ho Tram Strip",
-        address: "Phuoc Thuan, Xuyen Moc, Ba Ria - Vung Tau",
-        image: "https://plus.unsplash.com/premium_photo-1675616563084-63d1f129623d?q=80&w=1769&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        price: 3877530,
-        rating: 9.5,
-        review: 100,
-    },
-    {
-        id: 2,
-        name: "Jan Hostel Central Point",
-        address: "Quận 1, TP. Hồ Chí Minh",
-        image: "https://cf.bstatic.com/xdata/images/hotel/square600/458830113.webp?k=ff0cb97b7983f09e099de3260a9553fa2a4d0582323e0a962b52cf67ffc2b38f&o=",
-        price: 3948613,
-        rating: 9.0,
-        review: 50,
-    },
-    {
-        id: 3,
-        name: "HANZ 345 Business Suite Grand Residence",
-        address: "Quận 1, TP. Hồ Chí Minh",
-        image: "https://cf.bstatic.com/xdata/images/hotel/square600/586909150.webp?k=422e9c17817cd27de89aaa113a1711a3b23151c8f13919aa1dc08a970b70cf97&o=",
-        price: 2660000,
-        rating: 9.3,
-        review: 80,
-    },
-    {
-        id: 4,
-        name: "Apina Saigon - Truong Dinh",
-        address: "Quận 1, TP. Hồ Chí Minh",
-        image: "https://cf.bstatic.com/xdata/images/hotel/square600/596644761.webp?k=e146b7295510455911929c4fc7e26ea69228075e46195df169989d59705c6db1&o=",
-        price: 4288680,
-        rating: 9.5,
-        review: 100,
-    },
-];
-
 const Home = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -344,64 +305,64 @@ const Home = () => {
             </div>
 
             {/* <div className="homepage__subscribe">
-                <div className="homepage__subscribe-left">
-                    <h2 className="homepage__subscribe-title">Subscribe our newsletter</h2>
-                    <p className="homepage__subscribe-desc">
-                        Reciev latest news, update, and many other things every week.{" "}
-                    </p>
-
-                    <div className="homepage__subscribe-input-group">
-                        <input
-                            type="email"
-                            placeholder="Enter your email address"
-                            className="homepage__subscribe-input"
-                        />
-                        <button className="homepage__subscribe-btn">
-                            <svg
-                                className="homepage__subscribe-btn-icon"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 512 512"
-                            >
-                                <path d="M498.1 5.6c10.1 7 15.4 19.1 13.5 31.2l-64 416c-1.5 9.7-7.4 18.2-16 23s-18.9 5.4-28 1.6L284 427.7l-68.5 74.1c-8.9 9.7-22.9 12.9-35.2 8.1S160 493.2 160 480l0-83.6c0-4 1.5-7.8 4.2-10.8L331.8 202.8c5.8-6.3 5.6-16-.4-22s-15.7-6.4-22-.7L106 360.8 17.7 316.6C7.1 311.3 .3 300.7 0 288.9s5.9-22.8 16.1-28.7l448-256c10.7-6.1 23.9-5.5 34 1.4z" />
-                            </svg>
-                        </button>
+                    <div className="homepage__subscribe-left">
+                        <h2 className="homepage__subscribe-title">Subscribe our newsletter</h2>
+                        <p className="homepage__subscribe-desc">
+                            Reciev latest news, update, and many other things every week.{" "}
+                        </p>
+    
+                        <div className="homepage__subscribe-input-group">
+                            <input
+                                type="email"
+                                placeholder="Enter your email address"
+                                className="homepage__subscribe-input"
+                            />
+                            <button className="homepage__subscribe-btn">
+                                <svg
+                                    className="homepage__subscribe-btn-icon"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 512 512"
+                                >
+                                    <path d="M498.1 5.6c10.1 7 15.4 19.1 13.5 31.2l-64 416c-1.5 9.7-7.4 18.2-16 23s-18.9 5.4-28 1.6L284 427.7l-68.5 74.1c-8.9 9.7-22.9 12.9-35.2 8.1S160 493.2 160 480l0-83.6c0-4 1.5-7.8 4.2-10.8L331.8 202.8c5.8-6.3 5.6-16-.4-22s-15.7-6.4-22-.7L106 360.8 17.7 316.6C7.1 311.3 .3 300.7 0 288.9s5.9-22.8 16.1-28.7l448-256c10.7-6.1 23.9-5.5 34 1.4z" />
+                                </svg>
+                            </button>
+                        </div>
+    
+                        <svg
+                            className="homepage__subscribe-decor"
+                            width="67"
+                            height="77"
+                            viewBox="0 0 67 77"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M66.1051 0L66.1051 76.2102L0.105118 38.1051L66.1051 0Z"
+                                fill="#BFA82D"
+                            />
+                        </svg>
+                        <svg
+                            className="homepage__subscribe-decor"
+                            width="62"
+                            height="31"
+                            viewBox="0 0 62 31"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M62 31C62 22.7783 58.7339 14.8933 52.9203 9.07969C47.1067 3.26606 39.2217 6.20722e-07 31 0C22.7783 -6.20722e-07 14.8933 3.26606 9.07969 9.07969C3.26606 14.8933 1.24144e-06 22.7783 0 31L31 31H62Z"
+                                fill="#F1D84E"
+                            />
+                        </svg>
                     </div>
-
-                    <svg
-                        className="homepage__subscribe-decor"
-                        width="67"
-                        height="77"
-                        viewBox="0 0 67 77"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M66.1051 0L66.1051 76.2102L0.105118 38.1051L66.1051 0Z"
-                            fill="#BFA82D"
+                    <div className="homepage__subscribe-right">
+                        <img
+                            className="homepage__subscribe-image"
+                            src="https://plus.unsplash.com/premium_photo-1679768606018-7ac0b7583957?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                            alt=""
                         />
-                    </svg>
-                    <svg
-                        className="homepage__subscribe-decor"
-                        width="62"
-                        height="31"
-                        viewBox="0 0 62 31"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M62 31C62 22.7783 58.7339 14.8933 52.9203 9.07969C47.1067 3.26606 39.2217 6.20722e-07 31 0C22.7783 -6.20722e-07 14.8933 3.26606 9.07969 9.07969C3.26606 14.8933 1.24144e-06 22.7783 0 31L31 31H62Z"
-                            fill="#F1D84E"
-                        />
-                    </svg>
-                </div>
-                <div className="homepage__subscribe-right">
-                    <img
-                        className="homepage__subscribe-image"
-                        src="https://plus.unsplash.com/premium_photo-1679768606018-7ac0b7583957?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                        alt=""
-                    />
-                </div>
-            </div> */}
+                    </div>
+                </div> */}
         </section>
     );
 };

@@ -33,7 +33,7 @@ export class HotelsController {
     return this.hotelsService.remove(+id);
   }
   
-  // [GET]: /hotels/recommend-hotel
+  // [GET]: /hotels/recommended-hotel
   @Get('recommended-hotel')
   @Public()
   async recommendedHotel() {

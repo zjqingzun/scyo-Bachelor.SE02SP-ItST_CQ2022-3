@@ -60,16 +60,16 @@ export class HotelsService {
           'hotel.name AS name',
           'hotel.star AS star',
           'location.detailAddress AS address',
-          'ARRAY_AGG(image.url) AS images',
+          'ARRAY_AGG(DISTINCT image.url) AS images',
           'SUM(review.rating) AS totalrating',
           'AVG(CASE WHEN review.rating IS NOT NULL THEN review.rating ELSE NULL END) AS averagerating',
-          'COUNT(review.id) AS totalreviews',
-          'MIN(roomType.price) AS minprice',
+          'COUNT(DISTINCT review.id) AS totalreviews',
+          'MIN(roomType.price) AS minroomprice',
         ])
         .groupBy('hotel.id')
         .addGroupBy('location.id')
         .orderBy('COALESCE(AVG(review.rating), 0)', 'DESC')
-        .limit(10) // Lấy top 10 khách sạn chấm theo rating trung bình của người dùng 
+        .limit(10)
 
       const hotels = await queryBuilder.getRawMany();
 
@@ -122,85 +122,137 @@ export class HotelsService {
     // console.log('DTO: ', searchHotelDto);
 
     try {
-      const hotelQueryBuilder = this.hotelRepository
+      const queryBuilder = await this.hotelRepository
         .createQueryBuilder('hotel')
+        .leftJoinAndSelect('hotel.images', 'image')
         .leftJoinAndSelect('hotel.locations', 'location')
-        .leftJoin('hotel.images', 'image')
         .leftJoin('hotel.reviews', 'review')
         .leftJoin('hotel.roomTypes', 'roomType')
-        .leftJoin('roomType.rooms', 'room')
-        .leftJoin('hotel.bookings', 'booking', 'booking.status = :status', { status: 'confirmed' })
-        .leftJoin('booking.bookingDetails', 'bookingDetail')
+        .leftJoin('roomType.rooms', 'room') // Join thông qua bảng roomType
+        .leftJoin('hotel.bookings', 'booking')
+        .leftJoin('booking.bookingDetails', 'bookingdetail')
         .select([
           'hotel.id AS id',
           'hotel.name AS name',
           'hotel.star AS star',
           'location.city AS city',
           'location.detailAddress AS address',
-          'MIN(roomType.price) AS minPrice',
-          'ARRAY_AGG(image.url) AS images',
-          'AVG(review.rating) AS averageRating',
-          'COUNT(review.id) AS totalReviews',
-          `COUNT(CASE WHEN room.type = 2 AND (room.status = 'available' OR NOT EXISTS (
+          'ARRAY_AGG(DISTINCT image.url) AS images',
+          'SUM(review.rating) AS totalrating',
+          'AVG(CASE WHEN review.rating IS NOT NULL THEN review.rating ELSE NULL END) AS averagerating',
+          'COUNT(DISTINCT review.id) AS totalreviews',
+          'MIN(roomType.price) AS minroomprice',
+          `COUNT(DISTINCT CASE WHEN room.type = 2 AND (room.status = 'available' OR NOT EXISTS (
+            SELECT 1
+            FROM booking b
+            JOIN booking_detail bd ON b.id = bd."bookingId"
+            WHERE b."hotelId" = hotel.id
+            AND bd.type = 2
+            AND (b."checkinTime" < :checkOutDate AND b."checkoutTime" > :checkInDate)
+          )) THEN room.id END) AS numberoftype2`,
+          `COUNT(DISTINCT CASE WHEN room.type = 4 AND (room.status = 'available' OR NOT EXISTS (
+            SELECT 1
+            FROM booking b
+            JOIN booking_detail bd ON b.id = bd."bookingId"
+            WHERE b."hotelId" = hotel.id
+            AND bd.type = 4
+            AND (b."checkinTime" < :checkOutDate AND b."checkoutTime" > :checkInDate)
+          )) THEN room.id END) AS numberoftype4`
+        ])
+        .groupBy('hotel.id')
+        .addGroupBy('location.id')
+        .setParameters({ checkInDate, checkOutDate })
+
+      // Test trả về 
+      // "ARRAY_AGG(DISTINCT CASE WHEN room.status = 'available' THEN jsonb_build_object('id', room.id, 'name', room.name, 'type', room.type, 'hotelId', room.hotelId) END) AS availablerooms"
+
+      // Nếu có city thì duyệt qua city
+      if (city) {
+        queryBuilder.andWhere('location.city = :city', { city });
+      }
+
+      if (roomType2) {
+        queryBuilder.andWhere(subQuery => {
+          const sub = subQuery
+            .subQuery()
+            .select('COUNT(DISTINCT room.id)')
+            .from('Room', 'room')
+            .leftJoin('room.roomType', 'roomType')
+            .where('roomType.hotelId = hotel.id')
+            .andWhere('room.type = 2')
+            .andWhere(`(room.status = 'available' OR NOT EXISTS (
               SELECT 1
               FROM booking b
               JOIN booking_detail bd ON b.id = bd."bookingId"
               WHERE b."hotelId" = hotel.id
               AND bd.type = 2
               AND (b."checkinTime" < :checkOutDate AND b."checkoutTime" > :checkInDate)
-            )) THEN 1 END) AS roomType2Count`,
-          `COUNT(CASE WHEN room.type = 4 AND (room.status = 'available' OR NOT EXISTS (
+            ))`)
+            .getQuery();
+
+          return `(${sub}) >= :roomType2`;
+        }, { roomType2 });
+      }
+
+      if (roomType4) {
+        queryBuilder.andWhere(subQuery => {
+          const sub = subQuery
+            .subQuery()
+            .select('COUNT(DISTINCT room.id)')
+            .from('Room', 'room')
+            .leftJoin('room.roomType', 'roomType')
+            .where('roomType.hotelId = hotel.id')
+            .andWhere('room.type = 4')
+            .andWhere(`(room.status = 'available' OR NOT EXISTS (
               SELECT 1
               FROM booking b
               JOIN booking_detail bd ON b.id = bd."bookingId"
               WHERE b."hotelId" = hotel.id
               AND bd.type = 4
               AND (b."checkinTime" < :checkOutDate AND b."checkoutTime" > :checkInDate)
-            )) THEN 1 END) AS roomType4Count`
-        ])
-        .groupBy('hotel.id')
-        .addGroupBy('location.id')
-        .setParameters({ checkInDate, checkOutDate, city });
+            ))`)
+            .getQuery();
 
-      // Các điều kiện tìm kiếm
-      if (city) {
-        hotelQueryBuilder.andWhere('location.city = :city', { city });
-      }
-      if (roomType2) {
-        hotelQueryBuilder.andHaving('roomType2Count >= :roomType2', { roomType2 });
-      }
-      if (roomType4) {
-        hotelQueryBuilder.andHaving('roomType4Count >= :roomType4', { roomType4 });
+          return `(${sub}) >= :roomType2`;
+        }, { roomType4 });
       }
 
       // Lọc 
       // Lọc theo số sao của khách sạn
       if (minStar) {
-        hotelQueryBuilder.andWhere('hotel.star >= :minStar', { minStar });
+        queryBuilder.andWhere('hotel.star >= :minStar', { minStar });
       }
       // Lọc theo đánh giá trung bình tối thiểu
       if (minRating) {
-        hotelQueryBuilder.having('AVG(review.rating) >= :minRating', { minRating });
+        queryBuilder.having('AVG(review.rating) >= :minRating', { minRating });
       }
       // Lọc theo giá thấp nhất và lớn nhất
       if (minPrice) {
-        hotelQueryBuilder.having('MIN(roomType.price) >= :minPrice', { minPrice });
+        queryBuilder.having('MIN(roomType.price) >= :minPrice', { minPrice });
       }
       if (maxPrice) {
-        hotelQueryBuilder.having('MIN(roomType.price) <= :maxPrice', { maxPrice });
+        queryBuilder.having('MIN(roomType.price) <= :maxPrice', { maxPrice });
       }
 
+
       const offset = (page - 1) * per_page;
-      const [hotels, totalHotels] = await Promise.all([
-        hotelQueryBuilder
-          .skip(offset)
-          .take(per_page)
-          .getRawMany(),
-        hotelQueryBuilder.getCount()
-      ]);
+
+      // Áp dụng skip và take trước khi lấy kết quả
+      queryBuilder.skip(offset).take(per_page); 
+      const [hotels, totalHotels] = await Promise.all([queryBuilder.getRawMany(), queryBuilder.getCount(),]); 
       const totalPages = Math.ceil(totalHotels / per_page);
 
-      const data = await Promise.all(
+      console.log({
+        page,
+        per_page,
+        offset,
+        hotels: hotels.length,
+        totalHotels,
+      });
+
+      // Xử lý hình ảnh và trả kết quả về 
+      // const hotels = await queryBuilder.getRawMany();
+      const result = await Promise.all(
         hotels.map(async (hotel) => {
           const presignedImages = await Promise.all(
             hotel.images.map((url) => {
@@ -218,31 +270,31 @@ export class HotelsService {
             star: hotel.star,
             address: hotel.address,
             images: presignedImages,
-            averageRating: hotel.averagerating ?? 0,
+            averageRating: hotel.averagerating,
             totalReviews: Number(hotel.totalreviews) || 0,
-            minRoomPrice: hotel.minprice ?? 0,
-            numberOfRoom2: Number(hotel.roomtype2count),
-            numberOfRoom4: Number(hotel.roomtype4count)
+            minRoomPrice: hotel.minroomprice,
+            numberOfType2: Number(hotel.numberoftype2) || 0,
+            numberOfType4: Number(hotel.numberoftype4) || 0
           };
-        })
+        }),
       );
 
       return {
         status_code: HttpStatus.OK,
+        message: 'Search successfully',
         page,
         per_page,
         total: totalHotels,
         total_pages: totalPages,
-        data
+        data: result
       };
     } catch (error) {
-      console.error('Error finding available hotels:', error);
+      console.error('Error searching hotels:', error);
 
       throw new HttpException(
         {
           status_code: HttpStatus.INTERNAL_SERVER_ERROR,
-          message: 'Internal server error. Please try again later.',
-          error: error.message || 'Unknown error',
+          message: 'Internal server error',
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -256,35 +308,40 @@ export class HotelsService {
       // console.log(`Finding hotel with ID: ${id}`);
       const hotel = await this.hotelRepository
         .createQueryBuilder('hotel')
-        .leftJoin('hotel.locations', 'location')
-        .leftJoin('hotel.images', 'image')
+        .leftJoinAndSelect('hotel.images', 'image')
+        .leftJoinAndSelect('hotel.locations', 'location')
+        .leftJoin('hotel.reviews', 'review')
         .leftJoin('hotel.roomTypes', 'roomType')
-        .leftJoin('roomType.rooms', 'room')
-        .leftJoin('hotel.bookings', 'booking', 'booking.status = :status', { status: 'confirmed' })
-        .leftJoin('booking.bookingDetails', 'bookingDetail')
+        .leftJoin('roomType.rooms', 'room') // Join thông qua bảng roomType
+        .leftJoin('hotel.bookings', 'booking')
+        .leftJoin('booking.bookingDetails', 'bookingdetail')
         .select([
           'hotel.id AS id',
           'hotel.name AS name',
           'hotel.star AS star',
           'hotel.description AS description',
           'location.detailAddress AS address',
-          'ARRAY_AGG(image.url) AS images',
-          `COUNT(CASE WHEN room.type = 2 AND (room.status = 'available' OR NOT EXISTS (
+          'ARRAY_AGG(DISTINCT image.url) AS images',
+          'SUM(review.rating) AS totalrating',
+          'AVG(CASE WHEN review.rating IS NOT NULL THEN review.rating ELSE NULL END) AS averagerating',
+          'COUNT(DISTINCT review.id) AS totalreviews',
+          'MIN(roomType.price) AS minroomprice',
+          `COUNT(DISTINCT CASE WHEN room.type = 2 AND (room.status = 'available' OR NOT EXISTS (
             SELECT 1
             FROM booking b
             JOIN booking_detail bd ON b.id = bd."bookingId"
             WHERE b."hotelId" = hotel.id
             AND bd.type = 2
             AND (b."checkinTime" < :checkOutDate AND b."checkoutTime" > :checkInDate)
-          )) THEN 1 END) AS roomType2Count`,
-          `COUNT(CASE WHEN room.type = 4 AND (room.status = 'available' OR NOT EXISTS (
+          )) THEN room.id END) AS numberoftype2`,
+          `COUNT(DISTINCT CASE WHEN room.type = 4 AND (room.status = 'available' OR NOT EXISTS (
             SELECT 1
             FROM booking b
             JOIN booking_detail bd ON b.id = bd."bookingId"
             WHERE b."hotelId" = hotel.id
             AND bd.type = 4
             AND (b."checkinTime" < :checkOutDate AND b."checkoutTime" > :checkInDate)
-          )) THEN 1 END) AS roomType4Count`
+          )) THEN room.id END) AS numberoftype4`
         ])
         .where('hotel.id = :id', { id })
         .groupBy('hotel.id')
@@ -329,39 +386,6 @@ export class HotelsService {
         throw new Error('Internal server error');
       }
 
-      // Lấy ra review của khách sạn
-      // let reviews = [];
-      // try {
-      //   reviews = await this.hotelRepository
-      //     .createQueryBuilder('hotel')
-      //     .leftJoin('hotel.reviews', 'review')
-      //     .leftJoin('review.user', 'user')
-      //     .select([
-      //       'review.id AS review_id',
-      //       'user.avatar AS review_ava',
-      //       'user.name AS review_user',
-      //       'review.rating AS review_rate',
-      //       'review.comment AS review_cmt',
-      //       'review.createdAt AS review_date'
-      //     ])
-      //     .where('hotel.id = :hotelId', { hotelId: id })
-      //     .getRawMany();
-
-      //   // Xử lý hình ảnh avatar người review
-      //   for (const review of reviews) {
-      //     if (review.review_ava) {
-      //       if (review.review_ava.startsWith("https://img.freepik.com")) {
-      //         continue;
-      //       } else {
-      //         review.review_ava = await this.minioService.getPresignedUrl('user_avatar/' + review.review_ava);
-      //       }
-      //     }
-      //   }
-      // } catch (error) {
-      //   console.error('Error fetching rooms:', error);
-      //   throw new Error('Internal server error');
-      // }
-
       return {
         status_code: 200,
         message: 'Hotel details retrieved successfully',
@@ -377,8 +401,8 @@ export class HotelsService {
           checkOutDate: checkOutDate,
           roomType2: roomType2,
           roomType4: roomType4,
-          numberOfRoom2: Number(hotel.roomtype2count),
-          numberOfRoom4: Number(hotel.roomtype4count),
+          numberOfRoom2: Number(hotel.numberoftype2),
+          numberOfRoom4: Number(hotel.numberoftype4),
           room_types: roomTypes.map(room => ({
             id: room.id,
             type: room.type,
@@ -386,14 +410,6 @@ export class HotelsService {
             weekend_price: room.weekend_price,
             flexible_price: room.flexible_price
           }))
-          // reviews: reviews.map(review => ({
-          //   id: review.review_id,
-          //   avatar: review.review_ava,
-          //   user: review.review_user,
-          //   rate: review.review_rate,
-          //   date: review.review_date,
-          //   comment: review.review_cmt
-          // }))
         }
       };
     } catch (error) {

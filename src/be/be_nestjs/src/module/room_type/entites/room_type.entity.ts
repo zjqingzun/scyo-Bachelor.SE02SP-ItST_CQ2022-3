@@ -26,7 +26,6 @@ export class RoomType {
     @Column({ nullable: true })
     nums: number;
 
-    // Quan hệ một-nhiều với Room (một loại phòng có thể có nhiều phòng)
     @OneToMany(() => Room, (room) => room.roomType)
     rooms: Room[];
 }

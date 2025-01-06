@@ -32,9 +32,6 @@ export class Hotel {
     @Column()
     star: number;
 
-    @OneToMany(() => Room, (room) => room.hotel)
-    rooms: Room[];
-
     @ManyToOne(() => User, (user) => user.hotels)
     @JoinColumn({ name: "ownerId" })
     owner: User;
@@ -59,6 +56,9 @@ export class Hotel {
 
     @OneToMany(() => RoomType, (roomType) => roomType.hotel)
     roomTypes: RoomType[];
+
+    @OneToMany(() => Room, (room) => room.hotel)
+    rooms: Room[];
 
     @OneToMany(() => Booking, (booking) => booking.hotel)
     bookings: Booking[];

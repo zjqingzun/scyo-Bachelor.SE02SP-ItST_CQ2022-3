@@ -23,8 +23,7 @@ export class Room {
     @JoinColumn({ name: "hotelId" })
     hotel: Hotel;
 
-    // Quan hệ với RoomType (Một phòng thuộc một loại phòng)
     @ManyToOne(() => RoomType, (roomType) => roomType.rooms)
-    @JoinColumn({ name: "roomTypeId" }) // Tạo khóa ngoại để liên kết với RoomType
+    @JoinColumn({ name: "roomTypeId" }) 
     roomType: RoomType;
 }

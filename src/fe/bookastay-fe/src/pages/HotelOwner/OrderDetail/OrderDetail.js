@@ -1,7 +1,7 @@
-import "./Guest.scss";
+import "./OrderDetail.scss";
 import { useEffect, useRef, useState } from "react";
 
-import { Space, Table, Tag, Button, Popconfirm, Input } from "antd";
+import { Space, Table, Button, Popconfirm, Input, Descriptions } from "antd";
 import { QuestionCircleOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 
@@ -11,134 +11,24 @@ const data = [
     {
         key: "1",
         roomNumber: "#101",
-        roomType: "2021-09-01",
+        roomType: "Double",
         price: "1000",
     },
     {
         key: "2",
         roomNumber: "#102",
-        roomType: "2021-09-01",
+        roomType: "Double",
         price: "1000",
     },
     {
         key: "3",
         roomNumber: "#103",
-        roomType: "2021-09-01",
+        roomType: "Double",
         price: "1000",
     },
 ];
 
 const OrderDetail = () => {
-    const [searchText, setSearchText] = useState("");
-    const [searchedColumn, setSearchedColumn] = useState("");
-    const searchInput = useRef(null);
-    const handleSearch = (selectedKeys, confirm, dataIndex) => {
-        confirm();
-        setSearchText(selectedKeys[0]);
-        setSearchedColumn(dataIndex);
-    };
-    const handleReset = (clearFilters) => {
-        clearFilters();
-        setSearchText("");
-    };
-
-    const getColumnSearchProps = (dataIndex) => ({
-        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-            <div
-                style={{
-                    padding: 8,
-                }}
-                onKeyDown={(e) => e.stopPropagation()}
-            >
-                <Input
-                    ref={searchInput}
-                    placeholder={`Search ${dataIndex}`}
-                    value={selectedKeys[0]}
-                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-                    onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                    style={{
-                        marginBottom: 8,
-                        display: "block",
-                    }}
-                />
-                <Space>
-                    <Button
-                        type="primary"
-                        onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                        icon={<SearchOutlined />}
-                        size="small"
-                        style={{
-                            width: 90,
-                        }}
-                    >
-                        Search
-                    </Button>
-                    <Button
-                        onClick={() => clearFilters && handleReset(clearFilters)}
-                        size="small"
-                        style={{
-                            width: 90,
-                        }}
-                    >
-                        Reset
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
-                            confirm({
-                                closeDropdown: false,
-                            });
-                            setSearchText(selectedKeys[0]);
-                            setSearchedColumn(dataIndex);
-                        }}
-                    >
-                        Filter
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
-                            close();
-                        }}
-                    >
-                        close
-                    </Button>
-                </Space>
-            </div>
-        ),
-        filterIcon: (filtered) => (
-            <SearchOutlined
-                style={{
-                    color: filtered ? "#1677ff" : undefined,
-                }}
-            />
-        ),
-        onFilter: (value, record) =>
-            record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-        filterDropdownProps: {
-            onOpenChange(open) {
-                if (open) {
-                    setTimeout(() => searchInput.current?.select(), 100);
-                }
-            },
-        },
-        render: (text) =>
-            searchedColumn === dataIndex ? (
-                <Highlighter
-                    highlightStyle={{
-                        backgroundColor: "#ffc069",
-                        padding: 0,
-                    }}
-                    searchWords={[searchText]}
-                    autoEscape
-                    textToHighlight={text ? text.toString() : ""}
-                />
-            ) : (
-                text
-            ),
-    });
-
     const columns = [
         {
             title: "Room Number",
@@ -216,12 +106,19 @@ const OrderDetail = () => {
     // };
 
     return (
-        <div className="guest">
-            <h1>Guest</h1>
-            <div className="d-flex my-3">
-                {/* <button className="btn btn-primary ms-auto fs-4" onClick={() => handleAddRoom()}>
-                    Add Room
-                </button> */}
+        <div className="order-detail">
+            <h1>Order Detail</h1>
+            <div className="d-flex my-3 bg-white p-3">
+                <Descriptions title="Guest Information" column={2}>
+                    <Descriptions.Item span={2} label="Reservation Id">
+                        1
+                    </Descriptions.Item>
+                    <Descriptions.Item label="UserName">Zhou Maomao</Descriptions.Item>
+                    <Descriptions.Item label="Telephone">1810000000</Descriptions.Item>
+                    <Descriptions.Item label="Address">
+                        No. 18, Wantang Road, Xihu District, Hangzhou, Zhejiang, China
+                    </Descriptions.Item>
+                </Descriptions>
             </div>
             <Table
                 columns={columns}
@@ -232,6 +129,16 @@ const OrderDetail = () => {
                 pagination={tableParams.pagination}
                 onChange={handleTableChange}
             />
+
+            <div className="order-detail__special-request bg-white p-3 mb-5">
+                <h2>Special Request</h2>
+                <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, elit
+                    eget fermentum faucibus, nunc odio tincidunt nunc, vel ultricies nisl ligula nec
+                    erat. Nullam auctor, elit eget fermentum faucibus, nunc odio tincidunt nunc, vel
+                    ultricies nisl ligula nec erat.
+                </p>
+            </div>
         </div>
     );
 };

@@ -24,7 +24,6 @@ async function bootstrap() {
     }),
   );
   app.setGlobalPrefix('api', { exclude: [''] });
-
   //app.use(logger); //use global middleware
   await app.listen(port);
 }

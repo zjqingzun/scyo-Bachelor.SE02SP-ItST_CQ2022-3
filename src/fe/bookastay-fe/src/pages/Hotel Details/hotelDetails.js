@@ -57,13 +57,6 @@ const HotelDetails = () => {
         setIsActive(!isActive);
     };
 
-
-    const [activeTab, setActiveTab] = useState("info");
-
-    const handleTabClick = (tab) => {
-        setActiveTab(tab);
-    };
-
     return (
         <div className="mx-auto p-5">
             <div className="nav-bar-search px-5 py-2 mt-5">
@@ -148,54 +141,9 @@ const HotelDetails = () => {
                     <button className="btn btn-primary fs-3 py-2 px-5 mt-5">Reserve</button>
                 </div>
             </div>
-            <div className='tablist'>
-                <ul className="nav nav-tabs mx-5 tablist" role="tablist">
-                    <li className="nav-item" role="presentation">
-                        <a
-                            className={`nav-link ${activeTab === "info" ? "active" : ""}`}
-                            onClick={() => handleTabClick("info")}
-                            role="tab"
-                            aria-selected={activeTab === "info"}
-                        >
-                            Information
-                        </a>
-                    </li>
-                    <li className="nav-item" role="presentation">
-                        <a
-                            className={`nav-link ${activeTab === "payment" ? "active" : ""}`}
-                            onClick={() => handleTabClick("payment")}
-                            role="tab"
-                            aria-selected={activeTab === "payment"}
-                        >
-                            Payment
-                        </a>
-                    </li>
-                    <li className="nav-item" role="presentation">
-                        <a
-                            className={`nav-link ${activeTab === "review" ? "active" : ""}`}
-                            onClick={() => handleTabClick("review")}
-                            role="tab"
-                            aria-selected={activeTab === "review"}
-                        >
-                            Review
-                        </a>
-                    </li>
-                    <li className="nav-item" role="presentation">
-                        <a
-                            className={`nav-link ${activeTab === "qa" ? "active" : ""}`}
-                            onClick={() => handleTabClick("qa")}
-                            role="tab"
-                            aria-selected={activeTab === "qa"}
-                        >
-                            Q&A
-                        </a>
-                    </li>
-                </ul>
-            </div>
 
-
-            <div className="tab-content mt-3 px-5 py-4" id="myTabContent">
-                {activeTab === "info" && <div className="tab-pane fade show active px-2 my-5" id="info" role="tabpanel" aria-labelledby="info-tab">
+            <div className="px-5 py-4">
+                <div className="px-2 my-5 pb-5" id="info">
                     <p className="fs-3">Sabay Airport Apartment - 1 min to TSN Airport - Breakfast included has air-conditioned
                         guest
                         accommodation in Ho Chi Minh City, 5 km from Tan Dinh Market, 5 km from Giac Lam Pagoda and 6 km
@@ -212,8 +160,9 @@ const HotelDetails = () => {
                         Breakfast
                         included, while Diamond Plaza is 6 km from the property.
                         The nearest airport is Tan Son Nhat International Airport, 2.4 km from the accommodation.</p>
-                </div>}
-                {activeTab === "payment" && <div className="tab-pane fade show active px-2 my-5" id="payment" role="tabpanel" aria-labelledby="payment-tab">
+                </div>
+                
+                <div className="px-2 my-5 pb-5">
                     <div className="card shadow p-3">
                         <div className="card-body">
                             <table className="table">
@@ -319,8 +268,8 @@ const HotelDetails = () => {
                             </div>
                         </div>
                     </div>
-                </div>}
-                {activeTab === "review" && <div className="tab-pane fade show active" id="review" role="tabpanel" aria-labelledby="review-tab">
+                </div>
+                <div className="px-2 my-5 pb-5">
                     <div className="review-container d-flex flex-column align-items-center mx-auto">
                         <div className="rating-header d-flex align-items-center mb-5 mt-3">
                             <div className="score fw-bold">4.4</div>
@@ -394,9 +343,8 @@ const HotelDetails = () => {
                             </div>
                         </div>
                     </div>
-                </div>}
-                {activeTab === "qa" && <div className="tab-pane fade show active" id="qa" role="tabpanel"
-                    aria-labelledby="qa-tab">
+                </div>
+                <div className="px-2 my-5 pb-5">
                     <div className="row g-0 align-items-center">
                         <div className="col-md-4 text-bg-light text-center">
                             <div className="fs-1 h-100">
@@ -437,7 +385,7 @@ const HotelDetails = () => {
                             </div>
                         </div>
                     </div>
-                </div>}
+                </div>
             </div>
         </div>
     );

@@ -17,6 +17,9 @@ const icons = {
     clockRotateLeftIcon: require("~/assets/icon/clock-rotate-left-solid.svg").default,
     searchIcon: require("~/assets/icon/magnifying-glass-solid.svg").default,
     redHeartIcon: require("~/assets/icon/red-heart.svg").default,
+    trashIcon: require("~/assets/icon/trash-alt-solid.svg").default,
+    chevronLeftPinkIcon: require("~/assets/icon/chevron-left-pink.svg").default,
+    chevronRightPinkIcon: require("~/assets/icon/chevron-right-pink.svg").default,
 };
 
 export default icons;

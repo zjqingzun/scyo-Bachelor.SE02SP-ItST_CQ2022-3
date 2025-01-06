@@ -21,6 +21,7 @@ import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { Public } from '@/helpers/decorator/public';
 import { GoogleAuthGuard } from './guard/google-auth.guard';
 import { ResetpassAuthDto } from './dto/resetpassword-auth.dto';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {

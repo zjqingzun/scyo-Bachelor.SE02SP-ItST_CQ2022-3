@@ -41,7 +41,7 @@ const publicRoutes = [
     {
         path: "/",
         component: Home,
-        requiredRole: "user",
+        requiredRole: ["guest", "user"],
     },
     {
         path: "/unauthorized",
@@ -51,17 +51,17 @@ const publicRoutes = [
     {
         path: "/about",
         component: About,
-        requiredRole: "user",
+        requiredRole: ["guest", "user", "hotelier", "admin"],
     },
     {
         path: "/after-search",
         component: AfterSearch,
-        requiredRole: "user",
+        requiredRole: ["guest", "user"],
     },
     {
         path: "/reserve",
         component: Reserve,
-        requiredRole: "user",
+        requiredRole: ["guest", "user"],
     },
     {
         path: "/login",
@@ -78,27 +78,27 @@ const publicRoutes = [
     {
         path: "/history",
         component: History,
-        requiredRole: "user",
+        requiredRole: ["user"],
     },
     {
         path: "/favorite",
         component: Favorite,
-        requiredRole: "user",
+        requiredRole: ["user"],
     },
     {
         path: "/account-setting",
         component: AccountSetting,
-        requiredRole: "user",
+        requiredRole: ["user", "hotelier", "admin"],
     },
     {
         path: "/review",
         component: Review,
-        requiredRole: "user",
+        requiredRole: ["user"],
     },
     {
         path: "/hotel-details",
         component: HotelDetails,
-        requiredRole: "user",
+        requiredRole: ["user", "guest"],
     },
     {
         path: "/hotel-owner/register-hotel",
@@ -109,31 +109,31 @@ const publicRoutes = [
         path: "/hotel-owner/dashboard",
         component: Dashboard,
         layout: HotelOwnerLayout,
-        requiredRole: "hotelier",
+        requiredRole: ["hotelier"],
     },
     {
         path: "/hotel-owner/room",
         component: Room,
         layout: HotelOwnerLayout,
-        requiredRole: "hotelier",
+        requiredRole: ["hotelier"],
     },
     {
         path: "/hotel-owner/guest",
         component: Guest,
         layout: HotelOwnerLayout,
-        requiredRole: "hotelier",
+        requiredRole: ["hotelier"],
     },
     {
         path: "/hotel-owner/order-detail",
         component: OrderDetail,
         layout: HotelOwnerLayout,
-        requiredRole: "hotelier",
+        requiredRole: ["hotelier"],
     },
     {
         path: "/hotel-owner",
         component: Dashboard,
         layout: HotelOwnerLayout,
-        requiredRole: "hotelier",
+        requiredRole: ["hotelier"],
     },
     {
         path: "/hotel-owner/login",
@@ -149,13 +149,13 @@ const publicRoutes = [
         path: "/hotel-owner/room/add-room",
         component: AddRoom,
         layout: HotelOwnerLayout,
-        requiredRole: "hotelier",
+        requiredRole: ["hotelier"],
     },
     {
         path: "/hotel-owner/room-type",
         component: RoomType,
         layout: HotelOwnerLayout,
-        requiredRole: "hotelier",
+        requiredRole: ["hotelier"],
     },
     {
         path: "/admin",

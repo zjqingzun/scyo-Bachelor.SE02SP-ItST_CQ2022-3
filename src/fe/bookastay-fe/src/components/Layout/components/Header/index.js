@@ -112,6 +112,7 @@ const Header = () => {
                 <span
                     onClick={(e) => {
                         e.preventDefault();
+                        e.stopPropagation();
                         dispatch(doLogout());
                     }}
                     style={{ color: "#f5222d" }}
@@ -244,7 +245,14 @@ const Header = () => {
                             </Avatar>
                         </Dropdown>
                     ) : (
-                        <a href="/login" className="header__sign-in-btn">
+                        <a
+                            href="#!"
+                            className="header__sign-in-btn"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                navigate("/login");
+                            }}
+                        >
                             {t("header.signIn")}
                         </a>
                     )}

@@ -1,0 +1,24 @@
+Các tài liệu có liên quan đến UCSpecification có trong Project Assignment 3 (PA3) chỉ có duy nhất tài liệu UCSpecification.pdf
+
+
+Tài liệu UCSpecification.pdf có trong PA3 này có những nội dung được chỉnh sửa khác so với tài liệu UCSpecification.pdf có trong PA2 như sau:
+
+1. Thay đổi "Điều kiện sau" của đặc tả Use Case 2: Quên mật khẩu
+
+2. Thêm kịch bản phụ của đặc tả Use Case 7: Đánh giá khách sạn
+
+3. Thay đổi nội dung đặc tả Use Case 8: Quản lý khách sạn
+
+4. Thay đổi nội dung đặc tả Use Case 10: Nhắn tin với chủ khách sạn
+
+5. Thay đổi nội dung đặc tả Use Case 11: Đặt phòng
+
+6. Thay đổi nội dung đặc tả Use Case 12: Thanh toán đặt phòng online
+
+7. Xóa đặc tả Use Case 13: Xác nhận đặt phòng
+
+8. Thêm đặc tả Use Case 13: Quản lý phòng
+
+9. Chỉnh sửa "Kịch bản chính" của đặc tả Use Case 14: Xem báo cáo tài chính
+
+10. Chỉnh sửa "Kịch bản chính" và "Kịch bản phụ" của đặc tả Use Case 17: Hủy đơn đặt phòng

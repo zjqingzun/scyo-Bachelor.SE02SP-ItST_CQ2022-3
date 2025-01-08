@@ -80,17 +80,17 @@ const HotelAfterSearchCard = ({
     };
 
     // test get all favorite
-    useEffect(() => {
-        if (userInfo.email) {
-            getAllFavorite({ userId: userInfo.id, page: 1, limit: 6, sortBy: "name", order: "ASC" })
-                .then((res) => {
-                    const favoriteList = res.data.hotels;
-                    const isFav = favoriteList.some((fav) => fav.id === id);
-                    setIsFavorite(isFav);
-                })
-                .catch((err) => console.log(err));
-        }
-    }, [userInfo.email]);
+    // useEffect(() => {
+    //     if (userInfo.email) {
+    //         getAllFavorite({ userId: userInfo.id, page: 1, limit: 6, sortBy: "name", order: "ASC" })
+    //             .then((res) => {
+    //                 const favoriteList = res.data.hotels;
+    //                 const isFav = favoriteList.some((fav) => fav.id === id);
+    //                 setIsFavorite(isFav);
+    //             })
+    //             .catch((err) => console.log(err));
+    //     }
+    // }, [userInfo.email]);
 
     return (
         <div className="hotel-card hotel-card--after-search">

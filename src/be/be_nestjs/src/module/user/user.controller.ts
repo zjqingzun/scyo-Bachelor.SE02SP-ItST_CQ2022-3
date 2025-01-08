@@ -97,4 +97,10 @@ export class UserController {
   async addFav(@Req() req) {
     return await this.userService.addFav(req);
   }
+
+  @Get('deleteFav')
+  @Public()
+  async deleteFav(@Req() req) {
+    return await this.userService.deleteFav(req);
+  }
 }

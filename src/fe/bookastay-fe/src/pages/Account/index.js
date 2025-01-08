@@ -1,10 +1,17 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./account.css";
 import getFontSizes from "antd/es/theme/themes/shared/genFontSizes";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { DatePicker, Space } from "antd";
+import locale from "antd/es/date-picker/locale/vi_VN";
+
 import { formatDate } from "~/utils/datetime";
+import { updateAvatar, updateProfile } from "~/services/apiService";
+import dayjs from "dayjs";
+import { doGetAccount } from "~/redux/action/accountAction";
 
 const AccountSetting = () => {
+    const dispatch = useDispatch();
     const userInfo = useSelector((state) => state.account.userInfo);
 
     const [isModalOpen, setModalOpen] = useState(false);
@@ -16,7 +23,7 @@ const AccountSetting = () => {
         name: userInfo?.name || "Tran Thao Ngan",
         email: userInfo?.email || "ndjncscjdj@gmail.com",
         phone: userInfo?.phone || "0192837465",
-        dob: formatDate(userInfo?.dob) || "01/01/2000",
+        dob: userInfo?.dob || "01/01/2000",
         identify: userInfo?.cccd || "123456789412",
         password: "**********",
     });
@@ -27,7 +34,10 @@ const AccountSetting = () => {
     const openModal = (field, value) => {
         setCurrentField(field);
         setCurrentValue(value);
-        setModalOpen(true);
+
+        if (field !== "dob") {
+            setModalOpen(true);
+        }
     };
 
     // Hàm đóng modal
@@ -38,14 +48,34 @@ const AccountSetting = () => {
     };
 
     // Hàm lưu thay đổi
-    const handleSave = () => {
+    const handleSave = async () => {
         if (currentField) {
+            const oldDetails = { ...personalDetails };
+
             setPersonalDetails((prevDetails) => ({
                 ...prevDetails,
                 [currentField]: currentValue,
             }));
-
             // Gọi API cập nhật thông tin
+            let data = {
+                ...personalDetails,
+                [currentField]: currentValue,
+            };
+            data.id = userInfo.id;
+            data.cccd = data.identify;
+            data.dob = formatDate(data.dob);
+
+            delete data.password;
+            delete data.identify;
+            delete data.avatar;
+
+            const res = await updateProfile(data);
+
+            if (+res.status !== 201) {
+                setPersonalDetails(oldDetails);
+            } else {
+                dispatch(doGetAccount());
+            }
         }
         closeModal();
     };
@@ -53,14 +83,38 @@ const AccountSetting = () => {
     const handleChangeAvatar = (e) => {
         fileRef.current.click();
 
-        fileRef.current.onchange = (e) => {
+        fileRef.current.onchange = async (e) => {
             const file = e.target.files[0];
 
-            const formData = new FormData();
+            const res = await updateAvatar(userInfo.email, file);
 
-            formData.append("file", file);
+            dispatch(doGetAccount());
         };
     };
+
+    const handleChangeDate = (date, dateString) => {
+        setCurrentField("dob");
+        setCurrentValue(date);
+    };
+
+    useEffect(() => {
+        if (currentField === "dob") {
+            handleSave();
+        }
+    }, [currentField, currentValue]);
+
+    // render when userInfo is updated
+    useEffect(() => {
+        setPersonalDetails({
+            avatar: userInfo?.avatar || "",
+            name: userInfo?.name || "",
+            email: userInfo?.email || "",
+            phone: userInfo?.phone || "",
+            dob: userInfo?.dob || "",
+            identify: userInfo?.cccd || "",
+            password: "**********",
+        });
+    }, [userInfo]);
 
     return (
         <div className="m-5 py-5">
@@ -124,14 +178,29 @@ const AccountSetting = () => {
                                 </tr>
                                 <tr>
                                     <td>Date of birth</td>
-                                    <td>{personalDetails.dob}</td>
-                                    <td style={{ textAlign: "right" }}>
+                                    <td>
+                                        <Space
+                                            direction="vertical"
+                                            size={12}
+                                            style={{ marginBottom: "10px" }}
+                                        >
+                                            <DatePicker
+                                                value={dayjs(personalDetails.dob)}
+                                                locale={locale}
+                                                onChange={handleChangeDate}
+                                                size="large"
+                                                needConfirm
+                                                allowClear={false}
+                                            />
+                                        </Space>
+                                    </td>
+                                    {/* <td style={{ textAlign: "right" }}>
                                         <button
                                             onClick={() => openModal("dob", personalDetails.dob)}
                                         >
                                             Edit
                                         </button>
-                                    </td>
+                                    </td> */}
                                 </tr>
                             </tbody>
                         </table>
@@ -147,7 +216,10 @@ const AccountSetting = () => {
                         }}
                     >
                         <img
-                            src="https://scontent.fsgn8-1.fna.fbcdn.net/v/t39.30808-6/472219740_1936837300138014_2401011983813679479_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeG6Fmr-BAQKdhh2ewaDivFosRYc2nCLHvuxFhzacIse-2uRmjAejNA4nBgfdDmQzbIaTKDnhaICQ5oDE7fVkWm7&_nc_ohc=ErLnqiDVoKwQ7kNvgHBkrVN&_nc_oc=AdhkO5jqzhPpwYA7roi8a2CGbn7kVSeOIRWiPrMHuRs_QTvl56H3uNzS1Mm-oFM743ZOV0aJWNER-n3kweF_QClX&_nc_zt=23&_nc_ht=scontent.fsgn8-1.fna&_nc_gid=A5noT5KVoCb-elQhCLTXe85&oh=00_AYDVpELzxAX2_3rzhoAKLwi82sMDQ5wNtMuc42R9krOuCA&oe=67849507"
+                            src={
+                                personalDetails.avatar ||
+                                "https://scontent.fsgn8-1.fna.fbcdn.net/v/t39.30808-6/472219740_1936837300138014_2401011983813679479_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeG6Fmr-BAQKdhh2ewaDivFosRYc2nCLHvuxFhzacIse-2uRmjAejNA4nBgfdDmQzbIaTKDnhaICQ5oDE7fVkWm7&_nc_ohc=ErLnqiDVoKwQ7kNvgHBkrVN&_nc_oc=AdhkO5jqzhPpwYA7roi8a2CGbn7kVSeOIRWiPrMHuRs_QTvl56H3uNzS1Mm-oFM743ZOV0aJWNER-n3kweF_QClX&_nc_zt=23&_nc_ht=scontent.fsgn8-1.fna&_nc_gid=A5noT5KVoCb-elQhCLTXe85&oh=00_AYDVpELzxAX2_3rzhoAKLwi82sMDQ5wNtMuc42R9krOuCA&oe=67849507"
+                            }
                             alt="Avatar"
                             className="img-fluid shadow"
                             style={{
@@ -176,12 +248,22 @@ const AccountSetting = () => {
                 <div style={modalStyles.overlay}>
                     <div style={modalStyles.modal}>
                         <h2 className="mb-4">Edit {currentField}</h2>
-                        <input
-                            type="text"
-                            value={currentValue}
-                            onChange={(e) => setCurrentValue(e.target.value)}
-                            style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
-                        />
+                        {currentField !== "dob" ? (
+                            <input
+                                type="text"
+                                value={currentValue}
+                                onChange={(e) => setCurrentValue(e.target.value)}
+                                style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
+                            />
+                        ) : (
+                            <Space direction="vertical" size={12} style={{ marginBottom: "10px" }}>
+                                <DatePicker
+                                    locale={locale}
+                                    onChange={handleChangeDate}
+                                    needConfirm
+                                />
+                            </Space>
+                        )}
                         <button
                             className="btn btn-primary fs-4 py-2 px-4"
                             onClick={handleSave}

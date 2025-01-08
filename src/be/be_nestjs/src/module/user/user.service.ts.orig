@@ -26,34 +26,27 @@ export class UserService {
     private readonly minioService: MinioService,
   ) {}
 
-  async findAll(role: string, req: Request) {
-    const {page = 1, limit = 5, sortBy = 'id', order = 'ASC', searchTerm} = req.query;
-    const queryBuilder = this.usersRepository.createQueryBuilder('user')
-        .select([
-            'user.id',
-            'user.name',
-            'user.email',
-            'user.phone',
-            'user.dob',
-            'user.cccd'
-        ])
-        .innerJoin('users_roles', 'ur', 'ur."userId" = user.id')
-        .innerJoin('role', 'r', 'ur."roleId" = r.id')
-        .where('r.name = :role', { role });
-
-    queryBuilder.orderBy(`user.${sortBy}`, order === 'ASC' ? 'ASC' : 'DESC');
-
-    const [users, total] = await queryBuilder
-        .take(+limit)
-        .skip((+page - 1) * +limit)
-        .getManyAndCount();
-    return {
-      page: page,
-      per_page: limit,
-      total,
-      total_pages: Math.ceil(total / +limit),
-      users
-    };
+  async findAll(req: Request) {
+    const {
+      page = 1,
+      limit = 5,
+      sortBy = 'name',
+      order = 'ASC',
+      searchTerm,
+    } = req.query;
+    const [users, total] = await this.usersRepository.findAndCount({
+      select: {
+        name: true,
+        email: true,
+        phone: true,
+      },
+      order: {
+        [sortBy as string]: order,
+      },
+      take: limit as number,
+      skip: ((page as number) - 1) * (limit as number),
+    });
+    return { users, total };
   }
 
   findOne(id: number): Promise<User | null> {

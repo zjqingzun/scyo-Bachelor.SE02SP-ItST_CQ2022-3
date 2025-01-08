@@ -78,6 +78,23 @@ const getAllFavorite = async ({ userId, page = 1, limit = 6, sortBy = "name", or
     return await axios.get(`/user/fav?${params.toString()}`);
 };
 
+// Profile
+
+const updateProfile = async (data) => {
+    return await axios.post("/user/update", data);
+};
+
+const updateAvatar = async (email, file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return await axios.post(`/user/avatar/upload/${email}`, formData);
+};
+
+const getAvatarUrl = async (email) => {
+    return await axios.get(`/user/avatar/url/${email}`);
+};
+
 export {
     userLogin,
     getProfile,
@@ -88,4 +105,7 @@ export {
     addFavorite,
     removeFavorite,
     getAllFavorite,
+    updateAvatar,
+    getAvatarUrl,
+    updateProfile,
 };

@@ -1,19 +1,27 @@
-import React, { useState } from "react";
-import './account.css';
+import React, { useRef, useState } from "react";
+import "./account.css";
 import getFontSizes from "antd/es/theme/themes/shared/genFontSizes";
+import { useSelector } from "react-redux";
+import { formatDate } from "~/utils/datetime";
 
 const AccountSetting = () => {
+    const userInfo = useSelector((state) => state.account.userInfo);
+
     const [isModalOpen, setModalOpen] = useState(false);
     const [currentField, setCurrentField] = useState("");
     const [currentValue, setCurrentValue] = useState("");
     const [personalDetails, setPersonalDetails] = useState({
-        name: "Tran Thao Ngan",
-        email: "ndjncscjdj@gmail.com",
-        phone: "0192837465",
-        dob: "01/01/2000",
-        identify: "123456789412",
+        avatar:
+            userInfo?.avatar || "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png",
+        name: userInfo?.name || "Tran Thao Ngan",
+        email: userInfo?.email || "ndjncscjdj@gmail.com",
+        phone: userInfo?.phone || "0192837465",
+        dob: formatDate(userInfo?.dob) || "01/01/2000",
+        identify: userInfo?.cccd || "123456789412",
         password: "**********",
     });
+
+    const fileRef = useRef(null);
 
     // Hàm mở modal
     const openModal = (field, value) => {
@@ -36,8 +44,22 @@ const AccountSetting = () => {
                 ...prevDetails,
                 [currentField]: currentValue,
             }));
+
+            // Gọi API cập nhật thông tin
         }
         closeModal();
+    };
+
+    const handleChangeAvatar = (e) => {
+        fileRef.current.click();
+
+        fileRef.current.onchange = (e) => {
+            const file = e.target.files[0];
+
+            const formData = new FormData();
+
+            formData.append("file", file);
+        };
     };
 
     return (
@@ -54,35 +76,61 @@ const AccountSetting = () => {
                                     <td>Name</td>
                                     <td>{personalDetails.name}</td>
                                     <td style={{ textAlign: "right" }}>
-                                        <button onClick={() => openModal("name", personalDetails.name)}>Edit</button>
+                                        <button
+                                            onClick={() => openModal("name", personalDetails.name)}
+                                        >
+                                            Edit
+                                        </button>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Email address</td>
                                     <td>{personalDetails.email}</td>
                                     <td style={{ textAlign: "right" }}>
-                                        <button onClick={() => openModal("email", personalDetails.email)}>Edit</button>
+                                        <button
+                                            onClick={() =>
+                                                openModal("email", personalDetails.email)
+                                            }
+                                        >
+                                            Edit
+                                        </button>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Phone number</td>
                                     <td>{personalDetails.phone}</td>
                                     <td style={{ textAlign: "right" }}>
-                                        <button onClick={() => openModal("phone", personalDetails.phone)}>Edit</button>
+                                        <button
+                                            onClick={() =>
+                                                openModal("phone", personalDetails.phone)
+                                            }
+                                        >
+                                            Edit
+                                        </button>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Identify number</td>
                                     <td>{personalDetails.identify}</td>
                                     <td style={{ textAlign: "right" }}>
-                                        <button onClick={() => openModal("dob", personalDetails.identify)}>Edit</button>
+                                        <button
+                                            onClick={() =>
+                                                openModal("dob", personalDetails.identify)
+                                            }
+                                        >
+                                            Edit
+                                        </button>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Date of birth</td>
                                     <td>{personalDetails.dob}</td>
                                     <td style={{ textAlign: "right" }}>
-                                        <button onClick={() => openModal("dob", personalDetails.dob)}>Edit</button>
+                                        <button
+                                            onClick={() => openModal("dob", personalDetails.dob)}
+                                        >
+                                            Edit
+                                        </button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -93,9 +141,9 @@ const AccountSetting = () => {
                     <div
                         className="avatar-frame"
                         style={{
-                            width: '200px',
-                            height: '200px',
-                            borderRadius: '50%',
+                            width: "200px",
+                            height: "200px",
+                            borderRadius: "50%",
                         }}
                     >
                         <img
@@ -103,18 +151,25 @@ const AccountSetting = () => {
                             alt="Avatar"
                             className="img-fluid shadow"
                             style={{
-                                width: '100%',
-                                height: '100%',
-                                borderRadius: '50%'
+                                width: "100%",
+                                height: "100%",
+                                borderRadius: "50%",
                             }}
                         />
-                        
                     </div>
-                    <button className="mt-2">Change</button>
+                    <button className="mt-2" onClick={(e) => handleChangeAvatar(e)}>
+                        Change
+                    </button>
+                    <input ref={fileRef} type="file" className="d-none" />
                 </div>
             </div>
 
-            <button className="btn btn-danger my-5 fs-2" style={{padding: "8px 20px", borderRadius: "10px"}}>Delete account permanently</button>
+            <button
+                className="btn btn-danger my-5 fs-2"
+                style={{ padding: "8px 20px", borderRadius: "10px" }}
+            >
+                Delete account permanently
+            </button>
 
             {/* Modal */}
             {isModalOpen && (
@@ -127,8 +182,20 @@ const AccountSetting = () => {
                             onChange={(e) => setCurrentValue(e.target.value)}
                             style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
                         />
-                        <button className="btn btn-primary fs-4 py-2 px-4" onClick={handleSave} style={modalStyles.buttonSave}>Save</button>
-                        <button className="btn btn-danger fs-4 py-2 px-4" onClick={closeModal} style={modalStyles.buttonCancel}>Cancel</button>
+                        <button
+                            className="btn btn-primary fs-4 py-2 px-4"
+                            onClick={handleSave}
+                            style={modalStyles.buttonSave}
+                        >
+                            Save
+                        </button>
+                        <button
+                            className="btn btn-danger fs-4 py-2 px-4"
+                            onClick={closeModal}
+                            style={modalStyles.buttonCancel}
+                        >
+                            Cancel
+                        </button>
                     </div>
                 </div>
             )}

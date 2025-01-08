@@ -103,30 +103,56 @@ const Header = () => {
             label: (userInfo && userInfo.email) || "My Account",
             disabled: true,
         },
-        { type: "divider" },
-        { key: "2", label: "Profile", extra: "⌘P" },
-        { key: "3", label: "Billing", extra: "⌘B" },
-        { key: "4", label: "Settings", icon: <SettingOutlined />, extra: "⌘S" },
-        { type: "divider" },
+        {
+            type: "divider",
+        },
+        {
+            key: "2",
+            label: (
+                <a
+                    href="#!"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        navigate("/account-setting");
+                    }}
+                >
+                    Profile
+                </a>
+            ),
+            extra: "⌘P",
+        },
+        {
+            key: "3",
+            label: "Billing",
+            extra: "⌘B",
+        },
+        {
+            key: "4",
+            label: "Settings",
+            icon: <SettingOutlined />,
+            extra: "⌘S",
+        },
+        {
+            type: "divider",
+        },
         {
             key: "5",
-            label: "Logout",
             icon: <LoginOutlined />,
-            style: { color: "#f5222d" },
+            label: (
+                <a
+                    href="#!"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        dispatch(doLogout());
+                    }}
+                    style={{ color: "#f5222d" }}
+                >
+                    Logout
+                </a>
+            ),
             extra: "⌘L",
         },
     ];
-
-    // Render menu
-    const menu = (
-        <Menu
-            items={items.map((item) => ({
-                ...item,
-                label: <span style={item.style || {}}>{item.label}</span>,
-            }))}
-            onClick={handleMenuClick}
-        />
-    );
 
     return (
         <>
@@ -237,7 +263,7 @@ const Header = () => {
                     </a> */}
 
                     {userInfo && userInfo.email ? (
-                        <Dropdown overlay={menu} trigger={["click"]}>
+                        <Dropdown menu={{ items }} trigger={["click"]}>
                             <Avatar
                                 style={{ cursor: "pointer" }}
                                 src={

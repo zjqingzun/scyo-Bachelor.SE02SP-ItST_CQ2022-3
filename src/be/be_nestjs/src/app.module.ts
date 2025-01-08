@@ -48,7 +48,7 @@ import { BookingRoomModule } from './module/booking_room/booking_room.module';
         database: configService.get<string>('DATABASE_NAME'),
         autoLoadEntities: true,
         synchronize: false,
-        logging: ['query', 'error'],
+        // logging: ['query', 'error'],
         extra: {
           max: 50,
           min: 2,

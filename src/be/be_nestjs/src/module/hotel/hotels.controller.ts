@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   ParseIntPipe,
+  Req,
 } from '@nestjs/common';
 import { Public } from '@/helpers/decorator/public';
 
@@ -50,10 +51,10 @@ export class HotelsController {
   }
 
   // [GET]: /hotels?city=...&checkInDate=...&checkOutDate=...&roomType2=...&roomType4=...&minPrice=...&maxPrice=...&minRating=...&minStar=...&page=...&perPage=...
-  @Get('search')
+  @Get('search/:userId')
   @Public()
-  async findAvailableHotels(@Query() searchHotelDto: SearchHotelDto) {
-    return await this.hotelsService.findAvailableHotels(searchHotelDto);
+  async findAvailableHotels(@Param('userId') userId: string, @Query() searchHotelDto: SearchHotelDto) {
+    return await this.hotelsService.findAvailableHotels(searchHotelDto, +userId);
   }
 
   // [GET]: /hotels/:id?checkInDate=...&checkOutDate=...&roomType2=...&roomType4=...

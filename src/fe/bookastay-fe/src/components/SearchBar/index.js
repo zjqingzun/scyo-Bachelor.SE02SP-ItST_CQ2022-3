@@ -13,6 +13,7 @@ import calendarIcon from "./calender-icon.svg";
 import people from "./people-icon.svg";
 import caret from "./caret-icon.svg";
 import useWindowSize from "~/hooks/useWindowSize";
+import { addDays } from "date-fns";
 
 const SearchBar = (props) => {
     const { t } = useTranslation();
@@ -95,16 +96,16 @@ const SearchBar = (props) => {
             navigate("/after-search", {
                 state: {
                     destination,
-                    startDate,
-                    endDate,
+                    startDate: startDate || formatDate(new Date()),
+                    endDate: endDate || formatDate(addDays(new Date(), 2)),
                     numOfPeople,
                 },
             });
         } else {
             props.handleSearch({
                 destination,
-                startDate,
-                endDate,
+                startDate: startDate || formatDate(new Date()),
+                endDate: endDate || formatDate(addDays(new Date(), 2)),
                 numOfPeople,
             });
         }

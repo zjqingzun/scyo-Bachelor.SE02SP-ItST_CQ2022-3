@@ -103,4 +103,11 @@ export class UserController {
   async deleteFav(@Req() req) {
     return await this.userService.deleteFav(req);
   }
+
+  @Get('hotelier/dashboard/:hotelierId')
+  @Public()
+  async dashboardForHotelier(@Param('hotelierId') hotelierId : string) {
+    return this.userService.dashboardForHotelier(hotelierId as unknown as number);
+  }
+
 }

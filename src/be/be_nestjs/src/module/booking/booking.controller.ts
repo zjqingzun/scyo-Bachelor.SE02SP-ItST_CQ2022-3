@@ -31,4 +31,9 @@ export class BookingController {
   remove(@Param('id') id: string) {
     return this.bookingService.remove(+id);
   }
+
+  @Get('reservation')
+  async bookRoom(createBookingDto : CreateBookingDto) {
+    
+  }
 }

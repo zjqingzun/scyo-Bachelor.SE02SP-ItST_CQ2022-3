@@ -29,6 +29,7 @@ import { ImageModule } from './module/image/image.module';
 import { MinioService } from './minio/minio.service';
 import { RoomTypeModule } from './module/room_type/room_type.module';
 import { BookingDetailModule } from './module/booking_detail/booking_detail.module';
+import { BookingRoomModule } from './module/booking_room/booking_room.module';
 
 @Module({
   imports: [
@@ -98,7 +99,8 @@ import { BookingDetailModule } from './module/booking_detail/booking_detail.modu
     RoleModule,
     ImageModule,
     RoomTypeModule,
-    BookingDetailModule
+    BookingDetailModule,
+    BookingRoomModule
   ],
   controllers: [AppController],
   providers: [

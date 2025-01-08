@@ -315,4 +315,13 @@ export class UserService {
       );
     }
   }
+
+  async dashboardForHotelier(hotelierId : number) {
+    const hotelier = await this.usersRepository.findBy({
+      id: hotelierId
+    });
+    const dateNow = moment().toLocaleString();
+    
+    return hotelier;
+  }
 }

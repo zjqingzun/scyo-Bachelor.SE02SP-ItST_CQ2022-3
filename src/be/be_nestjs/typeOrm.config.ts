@@ -1,6 +1,7 @@
 import { Bill } from "@/module/bill/entities/bill.entity";
 import { Booking } from "@/module/booking/entities/booking.entity";
 import { BookingDetail } from "@/module/booking_detail/entities/booking_detail.entity";
+import { BookingRoom } from "@/module/booking_room/entities/booking_room.entity";
 import { Hotel } from "@/module/hotel/entities/hotel.entity";
 import { Image } from "@/module/image/entities/image.entity";
 import { Location } from "@/module/location/entities/location.entity";
@@ -23,5 +24,5 @@ export default new DataSource({
     password: "bookastaydata",
     database: "bookastay",
     migrations: ["./migrations/**"],
-    entities: [User, Bill, Booking, Hotel, Location, Payment, Report, Review, Room, Service, Image, Role, RoomType, BookingDetail],
+    entities: [User, Bill, Booking, Hotel, Location, Payment, Report, Review, Room, Service, Image, Role, RoomType, BookingDetail, BookingRoom],
 });

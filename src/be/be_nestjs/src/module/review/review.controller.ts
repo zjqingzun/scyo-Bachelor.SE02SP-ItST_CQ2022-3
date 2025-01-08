@@ -34,6 +34,7 @@ export class ReviewController {
     return this.reviewService.remove(+id);
   }
 
+  // [GET]: /review/:id?page=1&per_page=6
   @Get(':id')
   @Public()
   findReviewByID(

@@ -1,14 +1,16 @@
+import { Transform } from 'class-transformer';
 import { IsInt, IsOptional, Min, Max } from 'class-validator';
 
 export class GetReviewDto {
+  // Trường page, mặc định là 1 nếu không có giá trị
+  @Transform(({ value }) => (value ? parseInt(value, 10) : 1))
   @IsInt()
   @IsOptional()
-  @Min(1)
   page: number = 1;
 
+  // Trường per_page, mặc định là 6 nếu không có giá trị
+  @Transform(({ value }) => (value ? parseInt(value, 10) : 6))
   @IsInt()
   @IsOptional()
-  @Min(1)
-  @Max(100)
-  limit: number = 10;
+  per_page: number = 6;
 }

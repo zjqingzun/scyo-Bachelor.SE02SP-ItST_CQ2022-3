@@ -39,11 +39,10 @@ export class ReviewService {
   }
 
   async getHotelReviews(id: number, getReviewDto: GetReviewDto) {
-    const { page, limit } = getReviewDto;
+    const { page, per_page } = getReviewDto;
     try {
-      const skip = (page - 1) * limit;
+      const offset = (page - 1) * per_page;
 
-      // Sử dụng getRawMany và getCount để lấy dữ liệu raw và số lượng
       const reviews = await this.reviewRepository
         .createQueryBuilder('review')
         .leftJoin('review.user', 'user')
@@ -57,8 +56,8 @@ export class ReviewService {
         ])
         .where('review."hotelId" = :hotelId', { hotelId: id })
         .orderBy('review.createdAt', 'DESC')
-        .skip(skip)
-        .take(limit)
+        .limit(per_page)
+        .offset(offset)
         .getRawMany();  
 
       // Đếm số lượng review
@@ -78,9 +77,10 @@ export class ReviewService {
       return {
         status_code: 200,
         message: 'Reviews retrieved successfully',
+        page,
+        per_page,
         total: totalCount,
-        currentPage: page,
-        totalPages: Math.ceil(totalCount / limit),
+        total_pages: Math.ceil(totalCount / per_page),
         data: {
           reviews: reviews.map(review => ({
             id: review.review_id,

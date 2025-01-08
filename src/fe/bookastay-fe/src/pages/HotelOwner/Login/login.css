@@ -1,0 +1,26 @@
+.login-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 70px auto;
+    width: 450px;
+}
+
+input[type="submit"] {
+    background-color: #3B61DD;
+    border: none;
+    color: white;
+    border-radius: 15px;
+    margin: 0 35%;
+    width: 30%;
+}
+
+#forgetPassword {
+    text-decoration: none;
+    color: black;
+}
+
+.login-title {
+    font-size: 30px;
+}

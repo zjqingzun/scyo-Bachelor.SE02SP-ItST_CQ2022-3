@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
-import { Dropdown } from "react-bootstrap";
+import { Dropdown as BDropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { Avatar, Dropdown } from "antd";
+import { LoginOutlined, SettingOutlined } from "@ant-design/icons";
 import { GiHamburgerMenu } from "react-icons/gi";
 
 import icons from "~/assets/icon";
 import { setCurrency } from "~/redux/action/currencyAction";
 
 import "./Header.scss";
+import { doLogout } from "~/redux/action/accountAction";
 
 const CustomToggleForCurrency = React.forwardRef(({ children, onClick }, ref) => (
     <span
@@ -38,6 +41,7 @@ const CustomToggleForCurrency = React.forwardRef(({ children, onClick }, ref) =>
 const Header = ({ toggle = () => {} }) => {
     const { t, i18n } = useTranslation();
     const currency = useSelector((state) => state.currency.currency);
+    const userInfo = useSelector((state) => state.account.userInfo);
 
     const dispatch = useDispatch();
 
@@ -63,6 +67,52 @@ const Header = ({ toggle = () => {} }) => {
         dispatch(setCurrency(currency, currencyValue));
     };
 
+    const items = [
+        {
+            key: "1",
+            label: (userInfo && userInfo.email) || "My Account",
+            disabled: true,
+        },
+        {
+            type: "divider",
+        },
+        {
+            key: "2",
+            label: "Profile",
+            extra: "⌘P",
+        },
+        {
+            key: "3",
+            label: "Billing",
+            extra: "⌘B",
+        },
+        {
+            key: "4",
+            label: "Settings",
+            icon: <SettingOutlined />,
+            extra: "⌘S",
+        },
+        {
+            type: "divider",
+        },
+        {
+            key: "5",
+            icon: <LoginOutlined />,
+            label: (
+                <span
+                    onClick={(e) => {
+                        e.preventDefault();
+                        dispatch(doLogout());
+                    }}
+                    style={{ color: "#f5222d" }}
+                >
+                    Logout
+                </span>
+            ),
+            extra: "⌘L",
+        },
+    ];
+
     return (
         <div className="header">
             <div className="d-block d-xl-none" onClick={toggle} style={{ cursor: "pointer" }}>
@@ -71,57 +121,78 @@ const Header = ({ toggle = () => {} }) => {
 
             <div className="header__actions">
                 <div className="header__currency-group" style={{ width: "40px" }}>
-                    <Dropdown>
-                        <Dropdown.Toggle as={CustomToggleForCurrency}>{currency}</Dropdown.Toggle>
+                    <BDropdown>
+                        <BDropdown.Toggle as={CustomToggleForCurrency}>{currency}</BDropdown.Toggle>
 
-                        <Dropdown.Menu>
-                            <Dropdown.Item
+                        <BDropdown.Menu>
+                            <BDropdown.Item
                                 eventKey="VND"
                                 onClick={() => handleChangeCurrency("VND")}
                             >
                                 <span className="fs-3">VND ₫</span>
-                            </Dropdown.Item>
-                            <Dropdown.Item
+                            </BDropdown.Item>
+                            <BDropdown.Item
                                 eventKey="USD"
                                 onClick={() => handleChangeCurrency("USD")}
                             >
                                 <span className="fs-3">USD $</span>
-                            </Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
+                            </BDropdown.Item>
+                        </BDropdown.Menu>
+                    </BDropdown>
                     {/* <span className="header__currency-icon"></span> */}
                 </div>
 
                 <div className="header__language-group">
-                    <Dropdown onSelect={(e) => setLanguage(e)}>
-                        <Dropdown.Toggle as={CustomToggleForCurrency}>
+                    <BDropdown onSelect={(e) => setLanguage(e)}>
+                        <BDropdown.Toggle as={CustomToggleForCurrency}>
                             <img
                                 src={language === "Vietnam" ? icons.vietnamIcon : icons.englishIcon}
                                 alt=""
                                 className="header__language-icon"
                             ></img>
-                        </Dropdown.Toggle>
+                        </BDropdown.Toggle>
 
-                        <Dropdown.Menu>
-                            <Dropdown.Item
+                        <BDropdown.Menu>
+                            <BDropdown.Item
                                 eventKey="Vietnam"
                                 onClick={() => handleChangeLanguage("vi")}
                             >
                                 <span className="fs-3">Vietnam</span>
-                            </Dropdown.Item>
-                            <Dropdown.Item
+                            </BDropdown.Item>
+                            <BDropdown.Item
                                 eventKey="English"
                                 onClick={() => handleChangeLanguage("en")}
                             >
                                 <span className="fs-3">English</span>
-                            </Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
+                            </BDropdown.Item>
+                        </BDropdown.Menu>
+                    </BDropdown>
                 </div>
 
-                <a href="#!" className="header__sign-in-btn">
-                    {t("header.signIn")}
-                </a>
+                {userInfo && userInfo.email ? (
+                    <Dropdown menu={{ items }}>
+                        <Avatar
+                            style={{ cursor: "pointer" }}
+                            src={
+                                userInfo.avatar ||
+                                "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                            }
+                        >
+                            Nam
+                        </Avatar>
+                    </Dropdown>
+                ) : (
+                    <a
+                        href="#!"
+                        className="header__sign-in-btn"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate("/hotel-owner/login");
+                        }}
+                    >
+                        {t("header.signIn")}
+                    </a>
+                )}
             </div>
         </div>
     );

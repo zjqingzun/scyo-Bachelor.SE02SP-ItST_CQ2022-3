@@ -46,9 +46,21 @@ export class UserService {
   async findAllFav(req : Request) {
     const {page = 1, limit = 5, sortBy = 'name', order = 'ASC', userId = 1} = req.query;
     const queryRunner = this.dataSource.createQueryRunner();
-    const take = limit;
+    const take = limit as number;
     const skip = (page as number - 1) * (limit as number);
-    let allFavHotel = await queryRunner.query(`
+
+    const allFavHotel = await queryRunner.query(`
+      SELECT count(*)
+      FROM hotel
+      WHERE id IN (
+        SELECT "hotelId"
+        FROM "user_favouriteHotel"
+        WHERE "userId" = ${userId}
+      )
+    `);
+    const allPage = Math.ceil(parseInt(allFavHotel[0].count) / take);
+
+    let allFavHotelPaging = await queryRunner.query(`
       SELECT *
       FROM hotel
       WHERE id IN (
@@ -59,7 +71,14 @@ export class UserService {
       ORDER BY ${sortBy} ${order}
       LIMIT ${take} OFFSET ${skip}
     `);
-    return allFavHotel;
+    return {
+      status: 200,
+      message: "Successfully",
+      data: {
+        all_page: allPage,
+        hotels: allFavHotelPaging
+      }
+    };
   }
 
   async findByEmail(email : string) {

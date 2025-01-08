@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import "./utils/i18n";
 
 import { publicRoutes } from "./routes";
@@ -93,25 +93,25 @@ function App() {
                                 }
 
                                 // Kiểm tra xem route có yêu cầu role không
-                                // if (route.requiredRole) {
-                                //     return (
-                                //         <Route
-                                //             key={index}
-                                //             element={
-                                //                 <PrivateRoute requiredRole={route.requiredRole} />
-                                //             }
-                                //         >
-                                //             <Route
-                                //                 path={route.path}
-                                //                 element={
-                                //                     <Layout>
-                                //                         <Page />
-                                //                     </Layout>
-                                //                 }
-                                //             />
-                                //         </Route>
-                                //     );
-                                // }
+                                if (route.requiredRole) {
+                                    return (
+                                        <Route
+                                            key={index}
+                                            element={
+                                                <PrivateRoute requiredRole={route.requiredRole} />
+                                            }
+                                        >
+                                            <Route
+                                                path={route.path}
+                                                element={
+                                                    <Layout>
+                                                        <Page />
+                                                    </Layout>
+                                                }
+                                            />
+                                        </Route>
+                                    );
+                                }
                                 // Nếu không yêu cầu role thì render ra bình thường
                                 return (
                                     <Route

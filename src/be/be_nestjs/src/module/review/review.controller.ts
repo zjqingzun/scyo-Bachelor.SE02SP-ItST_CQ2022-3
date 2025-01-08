@@ -4,14 +4,22 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { GetReviewDto } from './dto/get-review.dto';
 import { Public } from '@/helpers/decorator/public';
+import { publishBehavior } from 'rxjs';
 
 @Controller('review')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
-  @Post()
+  @Post('create')
+  @Public()
   create(@Body() createReviewDto: CreateReviewDto) {
     return this.reviewService.create(createReviewDto);
+  }
+
+  @Get("detail/:id")
+  @Public()
+  getReviewByReviewId(@Param('id') id: string) {
+    return this.reviewService.getReviewById(id);
   }
 
   @Get()
@@ -33,6 +41,8 @@ export class ReviewController {
   remove(@Param('id') id: string) {
     return this.reviewService.remove(+id);
   }
+
+
 
   // [GET]: /review/:id?page=1&per_page=6
   @Get(':id')

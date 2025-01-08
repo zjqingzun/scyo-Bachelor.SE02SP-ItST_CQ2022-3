@@ -78,7 +78,7 @@ const publicRoutes = [
         component: Review,
     },
     {
-        path: "/hotel-details",
+        path: "/hotel/:id",
         component: HotelDetails,
     },
     {

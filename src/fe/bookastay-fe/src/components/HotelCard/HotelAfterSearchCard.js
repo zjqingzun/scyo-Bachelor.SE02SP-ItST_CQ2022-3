@@ -1,6 +1,7 @@
 import { memo, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 import icons from "~/assets/icon";
@@ -22,7 +23,16 @@ const HotelAfterSearchCard = ({
     averageRating: rating,
     totalReviews: review,
     star,
+    id,
+    description
 }) => {
+    const navigate = useNavigate();
+    const handleBookNow = () => {
+        navigate(`/hotel/${id}`, {
+            state: { id, name, address, images, price, rating, review, star, description },
+        }); // Chuyển hướng đến route chi tiết khách sạn
+    };
+
     const { t } = useTranslation();
 
     const currency = useSelector((state) => state.currency.currency);
@@ -64,8 +74,6 @@ const HotelAfterSearchCard = ({
     const handleCloseMapModel = () => setShowMapModal(false);
     const handleShowMapModel = async (address) => {
         mapPositionRef.current = await geocodeAddress(address);
-
-        // console.log(mapPositionRef.current);
 
         setShowMapModal(true);
     };
@@ -176,7 +184,10 @@ const HotelAfterSearchCard = ({
                         </span>
                     </div>
 
-                    <button className="hotel-card__btn ms-auto">{t("hotelCard.BookNow")}</button>
+                    <button className="hotel-card__btn ms-auto" onClick={handleBookNow}>
+                        {t("hotelCard.BookNow")}
+                    </button>
+
                 </div>
             </div>
         </div>

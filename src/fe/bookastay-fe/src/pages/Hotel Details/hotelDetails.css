@@ -11,6 +11,25 @@
     padding: 0;
 }
 
+.search {
+    position: relative;
+    margin: 0 auto;
+    margin-top: -20px;
+    /* width: 90%; */
+    width: 80%;
+    
+    border-radius: 15px;
+    box-shadow: 0 0 0 10px rgba(91, 153, 194, 0.15), 0 2px 48px 0 rgba(91, 153, 194, 0.04);
+    
+    @media (max-width: 1400px) { /* Replace xxl with an approximate breakpoint, e.g., 1400px */
+        width: 90%;
+    }
+    
+    @media (max-width: 1200px) { /* Replace xl with an approximate breakpoint, e.g., 1200px */
+        width: 95%;
+    }    
+}
+
 .property-images .main-img {
     width: 100%;
     height: 450px;

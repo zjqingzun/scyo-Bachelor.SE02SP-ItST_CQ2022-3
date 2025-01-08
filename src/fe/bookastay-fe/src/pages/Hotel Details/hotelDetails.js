@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './hotelDetails.css';
 import icons from "~/assets/icon";
+import SearchBarNoLocation from '~/components/SearchBarNoLocation';
 import { ro } from 'date-fns/locale';
 
 const locations = [
@@ -162,6 +163,10 @@ const HotelDetails = () => {
                         The nearest airport is Tan Son Nhat International Airport, 2.4 km from the accommodation.</p>
                 </div>
                 
+                <div className='mx-5 search'>
+                    <SearchBarNoLocation border-radius={12}/>
+                </div>
+
                 <div className="px-2 my-5 pb-5">
                     <div className="card shadow p-3">
                         <div className="card-body">

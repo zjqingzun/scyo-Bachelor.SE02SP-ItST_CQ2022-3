@@ -104,7 +104,8 @@ const Header = () => {
             icon: <LoginOutlined />,
             label: (
                 <span
-                    onClick={() => {
+                    onClick={(e) => {
+                        e.preventDefault();
                         dispatch(doLogout());
                     }}
                     style={{ color: "#f5222d" }}

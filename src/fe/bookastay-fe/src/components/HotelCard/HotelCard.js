@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { useSelector } from "react-redux";
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
-import { addFavorite } from "~/services/apiService";
+import { addFavorite, getAllFavorite, removeFavorite } from "~/services/apiService";
 
 const HotelCard = ({
     id,
@@ -54,6 +54,19 @@ const HotelCard = ({
         handleChangeCurrency();
     }, [currency]);
 
+    // test get all favorite
+    // useEffect(() => {
+    //     if (userInfo.email) {
+    //         getAllFavorite({ userId: userInfo.id, page: 1, limit: 6, sortBy: "name", order: "ASC" })
+    //             .then((res) => {
+    //                 const favoriteList = res.data.hotels;
+    //                 const isFav = favoriteList.some((fav) => fav.id === id);
+    //                 setIsFavorite(isFav);
+    //             })
+    //             .catch((err) => console.log(err));
+    //     }
+    // }, [userInfo.email]);
+
     return (
         <div className="hotel-card">
             <div className="hotel-card__image-wrap">
@@ -63,7 +76,11 @@ const HotelCard = ({
 
                 <button
                     onClick={() => {
-                        addFavorite(userInfo.id, id);
+                        if (isFavorite) {
+                            removeFavorite(userInfo.id, id);
+                        } else {
+                            addFavorite(userInfo.id, id);
+                        }
                         setIsFavorite(!isFavorite);
                     }}
                     className={`hotel-card__favorite ${userInfo.email ? "" : "d-none"}`}

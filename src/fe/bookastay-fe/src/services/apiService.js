@@ -59,11 +59,11 @@ const getRecommendHotels = async () => {
 
 // FAV
 const addFavorite = async (userId, hotelId) => {
-    return await axios.post(`/user/addFav?userId=${userId}&hotelId=${hotelId}`);
+    return await axios.get(`/user/addFav?userId=${userId}&hotelId=${hotelId}`);
 };
 
 const removeFavorite = async (userId, hotelId) => {
-    return await axios.delete(`/user/deleteFav?userId=${userId}&hotelId=${hotelId}`);
+    return await axios.get(`/user/deleteFav?userId=${userId}&hotelId=${hotelId}`);
 };
 
 const getAllFavorite = async ({ userId, page = 1, limit = 6, sortBy = "name", order = "ASC" }) => {

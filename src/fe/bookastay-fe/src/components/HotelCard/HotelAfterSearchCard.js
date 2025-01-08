@@ -14,7 +14,7 @@ import geocodeAddress from "~/utils/geocodeAddress";
 import staticImages from "~/assets/image";
 import "leaflet/dist/leaflet.css";
 import "./HotelCard.scss";
-import { addFavorite } from "~/services/apiService";
+import { addFavorite, getAllFavorite, removeFavorite } from "~/services/apiService";
 
 const HotelAfterSearchCard = ({
     name,
@@ -79,6 +79,19 @@ const HotelAfterSearchCard = ({
         setShowMapModal(true);
     };
 
+    // test get all favorite
+    useEffect(() => {
+        if (userInfo.email) {
+            getAllFavorite({ userId: userInfo.id, page: 1, limit: 6, sortBy: "name", order: "ASC" })
+                .then((res) => {
+                    const favoriteList = res.data.hotels;
+                    const isFav = favoriteList.some((fav) => fav.id === id);
+                    setIsFavorite(isFav);
+                })
+                .catch((err) => console.log(err));
+        }
+    }, [userInfo.email]);
+
     return (
         <div className="hotel-card hotel-card--after-search">
             <Modal centered show={showMapModal} onHide={handleCloseMapModel}>
@@ -112,7 +125,11 @@ const HotelAfterSearchCard = ({
 
                 <button
                     onClick={() => {
-                        addFavorite(userInfo.id, id);
+                        if (isFavorite) {
+                            removeFavorite(userInfo.id, id);
+                        } else {
+                            addFavorite(userInfo.id, id);
+                        }
                         setIsFavorite(!isFavorite);
                     }}
                     className={`hotel-card__favorite ${userInfo.email ? "" : "d-none"}`}

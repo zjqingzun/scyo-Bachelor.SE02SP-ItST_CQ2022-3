@@ -54,7 +54,7 @@ export class UserController {
     }
     return {
       status: 201,
-      message: 'Updated'
+      message: 'Updated',
     };
   }
 
@@ -74,7 +74,10 @@ export class UserController {
     }
 
     await this.userService.uploadAvatar(file, email);
-    return { message: 'Avatar has uploaded', image: await this.getImageUrl(email) };
+    return {
+      message: 'Avatar has uploaded',
+      image: await this.getImageUrl(email),
+    };
   }
 
   @Get('avatar/url/:email')
@@ -109,8 +112,9 @@ export class UserController {
 
   @Get('hotelier/dashboard/:hotelierId')
   @Public()
-  async dashboardForHotelier(@Param('hotelierId') hotelierId : string) {
-    return this.userService.dashboardForHotelier(hotelierId as unknown as number);
+  async dashboardForHotelier(@Param('hotelierId') hotelierId: string) {
+    return this.userService.dashboardForHotelier(
+      hotelierId as unknown as number,
+    );
   }
-
 }

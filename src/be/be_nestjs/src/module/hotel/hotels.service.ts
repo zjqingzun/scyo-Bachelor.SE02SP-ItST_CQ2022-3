@@ -40,15 +40,15 @@ export class HotelsService {
     try {
       const {page = 1, limit = 5, sortBy = 'id', order = 'ASC', searchTerm} = req.query;
       const queryBuilder = this.hotelRepository.createQueryBuilder('hotel')
-          .select([
-              'hotel.id',
-              'hotel.name',
-              'u.name',
-              'l.*'
-          ])
-          .innerJoin('hotels_locations', 'hl', 'hl."hotelId" = hotel.id')
-          .innerJoin('user', 'u', 'u.id = hotel."ownerId"')
-          .innerJoin('location', 'l', 'l.id = hl."localtionId"');
+      .leftJoinAndSelect('hotels_locations', 'hl', 'hl."hotelId" = hotel.id')
+      .leftJoinAndSelect('user', 'u', 'u.id = hotel."ownerId"')
+      .leftJoinAndSelect('location', 'l', 'l.id = hl."locationId"')
+      .select([
+        'hotel.id',
+        'hotel.name',
+        'u.name',
+        'l.city'
+      ]);
 
       queryBuilder.orderBy(`hotel.${sortBy}`, order === 'ASC' ? 'ASC' : 'DESC');
 
@@ -56,6 +56,9 @@ export class HotelsService {
           .take(+limit)
           .skip((+page - 1) * +limit)
           .getManyAndCount();
+
+      console.log(hotels);
+
       return {
         page: page,
         per_page: limit,

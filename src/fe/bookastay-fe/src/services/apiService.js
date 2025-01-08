@@ -32,7 +32,7 @@ const getHotels = async (
         minRating: 0,
         minStar: 0,
         page: 1,
-        per_page: 3,
+        per_page: 6,
     }
 ) => {
     const params = new URLSearchParams({
@@ -46,7 +46,7 @@ const getHotels = async (
         minRating: query?.minRating || 0,
         minStar: query?.minStar || 0,
         page: query?.page || 1,
-        per_page: query?.per_page || 3,
+        per_page: query?.per_page || 6,
     });
 
     return await axios.get(`/hotels/search?${params.toString()}`);

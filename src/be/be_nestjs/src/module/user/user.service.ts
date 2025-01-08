@@ -1,10 +1,10 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { User } from "./entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { DataSource, Repository } from "typeorm";
 import { hashPassword } from "@/helpers/utils";
-import { Request } from "express";
+import { query, Request } from "express";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { CreateAuthDto } from "@/auth/dto/create-auth.dto";
 import { v4 as uuidv4 } from 'uuid';
@@ -288,6 +288,31 @@ export class UserService {
       throw error;
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  async deleteFav(req : Request) {
+    try {
+      const {userId, hotelId} = req.query;
+      const queryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.query(`
+        DELETE FROM "user_favouriteHotel"
+        WHERE "userId" = ${userId} AND "hotelId" = ${hotelId}
+      `);
+      return {
+        status: 200,
+        message: "Successfully"
+      };
+    } catch (error) {
+      console.error('Error deleting favourite hotel:', error);
+      throw new HttpException(
+        {
+          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error. Please try again later.',
+          error: error.message || 'Unknown error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

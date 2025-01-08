@@ -34,7 +34,11 @@ export class ReviewService {
                     hotelId: review.hotelId
                   })
                   .execute();
-    return res.raw;
+    return {
+      status_code: 200,
+      message: "Successfully",
+      data: res.raw
+    };
   }
 
   async  getReviewById(id: string) {

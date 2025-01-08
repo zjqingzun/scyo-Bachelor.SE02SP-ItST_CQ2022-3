@@ -35,10 +35,10 @@ export class UserController {
     return new ForbiddenException('forbidden', 'forbidden desc');
   }
 
-  @Get('getAll')
+  @Get('getAll/:role')
   @Public()
-  async getAllUsers(@Req() req) {
-    return await this.userService.findAll(req);
+  async getAllUsers(@Param('role') role: string, @Req() req) {
+    return await this.userService.findAll(role, req);
   }
 
   @Post('create')

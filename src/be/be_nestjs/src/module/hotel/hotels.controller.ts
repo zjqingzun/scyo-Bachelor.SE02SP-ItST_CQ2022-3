@@ -28,9 +28,10 @@ export class HotelsController {
     return this.hotelsService.create(createHotelDto);
   }
 
-  @Get()
-  findAll() {
-    return this.hotelsService.findAll();
+  @Get('getAll')
+  @Public()
+  findAll(@Req() req) {
+    return this.hotelsService.findAll(req);
   }
 
   @Patch(':id')
@@ -44,10 +45,10 @@ export class HotelsController {
   }
 
   // [GET]: /hotels/recommended-hotel
-  @Get('recommended-hotel')
+  @Get('recommended-hotel/:userId')
   @Public()
-  async recommendedHotel() {
-    return await this.hotelsService.getTopTenRatingHotel();
+  async recommendedHotel(@Param('userId') userId: string) {
+    return await this.hotelsService.getTopTenRatingHotel(+userId);
   }
 
   // [GET]: /hotels?city=...&checkInDate=...&checkOutDate=...&roomType2=...&roomType4=...&minPrice=...&maxPrice=...&minRating=...&minStar=...&page=...&perPage=...

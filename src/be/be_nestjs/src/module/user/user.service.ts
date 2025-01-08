@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { BadRequestException, HttpException, HttpStatus, Injectable, Param } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { User } from "./entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as moment from "moment";
 import { MinioService } from "@/minio/minio.service";
 import { ResetpassAuthDto } from "@/auth/dto/resetpassword-auth.dto";
+import { take } from "rxjs";
 
 
 @Injectable()
@@ -22,21 +23,34 @@ export class UserService {
     private readonly minioService : MinioService
   ) {}
 
-  async findAll(req: Request) {
-    const {page = 1, limit = 5, sortBy = 'name', order = 'ASC', searchTerm} = req.query;
-    const [users, total] = await this.usersRepository.findAndCount({
-      select: {
-        name: true,
-        email: true,
-        phone: true,
-      },
-      order: {
-        [sortBy as string]: order,
-      },
-      take: limit as number,
-      skip: (page as number - 1) * (limit as number),
-    });
-    return {users, total};
+  async findAll(role: string, req: Request) {
+    const {page = 1, limit = 5, sortBy = 'id', order = 'ASC', searchTerm} = req.query;
+    const queryBuilder = this.usersRepository.createQueryBuilder('user')
+        .select([
+            'user.id',
+            'user.name',
+            'user.email',
+            'user.phone',
+            'user.dob',
+            'user.cccd'
+        ])
+        .innerJoin('users_roles', 'ur', 'ur."userId" = user.id')
+        .innerJoin('role', 'r', 'ur."roleId" = r.id')
+        .where('r.name = :role', { role });
+
+    queryBuilder.orderBy(`user.${sortBy}`, order === 'ASC' ? 'ASC' : 'DESC');
+
+    const [users, total] = await queryBuilder
+        .take(+limit)
+        .skip((+page - 1) * +limit)
+        .getManyAndCount();
+    return {
+      page: page,
+      per_page: limit,
+      total,
+      total_pages: Math.ceil(total / +limit),
+      users
+    };
   }
 
   findOne(id: number): Promise<User | null> {
@@ -187,6 +201,7 @@ export class UserService {
   }
 
   async update(updateUserDto: UpdateUserDto) {
+    console.log(updateUserDto);
     return await this.usersRepository.update({
       id: updateUserDto.id
     },

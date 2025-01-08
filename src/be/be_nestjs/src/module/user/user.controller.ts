@@ -46,13 +46,16 @@ export class UserController {
     return await this.userService.create(createUserDto);
   }
 
-  @Patch('update')
+  @Post('update')
   async update(@Body() updateUserDto: UpdateUserDto) {
     let result = await this.userService.update(updateUserDto);
     if (result.affected === 0) {
       throw new BadRequestException('no record has been updated');
     }
-    return 'Updated';
+    return {
+      status: 201,
+      message: 'Updated'
+    };
   }
 
   @Post('avatar/upload/:email')
@@ -71,7 +74,7 @@ export class UserController {
     }
 
     await this.userService.uploadAvatar(file, email);
-    return { message: 'Avatar has uploaded' };
+    return { message: 'Avatar has uploaded', image: await this.getImageUrl(email) };
   }
 
   @Get('avatar/url/:email')

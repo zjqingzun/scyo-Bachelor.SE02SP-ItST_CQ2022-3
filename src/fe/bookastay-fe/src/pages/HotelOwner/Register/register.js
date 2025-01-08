@@ -74,7 +74,7 @@ function Register() {
 
             if (response && response.email === data.email) {
                 toast.success("Registration successful!");
-                navigate("/login");
+                navigate("/hotel-owner/login");
             }
         } catch (error) {
             toast.error("Registration failed!");

@@ -53,7 +53,7 @@ function Login() {
 
         if (res && res.EC === 0) {
             toast.success("Login successfully!");
-            navigate("/");
+            navigate("/hotel-owner/dashboard");
         } else {
             toast.error(`Login failed: ${res?.EM}`);
         }

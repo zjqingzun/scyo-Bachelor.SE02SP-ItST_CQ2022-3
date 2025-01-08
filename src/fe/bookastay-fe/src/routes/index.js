@@ -41,22 +41,27 @@ const publicRoutes = [
     {
         path: "/",
         component: Home,
+        requiredRole: "user",
     },
     {
         path: "/unauthorized",
         component: Unauthorized,
+        layout: NoneLayout,
     },
     {
         path: "/about",
         component: About,
+        requiredRole: "user",
     },
     {
         path: "/after-search",
         component: AfterSearch,
+        requiredRole: "user",
     },
     {
         path: "/reserve",
         component: Reserve,
+        requiredRole: "user",
     },
     {
         path: "/login",
@@ -73,22 +78,27 @@ const publicRoutes = [
     {
         path: "/history",
         component: History,
+        requiredRole: "user",
     },
     {
         path: "/favorite",
         component: Favorite,
+        requiredRole: "user",
     },
     {
         path: "/account-setting",
         component: AccountSetting,
+        requiredRole: "user",
     },
     {
         path: "/review",
         component: Review,
+        requiredRole: "user",
     },
     {
         path: "/hotel-details",
         component: HotelDetails,
+        requiredRole: "user",
     },
     {
         path: "/hotel-owner/register-hotel",

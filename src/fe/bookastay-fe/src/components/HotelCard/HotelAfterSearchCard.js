@@ -17,7 +17,6 @@ import "./HotelCard.scss";
 import { addFavorite } from "~/services/apiService";
 
 const HotelAfterSearchCard = ({
-    id,
     name,
     address,
     images,
@@ -26,7 +25,7 @@ const HotelAfterSearchCard = ({
     totalReviews: review,
     star,
     id,
-    description
+    description,
 }) => {
     const navigate = useNavigate();
     const handleBookNow = () => {
@@ -192,7 +191,6 @@ const HotelAfterSearchCard = ({
                     <button className="hotel-card__btn ms-auto" onClick={handleBookNow}>
                         {t("hotelCard.BookNow")}
                     </button>
-
                 </div>
             </div>
         </div>

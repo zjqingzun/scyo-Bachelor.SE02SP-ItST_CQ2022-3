@@ -62,6 +62,22 @@ const addFavorite = async (userId, hotelId) => {
     return await axios.post(`/user/addFav?userId=${userId}&hotelId=${hotelId}`);
 };
 
+const removeFavorite = async (userId, hotelId) => {
+    return await axios.delete(`/user/deleteFav?userId=${userId}&hotelId=${hotelId}`);
+};
+
+const getAllFavorite = async ({ userId, page = 1, limit = 6, sortBy = "name", order = "ASC" }) => {
+    const params = new URLSearchParams({
+        userId: userId,
+        page: page || 1,
+        limit: limit || 6,
+        sortBy: sortBy || "name",
+        order: order || "ASC",
+    });
+
+    return await axios.get(`/user/fav?${params.toString()}`);
+};
+
 export {
     userLogin,
     getProfile,
@@ -70,4 +86,6 @@ export {
     getHotels,
     getRecommendHotels,
     addFavorite,
+    removeFavorite,
+    getAllFavorite,
 };

@@ -16,7 +16,16 @@ import Review from "~/pages/Review";
 
 // Hotel Owner Pages
 import RegisterHotel from "~/pages/HotelOwner/RegisterHotel/RegisterHotel";
-import { Dashboard, Room, Guest, AddRoom, RoomType, OrderDetail } from "~/pages/HotelOwner";
+import {
+    Dashboard,
+    Room,
+    Guest,
+    AddRoom,
+    RoomType,
+    OrderDetail,
+    Login as HotelOwnerLogin,
+    Register as HotelOwnerRegister,
+} from "~/pages/HotelOwner";
 import Unauthorized from "~/pages/Unauthorized/Unauthorized";
 
 // Admin Pages
@@ -115,6 +124,16 @@ const publicRoutes = [
         component: Dashboard,
         layout: HotelOwnerLayout,
         requiredRole: "hotelier",
+    },
+    {
+        path: "/hotel-owner/login",
+        component: HotelOwnerLogin,
+        layout: NoneLayout,
+    },
+    {
+        path: "/hotel-owner/register",
+        component: HotelOwnerRegister,
+        layout: NoneLayout,
     },
     {
         path: "/hotel-owner/room/add-room",

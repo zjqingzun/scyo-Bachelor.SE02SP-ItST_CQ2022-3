@@ -106,6 +106,7 @@ const AfterSearch = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(6);
     const [totalPage, setTotalPage] = useState(0);
+    const [total, setTotal] = useState(0);
 
     const filteredHotels = useMemo(() => {
         if (!searchedHotel?.length) return [];
@@ -145,6 +146,7 @@ const AfterSearch = () => {
                 setSearchedHotel(data);
                 setTotalPage(response.total_pages);
                 setCurrentPage(response.page);
+                setTotal(response.total);
             } else {
                 toast.error("Error when fetching hotels");
             }
@@ -390,9 +392,11 @@ const AfterSearch = () => {
                                     <Pagination
                                         showQuickJumper
                                         defaultCurrent={currentPage}
-                                        total={totalPage * 10}
+                                        total={total}
+                                        defaultPageSize={pageSize}
                                         pageSizeOptions={[6, 12, 18, 24]}
                                         onChange={(page, pageSize) => {
+                                            console.log(page, pageSize);
                                             setCurrentPage(page);
                                             setPageSize(pageSize);
                                         }}

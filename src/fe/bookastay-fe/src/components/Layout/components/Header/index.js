@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
 import { Dropdown as BDropdown } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Drawer, Avatar, Dropdown } from "antd";
 import { DownOutlined, LoginOutlined, SettingOutlined } from "@ant-design/icons";
 
@@ -43,6 +43,7 @@ const Header = () => {
     const userInfo = useSelector((state) => state.account.userInfo);
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const [language, setLanguage] = useState("English");
 
@@ -66,6 +67,11 @@ const Header = () => {
 
     const handleChangeCurrency = (currencyValue) => {
         dispatch(setCurrency(currency, currencyValue));
+    };
+
+    const handleNavigateLoginHotelOwner = (e) => {
+        e.preventDefault();
+        navigate("/hotel-owner/login");
     };
 
     // console.log("currency", currency);
@@ -125,7 +131,13 @@ const Header = () => {
                 </Link>
 
                 <div className="header__actions">
-                    <a href="#!" className="header__list-property-btn d-none d-md-block">
+                    <a
+                        href="#!"
+                        className="header__list-property-btn d-none d-md-block"
+                        onClick={(e) => {
+                            handleNavigateLoginHotelOwner(e);
+                        }}
+                    >
                         {t("header.listYourProperty")}
                     </a>
 
@@ -261,7 +273,11 @@ const Header = () => {
                 </Link>
 
                 <div className="d-flex flex-column gap-3 mt-3">
-                    <a href="#!" className="header__list-property-btn">
+                    <a
+                        href="#!"
+                        className="header__list-property-btn"
+                        onClick={(e) => handleNavigateLoginHotelOwner(e)}
+                    >
                         {t("header.listYourProperty")}
                     </a>
 

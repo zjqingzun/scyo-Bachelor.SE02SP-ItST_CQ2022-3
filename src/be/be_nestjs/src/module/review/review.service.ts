@@ -7,6 +7,8 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 import { Review } from '../review/entities/review.entity';
 import { MinioService } from '@/minio/minio.service';
 import { GetReviewDto } from './dto/get-review.dto';
+import * as moment from 'moment';
+import { hours } from '@nestjs/throttler';
 
 
 @Injectable()
@@ -18,8 +20,66 @@ export class ReviewService {
     private readonly minioService: MinioService,
   ) { }
 
-  create(createReviewDto: CreateReviewDto) {
-    return 'This action adds a new review';
+  async create(createReviewDto: CreateReviewDto) {
+    const review = {...createReviewDto, createdAt: moment().toLocaleString()};
+    const res = await this.reviewRepository
+                  .createQueryBuilder()
+                  .insert()
+                  .into(Review)
+                  .values({
+                    comment: review.comment,
+                    rating: review.rating,
+                    createdAt: review.createdAt,
+                    userId: review.userId,
+                    hotelId: review.hotelId
+                  })
+                  .execute();
+    return {
+      status_code: 200,
+      message: "Successfully",
+      data: res.raw
+    };
+  }
+
+  async  getReviewById(id: string) {
+    try {
+      const reviews = await this.reviewRepository
+        .createQueryBuilder('review')
+        .select()
+        .leftJoin('review.user', 'user')
+        .select([
+          'review.*',
+          'user.name',
+          'user.avatar'
+        ])
+        .where({
+          id: id
+        })
+        .execute();
+      const review = reviews[0];
+      return {
+        status_code: 200,
+        message: 'Reviews retrieved successfully',
+        data: {
+            id: review.id,
+            avatar: review.user_avatar,
+            name: review.user_name,
+            rate: review.rating,
+            date: review.createdAt,
+            comment: review.comment,
+        },
+      };
+    } catch (error) {
+      console.error('Error getting reviews:', error);
+      throw new HttpException(
+        {
+          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error. Please try again later.',
+          error: error.message || 'Unknown error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   findAll() {

@@ -47,7 +47,7 @@ import { BookingDetailModule } from './module/booking_detail/booking_detail.modu
         database: configService.get<string>('DATABASE_NAME'),
         autoLoadEntities: true,
         synchronize: false,
-        // logging: ['query', 'error'],
+        logging: ['query', 'error'],
         extra: {
           max: 50,
           min: 2,

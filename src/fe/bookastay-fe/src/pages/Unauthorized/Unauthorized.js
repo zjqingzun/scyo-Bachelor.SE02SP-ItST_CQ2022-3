@@ -1,3 +1,4 @@
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const { Button, Result } = require("antd");
@@ -5,8 +6,18 @@ const { Button, Result } = require("antd");
 const Unauthorized = () => {
     const navigate = useNavigate();
 
+    const userInfo = useSelector((state) => state.account.userInfo);
+
     const handleBackHome = () => {
-        navigate("/");
+        if (userInfo.role === "user") {
+            navigate("/");
+        } else if (userInfo.role === "hotelier") {
+            navigate("/hotel-owner/dashboard");
+        }
+        // To do
+        // else if (userInfo.role === "admin") {
+        //     navigate("/admin/dashboard");
+        // }
     };
 
     return (

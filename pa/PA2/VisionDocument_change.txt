@@ -1,0 +1,63 @@
+Các tài liệu có liên quan đến Vision Document có trong Project Assignment 2 (PA2) chỉ có duy nhất tài liệu VisionDocument.pdf
+
+
+
+
+Tài liệu VisionDocument.pdf có trong PA2 này có những nội dung được chỉnh sửa khác so với tài liệu VisionDocument.pdf có trong PA1 như sau:
+
+1. Anh hóa ngôn ngữ toàn bộ tài liệu (trừ các diagrams, hình ảnh có liên quan)
+
+2. Thay đổi tên tiêu đề (project name, version), hiệu chỉnh font chữ và một số thông tin Header Page
+
+3. Thay đổi Revision History
+
+4. Thay đổi đề mục Table of Contents mới
+
+5. Thay đổi nội dung phần 1. Introduction, đề mục dựa trên Table of Contents mới.
+
+6. Thêm vào phần 1.1 Organization và phần 1.2 Significance, đề mục dựa trên Table of Contents mới.
+
+7. Sửa đổi và thêm vào nội dung phần 3.1 Stakeholder Summary, đề mục dựa trên Table of Contents mới.
+
+8. Thêm vào phần 4. Use-case Diagrams, đề mục dựa trên Table of Contents mới.
+
+9. Sửa đổi toàn bộ phần 6. Product Feature, đề mục dựa trên Table of Contents mới.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
 import { Dropdown as BDropdown } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { Drawer, Avatar, Dropdown } from "antd";
+import { Drawer, Avatar, Dropdown, Menu } from "antd";
 import { DownOutlined, LoginOutlined, SettingOutlined } from "@ant-design/icons";
 
 import icons from "~/assets/icon";
@@ -77,6 +77,26 @@ const Header = () => {
     // console.log("currency", currency);
     // console.log("baseCurrency", baseCurrency);
 
+    const handleMenuClick = ({ key }) => {
+        switch (key) {
+            case "2":
+                navigate("/account-setting");
+                break;
+            case "3":
+                console.log("Billing clicked");
+                break;
+            case "4":
+                console.log("Settings clicked");
+                break;
+            case "5":
+                dispatch(doLogout());
+                break;
+            default:
+                break;
+        }
+    };
+
+    // Menu items
     const items = [
         {
             key: "1",
@@ -88,7 +108,17 @@ const Header = () => {
         },
         {
             key: "2",
-            label: "Profile",
+            label: (
+                <a
+                    href="#!"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        navigate("/account-setting");
+                    }}
+                >
+                    Profile
+                </a>
+            ),
             extra: "⌘P",
         },
         {
@@ -109,16 +139,16 @@ const Header = () => {
             key: "5",
             icon: <LoginOutlined />,
             label: (
-                <span
+                <a
+                    href="#!"
                     onClick={(e) => {
                         e.preventDefault();
-                        e.stopPropagation();
                         dispatch(doLogout());
                     }}
                     style={{ color: "#f5222d" }}
                 >
                     Logout
-                </span>
+                </a>
             ),
             extra: "⌘L",
         },
@@ -233,7 +263,7 @@ const Header = () => {
                     </a> */}
 
                     {userInfo && userInfo.email ? (
-                        <Dropdown menu={{ items }}>
+                        <Dropdown menu={{ items }} trigger={["click"]}>
                             <Avatar
                                 style={{ cursor: "pointer" }}
                                 src={

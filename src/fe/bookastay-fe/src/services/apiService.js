@@ -85,6 +85,10 @@ const updateAvatar = async (email, file) => {
     return await axios.post(`/user/avatar/upload/${email}`, formData);
 };
 
+const getAvatarUrl = async (email) => {
+    return await axios.get(`/user/avatar/url/${email}`);
+};
+
 export {
     userLogin,
     getProfile,
@@ -96,4 +100,5 @@ export {
     removeFavorite,
     getAllFavorite,
     updateAvatar,
+    getAvatarUrl,
 };

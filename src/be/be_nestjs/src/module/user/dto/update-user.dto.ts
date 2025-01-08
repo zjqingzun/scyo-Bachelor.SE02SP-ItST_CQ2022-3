@@ -10,4 +10,5 @@ export class UpdateUserDto extends OmitType(PartialType(CreateUserDto), ["passwo
     email?: string;
     phone?: string;
     dob?: Date;
+    cccd?: string;
 }

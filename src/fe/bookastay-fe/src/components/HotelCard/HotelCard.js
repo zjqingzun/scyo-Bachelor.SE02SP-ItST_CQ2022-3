@@ -18,6 +18,8 @@ const HotelCard = ({
     const currency = useSelector((state) => state.currency.currency);
     const exchangeRate = useSelector((state) => state.currency.exchangeRate);
 
+    const userInfo = useSelector((state) => state.account.userInfo);
+
     const [isFavorite, setIsFavorite] = useState(false);
 
     const [nowPrice, setNowPrice] = useState(price);
@@ -53,9 +55,11 @@ const HotelCard = ({
     return (
         <div className="hotel-card">
             <div className="hotel-card__image-wrap">
-                <a href="#!">
-                    <img src={images[0]} alt={name} className="hotel-card__image" />
-                </a>
+                {userInfo.email && (
+                    <a href="#!">
+                        <img src={images[0]} alt={name} className="hotel-card__image" />
+                    </a>
+                )}
 
                 <button onClick={() => setIsFavorite(!isFavorite)} className="hotel-card__favorite">
                     {!isFavorite ? (

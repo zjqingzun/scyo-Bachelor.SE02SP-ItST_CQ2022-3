@@ -1,0 +1,11 @@
+Các tài liệu có liên quan đến SAD có trong Project Assignment 4 (PA4) chỉ có duy nhất tài liệu SAD.pdf
+
+
+Tài liệu SAD.pdf có trong PA4 này có những nội dung được chỉnh sửa khác so với tài liệu SAD.pdf có trong PA3 như sau:
+
+1. Thêm nội dung vào mục 5. Deloyment 
+
+2. Thêm nội dung vào mục 6. Implementation View
+
+3. Chỉnh sửa nội dung mục 4. Logical View
+

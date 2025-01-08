@@ -9,9 +9,15 @@ import { Public } from '@/helpers/decorator/public';
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
-  @Post()
+  @Post('create')
   create(@Body() createReviewDto: CreateReviewDto) {
     return this.reviewService.create(createReviewDto);
+  }
+
+  @Get("detail/:id")
+  @Public()
+  getReviewByReviewId(@Param('id') id: string) {
+    return this.reviewService.getReviewById(id);
   }
 
   @Get()
@@ -33,6 +39,8 @@ export class ReviewController {
   remove(@Param('id') id: string) {
     return this.reviewService.remove(+id);
   }
+
+
 
   // [GET]: /review/:id?page=1&per_page=6
   @Get(':id')

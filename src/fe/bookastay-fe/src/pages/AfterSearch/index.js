@@ -104,6 +104,7 @@ const AfterSearch = () => {
 
     const [searchedHotel, setSearchedHotel] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(6);
     const [totalPage, setTotalPage] = useState(0);
 
     const filteredHotels = useMemo(() => {
@@ -135,6 +136,7 @@ const AfterSearch = () => {
                 maxPrice: filterData.maxPrice || 0,
                 minRating: filterData.minRating || 0,
                 minStar: filterData.minStar || 0,
+                per_page: pageSize,
             });
 
             if (response.status_code === 200 && response.data) {
@@ -152,7 +154,7 @@ const AfterSearch = () => {
         } finally {
             setIsLoaded(false);
         }
-    }, [location.state, currentPage, filterData]);
+    }, [location.state, currentPage, filterData, pageSize]);
 
     // useEffect(() => {
     //     // console.log(">>> first render AfterSearch");
@@ -389,7 +391,11 @@ const AfterSearch = () => {
                                         showQuickJumper
                                         defaultCurrent={currentPage}
                                         total={totalPage * 10}
-                                        onChange={(page) => setCurrentPage(page)}
+                                        pageSizeOptions={[6, 12, 18, 24]}
+                                        onChange={(page, pageSize) => {
+                                            setCurrentPage(page);
+                                            setPageSize(pageSize);
+                                        }}
                                     />
                                 </div>
                             )}

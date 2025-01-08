@@ -1,4 +1,22 @@
-import { BadRequestException, Body, Controller, Delete, ForbiddenException, Get, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post, Req, UploadedFile, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  ForbiddenException,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Req,
+  UploadedFile,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Request } from 'express';
@@ -8,26 +26,23 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { MinioService } from '@/minio/minio.service';
 
-
 @Controller('user')
 export class UserController {
-    constructor(
-      private userService : UserService,
-    ) {}
+  constructor(private userService: UserService) {}
 
   @Get('error')
   getError() {
-    return new ForbiddenException("forbidden", "forbidden desc");
+    return new ForbiddenException('forbidden', 'forbidden desc');
   }
 
   @Get('getAll')
   @Public()
-  async getAllUsers(@Req() req ) {
+  async getAllUsers(@Req() req) {
     return await this.userService.findAll(req);
   }
 
   @Post('create')
-  async create(@Body() createUserDto : CreateUserDto) {
+  async create(@Body() createUserDto: CreateUserDto) {
     return await this.userService.create(createUserDto);
   }
 
@@ -35,46 +50,44 @@ export class UserController {
   async update(@Body() updateUserDto: UpdateUserDto) {
     let result = await this.userService.update(updateUserDto);
     if (result.affected === 0) {
-      throw new BadRequestException("no record has been updated");
+      throw new BadRequestException('no record has been updated');
     }
-    return "Updated";
+    return 'Updated';
   }
 
   @Post('avatar/upload/:email')
   @Public()
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: memoryStorage()
+      storage: memoryStorage(),
     }),
   )
   async uploadAvatar(
     @UploadedFile() file: Express.Multer.File,
-    @Param('email') email: string
+    @Param('email') email: string,
   ) {
     if (!file) {
       throw new BadRequestException('File is required');
     }
 
     await this.userService.uploadAvatar(file, email);
-    return { message: 'Avatar has uploaded'};
+    return { message: 'Avatar has uploaded' };
   }
 
   @Get('avatar/url/:email')
   @Public()
-  async getImageUrl(
-    @Param('email') email: string,
-  ) {
+  async getImageUrl(@Param('email') email: string) {
     const result = await this.userService.getAvatarUrl(email);
     return result;
   }
 
   @Delete('delete/:id')
-  async delete(@Param('id') id : number) {
+  async delete(@Param('id') id: number) {
     return await this.userService.remove(+id);
   }
 
   @Get('fav')
-  async getFavs(@Req() req ) {
+  async getFavs(@Req() req) {
     return await this.userService.findAllFav(req);
   }
 

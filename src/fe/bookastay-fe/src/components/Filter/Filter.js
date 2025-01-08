@@ -81,8 +81,8 @@ const Filter = (props) => {
 
     useEffect(() => {
         const dataPrice = [
-            convertCurrency(priceToShow[0], currency, "VND", exchangeRate),
-            convertCurrency(priceToShow[1], currency, "VND", exchangeRate),
+            Math.round(convertCurrency(priceToShow[0], currency, "VND", exchangeRate)),
+            Math.round(convertCurrency(priceToShow[1], currency, "VND", exchangeRate)),
         ];
 
         console.log(">>> data", dataPrice);

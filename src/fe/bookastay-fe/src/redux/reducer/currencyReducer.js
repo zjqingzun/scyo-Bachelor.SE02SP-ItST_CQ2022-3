@@ -4,8 +4,8 @@ const initialState = {
     baseCurrency: "VND", // Loại tiền gốc mặc định
     currency: "VND", // Loại tiền hiển thị hiện tại
     exchangeRate: {
-        VND: { VND: 1, USD: 0.00003956, EUR: 0.000039 },
-        USD: { USD: 1, VND: 25275.1713, EUR: 0.9 },
+        VND: { VND: 1, USD: 0.000039, EUR: 0.000039 },
+        USD: { USD: 1, VND: 1 / 0.000039, EUR: 0.9 },
         // ... thêm các tỉ giá khác nếu cần
     },
 };

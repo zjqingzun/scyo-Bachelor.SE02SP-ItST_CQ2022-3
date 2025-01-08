@@ -87,11 +87,13 @@ export class UserController {
   }
 
   @Get('fav')
+  @Public()
   async getFavs(@Req() req) {
     return await this.userService.findAllFav(req);
   }
 
   @Get('addFav')
+  @Public()
   async addFav(@Req() req) {
     return await this.userService.addFav(req);
   }

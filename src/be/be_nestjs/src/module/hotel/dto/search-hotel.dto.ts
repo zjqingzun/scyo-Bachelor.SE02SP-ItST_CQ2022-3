@@ -6,14 +6,28 @@ export class SearchHotelDto {
     @IsOptional()
     city?: string;
 
+    @Transform(({ value }) => {
+        if (!value || value.trim() === '') {
+            return new Date().toISOString().split('T')[0]; // Ngày hôm nay
+        }
+        return value;
+    })
     @IsDateString()
     @IsOptional()
     checkInDate?: string;
 
+    @Transform(({ value }) => {
+        if (!value || value.trim() === '') {
+            const today = new Date();
+            const checkOutDate = new Date(today.setDate(today.getDate() + 3));
+            return checkOutDate.toISOString().split('T')[0]; // Ngày hôm nay + 3 ngày
+        }
+        return value;
+    })
     @IsDateString()
     @IsOptional()
     checkOutDate?: string;
-
+    
     @Transform(({ value }) => (value ? parseInt(value, 10) : undefined))
     @IsInt()
     @IsOptional()

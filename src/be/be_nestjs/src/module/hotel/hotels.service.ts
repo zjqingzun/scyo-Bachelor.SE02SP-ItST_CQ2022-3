@@ -168,7 +168,8 @@ export class HotelsService {
 
       // Nếu có city thì duyệt qua city
       if (city) {
-        queryBuilder.andWhere('location.city = :city', { city });
+        const normalizedCity = removeDiacritics(city);
+        queryBuilder.andWhere('LOWER(UNACCENT(location.city)) = :city', { city: normalizedCity });
       }
 
       if (roomType2) {
@@ -213,7 +214,7 @@ export class HotelsService {
             ))`)
             .getQuery();
 
-          return `(${sub}) >= :roomType2`;
+          return `(${sub}) >= :roomType4`;
         }, { roomType4 });
       }
 
@@ -227,10 +228,11 @@ export class HotelsService {
         queryBuilder.having('AVG(review.rating) >= :minRating', { minRating });
       }
       // Lọc theo giá thấp nhất và lớn nhất
-      if (minPrice) {
+      if (minPrice && maxPrice) {
+        queryBuilder.having('MIN(roomType.price) >= :minPrice AND MIN(roomType.price) <= :maxPrice', { minPrice, maxPrice });
+      } else if (minPrice) {
         queryBuilder.having('MIN(roomType.price) >= :minPrice', { minPrice });
-      }
-      if (maxPrice) {
+      } else if (maxPrice) {
         queryBuilder.having('MIN(roomType.price) <= :maxPrice', { maxPrice });
       }
 
@@ -238,8 +240,8 @@ export class HotelsService {
       const offset = (page - 1) * per_page;
 
       // Áp dụng skip và take trước khi lấy kết quả
-      queryBuilder.skip(offset).take(per_page); 
-      const [hotels, totalHotels] = await Promise.all([queryBuilder.getRawMany(), queryBuilder.getCount(),]); 
+      queryBuilder.limit(per_page).offset(offset);
+      const [hotels, totalHotels] = await Promise.all([queryBuilder.getRawMany(), queryBuilder.getCount(),]);
       const totalPages = Math.ceil(totalHotels / per_page);
 
       console.log({
@@ -424,4 +426,11 @@ export class HotelsService {
       );
     }
   }
+}
+
+function removeDiacritics(value: string): string {
+  return value
+    .normalize('NFD') // Chuẩn hóa ký tự Unicode
+    .replace(/[\u0300-\u036f]/g, '') // Loại bỏ dấu
+    .toLowerCase(); // Chuyển thành chữ thường
 }

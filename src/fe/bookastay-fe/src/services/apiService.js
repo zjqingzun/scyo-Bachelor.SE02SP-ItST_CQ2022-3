@@ -52,8 +52,22 @@ const getHotels = async (
     return await axios.get(`/hotels/search?${params.toString()}`);
 };
 
+// Homepage api
 const getRecommendHotels = async () => {
     return await axios.get(`/hotels/recommended-hotel`);
 };
 
-export { userLogin, getProfile, getRefreshToken, userRegister, getHotels, getRecommendHotels };
+// FAV
+const addFavorite = async (userId, hotelId) => {
+    return await axios.post(`/user/addFav?userId=${userId}&hotelId=${hotelId}`);
+};
+
+export {
+    userLogin,
+    getProfile,
+    getRefreshToken,
+    userRegister,
+    getHotels,
+    getRecommendHotels,
+    addFavorite,
+};

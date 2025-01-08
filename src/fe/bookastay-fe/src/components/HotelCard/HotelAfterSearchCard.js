@@ -13,8 +13,10 @@ import geocodeAddress from "~/utils/geocodeAddress";
 import staticImages from "~/assets/image";
 import "leaflet/dist/leaflet.css";
 import "./HotelCard.scss";
+import { addFavorite } from "~/services/apiService";
 
 const HotelAfterSearchCard = ({
+    id,
     name,
     address,
     images,
@@ -102,7 +104,10 @@ const HotelAfterSearchCard = ({
                 </a>
 
                 <button
-                    onClick={() => setIsFavorite(!isFavorite)}
+                    onClick={() => {
+                        addFavorite(userInfo.id, id);
+                        setIsFavorite(!isFavorite);
+                    }}
                     className={`hotel-card__favorite ${userInfo.email ? "" : "d-none"}`}
                 >
                     {userInfo.email && !isFavorite && (

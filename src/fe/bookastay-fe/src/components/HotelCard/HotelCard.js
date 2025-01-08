@@ -4,8 +4,10 @@ import { useTranslation } from "react-i18next";
 
 import { useSelector } from "react-redux";
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
+import { addFavorite } from "~/services/apiService";
 
 const HotelCard = ({
+    id,
     name,
     address,
     images,
@@ -60,7 +62,10 @@ const HotelCard = ({
                 </a>
 
                 <button
-                    onClick={() => setIsFavorite(!isFavorite)}
+                    onClick={() => {
+                        addFavorite(userInfo.id, id);
+                        setIsFavorite(!isFavorite);
+                    }}
                     className={`hotel-card__favorite ${userInfo.email ? "" : "d-none"}`}
                 >
                     {userInfo.email && !isFavorite && (

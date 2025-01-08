@@ -78,6 +78,12 @@ const getAllFavorite = async ({ userId, page = 1, limit = 6, sortBy = "name", or
     return await axios.get(`/user/fav?${params.toString()}`);
 };
 
+// Profile
+
+const updateProfile = async (data) => {
+    return await axios.post("/user/update", data);
+};
+
 const updateAvatar = async (email, file) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -101,4 +107,5 @@ export {
     getAllFavorite,
     updateAvatar,
     getAvatarUrl,
+    updateProfile,
 };

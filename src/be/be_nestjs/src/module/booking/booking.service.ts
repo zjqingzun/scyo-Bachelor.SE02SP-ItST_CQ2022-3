@@ -12,6 +12,9 @@ import { User } from '../user/entities/user.entity';
 import { Request, Response } from 'express';
 import { BookingDetail } from '../booking_detail/entities/booking_detail.entity';
 import { BookingRoom } from '../booking_room/entities/booking_room.entity';
+import axios from 'axios';
+import * as crypto from 'crypto';
+import { Payment } from '../payment/entities/payment.entity';
 
 @Injectable()
 export class BookingService {
@@ -33,6 +36,9 @@ export class BookingService {
 
     @InjectRepository(Room)
     private readonly roomRepository: Repository<Room>,
+
+    @InjectRepository(Payment)
+    private readonly paymentRepository: Repository<Payment>,
 
     @InjectRepository(RoomType)
     private readonly roomTypeRepository: Repository<RoomType>,
@@ -273,7 +279,7 @@ export class BookingService {
 
   async processPayment(req: Request, res: Response, paymentMethod){
     try {
-      console.log('PAYMENTMETHOD: ', paymentMethod);
+      // console.log('PAYMENTMETHOD: ', paymentMethod);
       // Kiểm tra xem có thông tin booking trong cookie không
       const bookingDT = req.cookies['bookingData'];
       const noteDT = req.cookies['note'];
@@ -282,14 +288,14 @@ export class BookingService {
       }
       const bookingData = JSON.parse(bookingDT);
       const note = JSON.parse(noteDT);
-      console.log('NOTE: ', note);
+      // console.log('NOTE: ', note);
   
       let status = '';
       if (paymentMethod === 'cash') {
         status = 'unpaid';
         // console.log('VAO DUOC PAYMENT CASH');
         // console.log('BOOKING DATA TRUOC KHI VAO: ', bookingData);
-        await this.saveDataIntoDatabase(bookingData, status, note);
+        await this.saveDataIntoDatabase(bookingData, status, note, paymentMethod);
       
         return res.status(HttpStatus.OK).json({
           message: 'Cash successful, information saved to database.',
@@ -297,8 +303,15 @@ export class BookingService {
       }
   
       if (paymentMethod === 'momo') {
-        status = 'paid';
         // Tạm thời chưa xử lý
+        const amount = bookingData.sumPrice;
+        const orderInfo = `Đặt phòng tại khách sạn ${bookingData.hotelId} - Loại phòng: ${bookingData.roomType2} và ${bookingData.roomType4}.`;
+
+        const paymentUrl = await this.createMomoPayment(amount, orderInfo);
+        return res.status(HttpStatus.OK).json({
+          message: 'Redirect to MoMo for payment.',
+          paymentUrl,
+        });
       }
   
       // Trả về lỗi nếu phương thức thanh toán không hợp lệ
@@ -314,6 +327,81 @@ export class BookingService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  private async createMomoPayment(amount: number, orderInfo: string): Promise<string> {
+    const partnerCode = 'MOMO';
+    const accessKey = process.env.MOMO_ACCESS_KEY;
+    const secretKey = process.env.MOMO_SECRET_KEY;
+    const redirectUrl = 'http://localhost:3000';
+    const ipnUrl = 'https://240b-2402-800-6315-309c-9cdf-3795-d2c5-46c.ngrok-free.app/callback';
+    const requestId = `${partnerCode}-${new Date().getTime()}`;
+    const orderId = requestId;
+    const requestType = 'captureWallet';
+    const extraData = '';
+  
+    const rawSignature = `accessKey=${accessKey}&amount=${amount}&extraData=${extraData}&ipnUrl=${ipnUrl}&orderId=${orderId}&orderInfo=${orderInfo}&partnerCode=${partnerCode}&redirectUrl=${redirectUrl}&requestId=${requestId}&requestType=${requestType}`;
+    const signature = crypto.createHmac('sha256', secretKey).update(rawSignature).digest('hex');
+  
+    const requestBody = {
+      partnerCode,
+      partnerName: 'YourPartnerName',
+      storeId: 'StoreID',
+      requestId,
+      amount,
+      orderId,
+      orderInfo,
+      redirectUrl,
+      ipnUrl,
+      requestType,
+      extraData,
+      lang: 'vi',
+      autoCapture: true,
+      signature,
+    };
+  
+    try {
+      const response = await axios.post('https://test-payment.momo.vn/v2/gateway/api/create', requestBody, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response.data && response.data.payUrl) {
+        return response.data.payUrl;
+      } else {
+        throw new Error('Failed to get payment URL from MoMo.');
+      }
+    } catch (error) {
+      console.error('Error creating MoMo payment:', error.response?.data || error.message);
+      throw new HttpException('Error creating MoMo payment', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async updatePaymentStatus(req: Request, res: Response, detailPay) {
+    const bookingDT = req.cookies['bookingData'];
+      const noteDT = req.cookies['note'];
+      if (!bookingDT || !noteDT) {
+        throw new HttpException('Booking data not found in cookies', HttpStatus.NOT_FOUND);
+      }
+      const bookingData = JSON.parse(bookingDT);
+      const note = JSON.parse(noteDT);
+      // console.log('NOTE: ', note);
+      const paymentStatus = detailPay.status;
+      let status = '';
+      if(paymentStatus === 'success'){
+        status = 'paid';
+        this.saveDataIntoDatabase(bookingData, status, note, 'momo');
+        return res.status(HttpStatus.OK).json({
+          message: 'Payment success, save data into database',
+          data: { status, bookingData },
+        });
+      }
+      else if(paymentStatus === 'fail'){
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          message: 'Payment failed, please try again.',
+        });
+      }
   }
 
   private async saveBooking(bookingData: any, status: string, note) {
@@ -392,13 +480,33 @@ export class BookingService {
       throw error;
     }
   }
+
+  private async createPayment(bookingId: number, bookingData: any, paymentMethod: string, status: string) {
+    try {
+      const paymentQuery = await this.paymentRepository
+        .createQueryBuilder()
+        .insert()
+        .into(Payment)
+        .values({
+          method: paymentMethod,
+          status: status,
+          booking: { id: bookingId },
+          totalCost: bookingData.sumPrice
+        })
+        .execute();
+    } catch (error) {
+      console.error('Error saving payment:', error);
+      throw error;
+    }
+  }
   
-  private async saveDataIntoDatabase(bookingData: any, status: string, note: string) {
+  private async saveDataIntoDatabase(bookingData: any, status: string, note: string, paymentMethod: string) {
     try {
       const bookingId = await this.saveBooking(bookingData, status, note);
       console.log('BOOKING ID: ', bookingId);
       await this.saveBookingDetail(bookingId, bookingData);
       await this.saveBookingRoom(bookingId, bookingData);
+      await this.createPayment(bookingId, bookingData, paymentMethod, status);
     } catch (error) {
       console.error('Error saving data into database:', error);
       throw new HttpException(

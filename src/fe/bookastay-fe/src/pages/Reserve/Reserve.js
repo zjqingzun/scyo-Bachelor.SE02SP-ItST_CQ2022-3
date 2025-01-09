@@ -15,7 +15,12 @@ import images from "~/assets/image";
 import icons from "~/assets/icon";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
-import { getHotelDetail } from "~/services/apiService";
+import {
+    getBookingInfo,
+    getHotelDetail,
+    paymentBooking,
+    postBookingInfo,
+} from "~/services/apiService";
 import { useLocation } from "react-router-dom";
 import { formatCheckInOutDate } from "~/utils/datetime";
 
@@ -45,31 +50,37 @@ const Reserve = () => {
         userId,
         numberOfRoom2,
         numberOfRoom4,
+        tempInfo,
     } = location.state || {};
 
     const [hotelDetail, setHotelDetail] = useState(null);
+    const [bookingInfo, setBookingInfo] = useState(null);
 
     useEffect(() => {
-        const fetchHotelDetail = async () => {
+        const fetchBookingInfo = async () => {
             try {
-                // console.log(hotelId, checkInDate, checkOutDate, numberOfRoom2, numberOfRoom4);
+                console.log(hotelId, checkInDate, checkOutDate, numberOfRoom2, numberOfRoom4);
 
-                const response = await getHotelDetail(hotelId, {
-                    checkInDate,
-                    checkOutDate,
-                    roomType2: numberOfRoom2,
-                    roomType4: numberOfRoom4,
-                });
+                console.log(tempInfo);
+
+                const id = hotelId || tempInfo?.hotelId;
+
+                const res = await getBookingInfo();
 
                 // console.log(response.data);
 
-                setHotelDetail(response.data);
+                const { hotel, ...booking } = res.data;
+
+                console.log(hotel, booking);
+
+                setHotelDetail(hotel);
+                setBookingInfo(booking);
             } catch (error) {
-                toast.error("Failed to get hotel detail");
+                toast.error("Failed to get booking info");
             }
         };
 
-        fetchHotelDetail();
+        fetchBookingInfo();
     }, [location.state]);
 
     const formik = useFormik({
@@ -78,9 +89,7 @@ const Reserve = () => {
             cccd: userInfo?.cccd || "",
             email: userInfo?.email || "",
             phone: userInfo?.phone || "",
-            discount: "",
             specialRequest: "",
-            arrivalTime: new Date(),
         },
         validationSchema: Yup.object({
             name: Yup.string().required("Name is required"),
@@ -119,24 +128,32 @@ const Reserve = () => {
 
     const stepsConfig = [
         {
-            title: "Your selection",
+            title: t("reserve.stepTitle.step1"),
         },
         {
-            title: "Your details",
+            title: t("reserve.stepTitle.step2"),
         },
         {
-            title: "Payment details",
+            title: t("reserve.stepTitle.step3"),
         },
     ];
 
     const [currentStep, setCurrentStep] = useState(2);
     const [isComplete, setIsComplete] = useState(false);
 
-    const handleNext = () => {
+    const handleNext = async () => {
         if (currentStep === 2) {
             formik.handleSubmit();
 
-            if (formik.isValid && formik.dirty) {
+            formik.setTouched({
+                name: true,
+                cccd: true,
+                email: true,
+                phone: true,
+                specialRequest: true,
+            });
+
+            if (formik.isValid) {
                 setCurrentStep((prevStep) => {
                     if (prevStep === stepsConfig.length) {
                         setIsComplete(true);
@@ -147,12 +164,29 @@ const Reserve = () => {
                 });
             }
 
+            try {
+                const res = await postBookingInfo(formik.values.specialRequest);
+                console.log(">>> res", res);
+            } catch (error) {
+                console.log(">>> error", error);
+                toast.error("Failed to post booking info");
+            }
+
             return;
         }
 
         // finish
         if (currentStep === stepsConfig.length) {
-            setIsComplete(true);
+            try {
+                const res = await paymentBooking(paymentMethod);
+
+                console.log(">>> res", res);
+            } catch (error) {
+                console.log(">>> error", error);
+                toast.error("Failed to payment booking");
+            }
+
+            // setIsComplete(true);
 
             persistData.current = {
                 ...persistData.current,
@@ -223,7 +257,8 @@ const Reserve = () => {
                                                     </label>
                                                     <input
                                                         type="text"
-                                                        name="firstName"
+                                                        name="name"
+                                                        disabled
                                                         value={formik.values.name}
                                                         onChange={formik.handleChange}
                                                         className={`form-control form-control-lg fs-4  ${
@@ -251,7 +286,8 @@ const Reserve = () => {
                                                     </label>
                                                     <input
                                                         type="text"
-                                                        name="lastName"
+                                                        name="cccd"
+                                                        disabled
                                                         value={formik.values.cccd}
                                                         onChange={formik.handleChange}
                                                         className={`form-control form-control-lg fs-4  ${
@@ -281,6 +317,7 @@ const Reserve = () => {
                                             <input
                                                 type="email"
                                                 name="email"
+                                                disabled
                                                 value={formik.values.email}
                                                 onChange={formik.handleChange}
                                                 className={`form-control form-control-lg fs-4  ${
@@ -309,6 +346,7 @@ const Reserve = () => {
                                                     <input
                                                         type="text"
                                                         name="phone"
+                                                        disabled
                                                         value={formik.values.phone}
                                                         onChange={formik.handleChange}
                                                         className={`form-control form-control-lg fs-4  ${
@@ -530,7 +568,7 @@ const Reserve = () => {
                                                 <span>Check-in</span>
                                                 <h4 className="mt-2 fs-3 fw-bold">
                                                     {formatCheckInOutDate(
-                                                        checkInDate,
+                                                        checkInDate ?? tempInfo?.checkInDate,
                                                         localStorage.getItem("i18nextLng")
                                                     )}
                                                 </h4>
@@ -542,7 +580,7 @@ const Reserve = () => {
                                                 <span>Check-out</span>
                                                 <h4 className="mt-2 fs-3 fw-bold">
                                                     {formatCheckInOutDate(
-                                                        checkOutDate,
+                                                        checkOutDate ?? tempInfo?.checkOutDate,
                                                         localStorage.getItem("i18nextLng")
                                                     )}
                                                 </h4>
@@ -559,7 +597,8 @@ const Reserve = () => {
                                                     {t("reserve.yourChoice")}
                                                 </span>
                                                 <p className="fs-3 fw-bold">
-                                                    3 {t("reserve.rooms")}
+                                                    {numberOfRoom2 + numberOfRoom4}{" "}
+                                                    {t("reserve.rooms")}
                                                 </p>
                                             </div>
 
@@ -580,8 +619,14 @@ const Reserve = () => {
                                             className="collapse"
                                             ref={(ref) => (roomsInfoRef.current = ref)}
                                         >
-                                            <p className="fw-medium">1 x Phòng Giường Đôi</p>
-                                            <p className="fw-medium">2 x Phòng Giường Đơn</p>
+                                            <p className="fw-medium">
+                                                {bookingInfo?.roomType2 || numberOfRoom2} x{" "}
+                                                {t("reserve.double")}
+                                            </p>
+                                            <p className="fw-medium">
+                                                {bookingInfo?.roomType4 || numberOfRoom4} x{" "}
+                                                {t("reserve.quadruple")}
+                                            </p>
                                         </div>
                                     </div>
                                     <a href="#!">
@@ -600,17 +645,25 @@ const Reserve = () => {
 
                                     <div className="d-flex justify-content-between">
                                         <span>{t("reserve.originalPrice")}</span>
-                                        <span className="ms-3">540,000VND</span>
+                                        <span className="ms-3">
+                                            {bookingInfo?.sumPrice?.toLocaleString() ||
+                                                sumPrice?.toLocaleString()}{" "}
+                                            VND
+                                        </span>
                                     </div>
 
                                     <div className="d-flex justify-content-between">
                                         <span>{t("reserve.discount")}</span>
-                                        <span className="ms-3">-40,000VND</span>
+                                        <span className="ms-3">-0 VND</span>
                                     </div>
 
                                     <div className="d-flex justify-content-between mt-5 fs-4  fw-bold">
                                         <span>{t("reserve.totalPrice")}</span>
-                                        <span className="ms-3">500,000VND</span>
+                                        <span className="ms-3">
+                                            {bookingInfo?.sumPrice?.toLocaleString() ||
+                                                sumPrice?.toLocaleString()}{" "}
+                                            VND
+                                        </span>
                                     </div>
                                 </div>
                             </div>

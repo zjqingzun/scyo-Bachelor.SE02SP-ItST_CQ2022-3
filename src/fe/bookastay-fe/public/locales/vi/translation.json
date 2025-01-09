@@ -82,6 +82,12 @@
         "discount": "Giảm giá",
         "totalPrice": "Tổng giá",
         "double": "Phòng đôi",
-        "quadruple": "Phòng bốn người"
+        "quadruple": "Phòng bốn người",
+        "stepTitle": {
+            "step1": "Lựa chọn của bạn",
+            "step2": "Thông tin của bạn",
+            "step3": "Thông tin thanh toán",
+            "step4": "Hoàn tất"
+        }
     }
 }

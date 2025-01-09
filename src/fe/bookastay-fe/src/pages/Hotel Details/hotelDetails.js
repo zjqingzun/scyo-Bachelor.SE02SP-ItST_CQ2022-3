@@ -7,6 +7,7 @@ import SearchBarNoLocation from "~/components/SearchBarNoLocation";
 import { getHotelDetail, startBooking } from "~/services/apiService";
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const HotelDetails = () => {
     const { id } = useParams();
@@ -211,13 +212,18 @@ const HotelDetails = () => {
     const displayedImages = showAllImages ? images : images.slice(0, 5);
 
     const handleReserve = async () => {
+        const numberOfRoom2 =
+            roomCounts[hotelDetails.room_types.find((room) => room.type === 2).id] || 0;
+        const numberOfRoom4 =
+            roomCounts[hotelDetails.room_types.find((room) => room.type === 4).id] || 0;
+
         const data = {
             hotelId: +id,
             checkInDate: new Date(checkInDate).toISOString(),
             checkOutDate: new Date(checkOutDate).toISOString(),
-            roomType2: 2,
+            roomType2: numberOfRoom2,
             type2Price: roomPrice1,
-            roomType4: 4,
+            roomType4: numberOfRoom4,
             type4Price: roomPrice2,
             sumPrice: room_types.reduce((total, room) => {
                 const count = roomCounts[room.id] || 0;
@@ -227,22 +233,26 @@ const HotelDetails = () => {
             userId: +userInfo.id,
         };
 
-        const res = await startBooking(data);
+        try {
+            const res = await startBooking(data);
+            console.log(">>> Start booking response: ", res);
 
-        const numberOfRoom2 =
-            roomCounts[hotelDetails.room_types.find((room) => room.type === 2).id] || 0;
-        const numberOfRoom4 =
-            roomCounts[hotelDetails.room_types.find((room) => room.type === 4).id] || 0;
-
-        console.log(">>> Start booking response: ", res);
-
-        navigate("/reserve", {
-            state: {
-                ...res.bookingData,
-                numberOfRoom2: numberOfRoom2,
-                numberOfRoom4: numberOfRoom4,
-            },
-        });
+            navigate("/reserve", {
+                state: {
+                    ...res.bookingData,
+                    tempInfo: {
+                        hotelId: +id,
+                        checkInDate: new Date(checkInDate).toISOString(),
+                        checkOutDate: new Date(checkOutDate).toISOString(),
+                    },
+                    numberOfRoom2: numberOfRoom2,
+                    numberOfRoom4: numberOfRoom4,
+                },
+            });
+        } catch (error) {
+            console.error(">>> Error: ", error);
+            toast.error("Error while starting booking");
+        }
     };
 
     return (

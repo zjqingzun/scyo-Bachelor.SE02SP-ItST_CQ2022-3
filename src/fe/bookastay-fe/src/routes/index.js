@@ -158,7 +158,7 @@ const publicRoutes = [
         requiredRole: ["hotelier"],
     },
     {
-        path: "/admin",
+        path: "/admin/login",
         component: AdminLogin,
         layout: NoneLayout,
     },
@@ -166,26 +166,31 @@ const publicRoutes = [
         path: "/admin/dashboard",
         layout: AdminLayout,
         component: AdminDashboard,
+        requiredRole: ["admin"],
     },
     {
         path: "/admin/manage-users",
         layout: AdminLayout,
         component: ManageUsers,
+        requiredRole: ["admin"],
     },
     {
         path: "/admin/manage-hotel-owners",
         layout: AdminLayout,
         component: ManageHotelOwners,
+        requiredRole: ["admin"],
     },
     {
         path: "/admin/manage-hotels",
         layout: AdminLayout,
         component: ManageHotels,
+        requiredRole: ["admin"],
     },
     {
         path: "/admin/manage-requests",
         layout: AdminLayout,
         component: ManageRequests,
+        requiredRole: ["admin"],
     },
 ];
 

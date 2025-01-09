@@ -15,9 +15,9 @@ const Unauthorized = () => {
             navigate("/hotel-owner/dashboard");
         }
         // To do
-        // else if (userInfo.role === "admin") {
-        //     navigate("/admin/dashboard");
-        // }
+        else if (userInfo.role === "admin") {
+            navigate("/admin/dashboard");
+        }
     };
 
     return (

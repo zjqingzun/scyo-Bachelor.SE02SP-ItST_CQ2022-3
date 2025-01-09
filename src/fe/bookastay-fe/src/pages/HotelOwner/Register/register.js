@@ -83,8 +83,8 @@ function Register() {
     };
 
     return (
-        <div className="p-4 d-flex justify-content-center align-items-center body">
-            <div className="register-container my-4 pt-5 pb-2 shadow-lg">
+        <div className="d-flex justify-content-center align-items-center body">
+            <div className="register-container shadow-lg">
                 <h1 className="text-center mt-3 mb-3 fs-1">Create account!</h1>
 
                 {/* Alert Section */}

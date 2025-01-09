@@ -16,33 +16,76 @@ const HotelDetails = () => {
 
     const currency = useSelector((state) => state.currency.currency);
     const exchangeRate = useSelector((state) => state.currency.exchangeRate);
+
+    const newCurrency = useRef("VND");
+
+    const [roomPrice1, setRoomPrice1] = useState(0);
+    const [roomPrice2, setRoomPrice2] = useState(0);
     const [roomPrice1Now, setRoomPrice1Now] = useState(0);
     const [roomPrice2Now, setRoomPrice2Now] = useState(0);
-    const newCurrency = useRef("VND");
-    const roomPrice1 = useRef(0);
-    const roomPrice2 = useRef(0);
 
-    const handleChangeCurrency = useCallback(() => {
-        if (currency !== newCurrency.current) {
-            if (currency === "VND") {
-                setRoomPrice1Now(roomPrice1.current);
-                setRoomPrice2Now(roomPrice2.current);
-            } else {
-                setRoomPrice1Now(
-                    convertCurrency(roomPrice1Now, newCurrency.current, currency, exchangeRate)
-                );
-                setRoomPrice2Now(
-                    convertCurrency(roomPrice2Now, newCurrency.current, currency, exchangeRate)
-                );
-            }
-
-            newCurrency.current = currency;
-        }
-    }, [currency, exchangeRate, roomPrice1, roomPrice1Now, roomPrice2, roomPrice2Now]);
+    const convertPrice = useCallback(
+        (price, fromCurrency, toCurrency) => {
+            if (toCurrency === "VND") return price;
+            return convertCurrency(price, fromCurrency, toCurrency, exchangeRate);
+        },
+        [exchangeRate]
+    );
 
     useEffect(() => {
-        handleChangeCurrency();
-    }, [currency, handleChangeCurrency]);
+        if (currency !== newCurrency.current) {
+            if (currency === "VND") {
+                setRoomPrice1Now(roomPrice1);
+                setRoomPrice2Now(roomPrice2);
+            } else {
+                setRoomPrice1Now(convertPrice(roomPrice1, "VND", currency));
+                setRoomPrice2Now(convertPrice(roomPrice2, "VND", currency));
+            }
+            newCurrency.current = currency;
+        }
+    }, [currency, roomPrice1, roomPrice2, convertPrice]);
+
+    const handleSearch = useCallback(async (data) => {
+        const { startDate, endDate, numOfPeople } = data;
+
+        try {
+            const response = await getHotelDetail(id, {
+                checkInDate: startDate,
+                checkOutDate: endDate,
+                roomType2: numOfPeople.roomType2 || 1,
+                roomType4: numOfPeople.roomType4 || 1,
+            });
+
+            console.log(">>> Hotel detail: ", response.data);
+
+            // roomPrice1.current = response.data.room_types[0].price;
+            setRoomPrice1(response.data.room_types[0].price);
+            if (checkWeekend(startDate) || checkWeekend(endDate)) {
+                setRoomPrice1Now(response.data.room_types[0].weekend_price);
+            } else {
+                setRoomPrice1Now(response.data.room_types[0].price);
+            }
+
+            // roomPrice2.current = response.data.room_types[1].price;
+            setRoomPrice2(response.data.room_types[1].price);
+            if (checkWeekend(startDate) || checkWeekend(endDate)) {
+                setRoomPrice2Now(response.data.room_types[1].weekend_price);
+            } else {
+                setRoomPrice2Now(response.data.room_types[1].price);
+            }
+
+            setRoomCounts({
+                [response.data.room_types[0].id]: numOfPeople.roomType2 || 1,
+                [response.data.room_types[1].id]: numOfPeople.roomType4 || 1,
+            });
+
+            setHotelDetails(response.data);
+        } catch (error) {
+            console.error(">>> Error: ", error);
+
+            toast.error("Error while searching hotel detail");
+        }
+    }, []);
 
     // const [roomPrice1, setRoomPrice1] = useState(0);
     // const [roomPrice2, setRoomPrice2] = useState(0);
@@ -105,17 +148,28 @@ const HotelDetails = () => {
                 );
                 const data = await response.json();
                 if (data.status_code === 200) {
-                    // Lưu giá phòng hiện tại để chuyển đổi tiền tệ
-                    roomPrice1.current = data.data.room_types[0].price;
-                    roomPrice2.current = data.data.room_types[1].price;
+                    const room1 = data.data.room_types[0];
+                    const room2 = data.data.room_types[1];
 
-                    if (checkWeekend(checkInDate) || checkWeekend(checkOutDate)) {
-                        setRoomPrice1Now(data.data.room_types[0].weekend_price);
-                        setRoomPrice2Now(data.data.room_types[1].weekend_price);
+                    setRoomPrice1(room1.price);
+                    setRoomPrice2(room2.price);
+
+                    const isWeekendDay = checkWeekend(checkInDate) || checkWeekend(checkOutDate);
+                    const initialPrice1 = isWeekendDay ? room1.weekend_price : room1.price;
+                    const initialPrice2 = isWeekendDay ? room2.weekend_price : room2.price;
+
+                    if (currency === "VND") {
+                        setRoomPrice1Now(initialPrice1);
+                        setRoomPrice2Now(initialPrice2);
                     } else {
-                        setRoomPrice1Now(data.data.room_types[0].price);
-                        setRoomPrice2Now(data.data.room_types[1].price);
+                        setRoomPrice1Now(convertPrice(initialPrice1, "VND", currency));
+                        setRoomPrice2Now(convertPrice(initialPrice2, "VND", currency));
                     }
+
+                    setRoomCounts({
+                        [room1.id]: roomType2 || 1,
+                        [room2.id]: roomType4 || 1,
+                    });
 
                     setHotelDetails(data.data);
                 } else {
@@ -226,12 +280,12 @@ const HotelDetails = () => {
                 <div className="my-5 search">
                     <SearchBarNoLocation
                         border-radius={12}
-                        // searchData={{
-                        //     startDate: checkInDate,
-                        //     endDate: checkOutDate,
-                        //     numOfPeople: numOfPeople,
-                        // }}
-                        // handleSearch={handleSearch}
+                        searchData={{
+                            startDate: checkInDate,
+                            endDate: checkOutDate,
+                            numOfPeople: numOfPeople,
+                        }}
+                        handleSearch={handleSearch}
                     />
                 </div>
                 <div className="px-2 my-5 py-5">

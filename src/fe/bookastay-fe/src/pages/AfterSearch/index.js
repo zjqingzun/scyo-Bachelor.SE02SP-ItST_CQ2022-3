@@ -42,7 +42,7 @@ const AfterSearch = () => {
             return;
         }
 
-        const { destination, startDate, endDate, numOfPeople } = location.state || {};
+        isFetching.current = true;
         setIsLoaded(true);
 
         try {

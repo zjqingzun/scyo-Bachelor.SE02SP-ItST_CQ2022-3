@@ -1,3 +1,6 @@
+import { format } from "date-fns";
+import { enUS, vi } from "date-fns/locale";
+
 const addDays = (date, days) => {
     const result = new Date(date);
     result.setDate(result.getDate() + days);
@@ -21,4 +24,23 @@ const formatDate = (date, formatType = "dd/mm/yyyy") => {
     }
 };
 
-export { addDays, formatDate };
+const formatCheckInOutDate = (dateString, locale = "vi") => {
+    const date = new Date(dateString);
+    const locales = {
+        vi,
+        en: enUS,
+    };
+
+    const dayOfWeek = format(date, "EEEE", { locale: locales[locale] });
+    const day = format(date, "dd", { locale: locales[locale] });
+    const month = format(date, "MMMM", { locale: locales[locale] });
+    const year = format(date, "yyyy", { locale: locales[locale] });
+
+    if (locale === "vi") {
+        return `${dayOfWeek}, ${day} tháng ${month}, ${year}`;
+    }
+
+    return `${dayOfWeek}, ${month} ${day}, ${year}`;
+};
+
+export { addDays, formatDate, formatCheckInOutDate };

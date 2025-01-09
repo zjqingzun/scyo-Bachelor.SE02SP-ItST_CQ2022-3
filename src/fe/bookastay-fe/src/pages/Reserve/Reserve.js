@@ -1,4 +1,4 @@
- import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DatePicker from "rsuite/DatePicker";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
@@ -14,6 +14,10 @@ import "rsuite/DatePicker/styles/index.css";
 import images from "~/assets/image";
 import icons from "~/assets/icon";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import { getHotelDetail } from "~/services/apiService";
+import { useLocation } from "react-router-dom";
+import { formatCheckInOutDate } from "~/utils/datetime";
 
 const StyledStepLabel = styled.div`
     font-size: 2.8rem;
@@ -24,20 +28,63 @@ const StyledStepLabel = styled.div`
 
 const Reserve = () => {
     const { t } = useTranslation();
+    const location = useLocation();
+
+    const userInfo = useSelector((state) => state.account.userInfo);
+
+    const {
+        hotelId,
+        checkInDate,
+        checkOutDate,
+        roomType2,
+        roomType4,
+        rooms,
+        sumPrice,
+        type2Price,
+        type4Price,
+        userId,
+        numberOfRoom2,
+        numberOfRoom4,
+    } = location.state || {};
+
+    const [hotelDetail, setHotelDetail] = useState(null);
+
+    useEffect(() => {
+        const fetchHotelDetail = async () => {
+            try {
+                // console.log(hotelId, checkInDate, checkOutDate, numberOfRoom2, numberOfRoom4);
+
+                const response = await getHotelDetail(hotelId, {
+                    checkInDate,
+                    checkOutDate,
+                    roomType2: numberOfRoom2,
+                    roomType4: numberOfRoom4,
+                });
+
+                // console.log(response.data);
+
+                setHotelDetail(response.data);
+            } catch (error) {
+                toast.error("Failed to get hotel detail");
+            }
+        };
+
+        fetchHotelDetail();
+    }, [location.state]);
 
     const formik = useFormik({
         initialValues: {
-            firstName: "",
-            lastName: "",
-            email: "",
-            phone: "",
+            name: userInfo?.name || "",
+            cccd: userInfo?.cccd || "",
+            email: userInfo?.email || "",
+            phone: userInfo?.phone || "",
             discount: "",
             specialRequest: "",
             arrivalTime: new Date(),
         },
         validationSchema: Yup.object({
-            firstName: Yup.string().required("First name is required"),
-            lastName: Yup.string().required("Last name is required"),
+            name: Yup.string().required("Name is required"),
+            cccd: Yup.string().required("CCCD is required"),
             email: Yup.string()
                 .matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Invalid email format")
                 .required("Email is required"),
@@ -46,8 +93,8 @@ const Reserve = () => {
         onSubmit: (values) => {
             persistData.current = {
                 ...persistData.current,
-                firstName: values.firstName,
-                lastName: values.lastName,
+                name: values.name,
+                cccd: values.cccd,
                 email: values.email,
                 phone: values.phone,
                 discount: values.discount,
@@ -60,8 +107,8 @@ const Reserve = () => {
     const [paymentMethod, setPaymentMethod] = useState("momo");
 
     const persistData = useRef({
-        firstName: "",
-        lastName: "",
+        name: "",
+        cccd: "",
         email: "",
         phone: "",
         discount: "",
@@ -160,7 +207,8 @@ const Reserve = () => {
                         <div className="reserve-container">
                             {currentStep === 2 && (
                                 <>
-                                    <h2>Enter your details</h2>
+                                    {/* <h2>Enter your details</h2> */}
+                                    <h2>{t("reserve.detailHeader")}</h2>
 
                                     <form className="mt-5" onSubmit={formik.handleSubmit}>
                                         <div className="row row-cols-1 row-cols-lg-2">
@@ -170,25 +218,25 @@ const Reserve = () => {
                                                         htmlFor="reserveFirstNameInput"
                                                         className="form-label"
                                                     >
-                                                        First name:{" "}
+                                                        {t("reserve.name")}:{" "}
                                                         <span className="red-dot">*</span>
                                                     </label>
                                                     <input
                                                         type="text"
                                                         name="firstName"
-                                                        value={formik.values.firstName}
+                                                        value={formik.values.name}
                                                         onChange={formik.handleChange}
                                                         className={`form-control form-control-lg fs-4  ${
-                                                            formik.errors.firstName &&
-                                                            formik.touched.firstName
+                                                            formik.errors.name &&
+                                                            formik.touched.name
                                                                 ? "is-invalid"
                                                                 : ""
                                                         }`}
                                                         id="reserveFirstNameInput"
-                                                        placeholder="Enter your first name"
+                                                        placeholder="Enter your name"
                                                     />
                                                     <div className="invalid-feedback">
-                                                        {formik.errors.firstName}
+                                                        {formik.errors.name}
                                                     </div>
                                                 </div>
                                             </div>
@@ -198,25 +246,25 @@ const Reserve = () => {
                                                         htmlFor="reserveLastNameInput"
                                                         className="form-label"
                                                     >
-                                                        Last name:{" "}
+                                                        {t("reserve.identityNumber")}:{" "}
                                                         <span className="red-dot">*</span>
                                                     </label>
                                                     <input
                                                         type="text"
                                                         name="lastName"
-                                                        value={formik.values.lastName}
+                                                        value={formik.values.cccd}
                                                         onChange={formik.handleChange}
                                                         className={`form-control form-control-lg fs-4  ${
-                                                            formik.errors.lastName &&
-                                                            formik.touched.lastName
+                                                            formik.errors.cccd &&
+                                                            formik.touched.cccd
                                                                 ? "is-invalid"
                                                                 : ""
                                                         }`}
                                                         id="reserveLastNameInput"
-                                                        placeholder="Enter your last name"
+                                                        placeholder="Enter your cccd"
                                                     />
                                                     <div className="invalid-feedback">
-                                                        {formik.errors.lastName}
+                                                        {formik.errors.cccd}
                                                     </div>
                                                 </div>
                                             </div>
@@ -227,7 +275,8 @@ const Reserve = () => {
                                                 htmlFor="reserveEmailInput"
                                                 className="form-label"
                                             >
-                                                Email: <span className="red-dot">*</span>
+                                                {t("reserve.email")}:{" "}
+                                                <span className="red-dot">*</span>
                                             </label>
                                             <input
                                                 type="email"
@@ -254,7 +303,8 @@ const Reserve = () => {
                                                         htmlFor="reservePhoneInput"
                                                         className="form-label"
                                                     >
-                                                        Phone: <span className="red-dot">*</span>
+                                                        {t("reserve.phone")}:{" "}
+                                                        <span className="red-dot">*</span>
                                                     </label>
                                                     <input
                                                         type="text"
@@ -318,7 +368,7 @@ const Reserve = () => {
                                                 className="form-label"
                                                 htmlFor="reserveSpecialRequestTextarea"
                                             >
-                                                Special request (optional):
+                                                {t("reserve.specialRequests")}:
                                             </label>
                                             <textarea
                                                 className="form-control fs-4 "
@@ -364,7 +414,7 @@ const Reserve = () => {
 
                             {currentStep === 3 && (
                                 <>
-                                    <h2>Choose your payment method</h2>
+                                    <h2>{t("reserve.paymentHeader")}</h2>
 
                                     <div className="mt-5">
                                         <div className="d-flex align-items-center justify-content-between">
@@ -408,7 +458,7 @@ const Reserve = () => {
                                                     className="form-check-label ms-5"
                                                     htmlFor="cashMethod"
                                                 >
-                                                    Cash
+                                                    {t("reserve.cash")}
                                                 </label>
                                             </div>
 
@@ -426,7 +476,7 @@ const Reserve = () => {
                                     style={{ background: "#227B94" }}
                                     onClick={() => handlePrev()}
                                 >
-                                    Back
+                                    {t("reserve.back")}
                                 </button>
 
                                 {!isComplete && (
@@ -435,7 +485,9 @@ const Reserve = () => {
                                         style={{ background: "#227B94" }}
                                         onClick={() => handleNext()}
                                     >
-                                        {currentStep === stepsConfig.length ? "Finish" : "Next"}
+                                        {currentStep === stepsConfig.length
+                                            ? t("reserve.finish")
+                                            : t("reserve.next")}
                                     </button>
                                 )}
                             </div>
@@ -446,30 +498,30 @@ const Reserve = () => {
                         <div className="row row-cols-1 gy-4">
                             <div className="col">
                                 <div className="reserve-container">
-                                    <h3>Your booking details</h3>
+                                    <h3>{t("reserve.bookingHeader")}</h3>
 
                                     <div className="separate my-4 mx-0"></div>
 
                                     {/* Hotel info */}
                                     <div>
                                         <div className="d-flex align-items-center gap-4 mb-1">
-                                            <span className="fw-lighter">Khách sạn</span>
+                                            <span className="fw-lighter">{t("reserve.hotel")}</span>
                                             <div className="d-flex gap-1">
-                                                {[...Array(5)].map((_, index) => (
-                                                    <img
-                                                        style={{ width: 20 }}
-                                                        key={index}
-                                                        src={icons.yellowStarIcon}
-                                                        alt="star"
-                                                        className="hotel-card__star-icon"
-                                                    />
-                                                ))}
+                                                {[...Array(hotelDetail?.star ?? 0)].map(
+                                                    (_, index) => (
+                                                        <img
+                                                            style={{ width: 20 }}
+                                                            key={index}
+                                                            src={icons.yellowStarIcon}
+                                                            alt="star"
+                                                            className="hotel-card__star-icon"
+                                                        />
+                                                    )
+                                                )}
                                             </div>
                                         </div>
-                                        <h2>The Noble Swan Wood Park Hotel</h2>
-                                        <p className="fw-light mt-3">
-                                            217 Phạm Ngũ Lão, Quận 1, TP. Hồ Chí Minh, Việt Nam
-                                        </p>
+                                        <h2>{hotelDetail?.name}</h2>
+                                        <p className="fw-light mt-3">{hotelDetail?.address}</p>
                                     </div>
                                     {/* Detail */}
                                     <div>
@@ -477,7 +529,10 @@ const Reserve = () => {
                                             <div>
                                                 <span>Check-in</span>
                                                 <h4 className="mt-2 fs-3 fw-bold">
-                                                    T7, 28 tháng 6 2025
+                                                    {formatCheckInOutDate(
+                                                        checkInDate,
+                                                        localStorage.getItem("i18nextLng")
+                                                    )}
                                                 </h4>
                                             </div>
 
@@ -486,7 +541,10 @@ const Reserve = () => {
                                             <div>
                                                 <span>Check-out</span>
                                                 <h4 className="mt-2 fs-3 fw-bold">
-                                                    CN, 29 tháng 6 2025
+                                                    {formatCheckInOutDate(
+                                                        checkOutDate,
+                                                        localStorage.getItem("i18nextLng")
+                                                    )}
                                                 </h4>
                                             </div>
                                         </div>
@@ -497,9 +555,11 @@ const Reserve = () => {
                                     <div>
                                         <div className="d-flex align-items-center justify-content-between">
                                             <div>
-                                                <span className="fs-4  fw-medium">Bạn đã chọn</span>
+                                                <span className="fs-4  fw-medium">
+                                                    {t("reserve.yourChoice")}
+                                                </span>
                                                 <p className="fs-3 fw-bold">
-                                                    3 phòng cho 2 người lớn
+                                                    3 {t("reserve.rooms")}
                                                 </p>
                                             </div>
 
@@ -526,7 +586,7 @@ const Reserve = () => {
                                     </div>
                                     <a href="#!">
                                         <span className="reserve-page__change">
-                                            Đổi lựa chọn của bạn
+                                            {t("reserve.changeYourChoice")}
                                         </span>
                                     </a>
                                 </div>
@@ -534,22 +594,22 @@ const Reserve = () => {
 
                             <div className="col">
                                 <div className="reserve-container">
-                                    <h3>Price Summary</h3>
+                                    <h3>{t("reserve.summaryHeader")}</h3>
 
                                     <div className="separate mx-0 my-3"></div>
 
                                     <div className="d-flex justify-content-between">
-                                        <span>Original price</span>
+                                        <span>{t("reserve.originalPrice")}</span>
                                         <span className="ms-3">540,000VND</span>
                                     </div>
 
                                     <div className="d-flex justify-content-between">
-                                        <span>Discount</span>
+                                        <span>{t("reserve.discount")}</span>
                                         <span className="ms-3">-40,000VND</span>
                                     </div>
 
                                     <div className="d-flex justify-content-between mt-5 fs-4  fw-bold">
-                                        <span>Total</span>
+                                        <span>{t("reserve.totalPrice")}</span>
                                         <span className="ms-3">500,000VND</span>
                                     </div>
                                 </div>

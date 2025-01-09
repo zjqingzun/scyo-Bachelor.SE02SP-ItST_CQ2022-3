@@ -58,5 +58,30 @@
         "hours": "Giờ",
         "minutes": "Phút",
         "seconds": "Giây"
+    },
+    "reserve": {
+        "detailHeader": "Nhập thông tin của bạn",
+        "name": "Tên",
+        "email": "Email",
+        "phone": "Phone",
+        "identityNumber": "CCCD/CMND",
+        "specialRequests": "Yêu cầu đặc biệt - không bắt buộc",
+        "paymentHeader": "Chọn phương thức thanh toán",
+        "cash": "Thanh toán khi nhận phòng",
+        "back": "Quay lại",
+        "next": "Tiếp",
+        "finish": "Hoàn tất",
+        "bookingHeader": "Thông tin đặt phòng của bạn",
+        "hotel": "Khách sạn",
+        "yourChoice": "Bạn đã chọn",
+        "room": "Phòng",
+        "rooms": "Phòng",
+        "changeYourChoice": "Đổi lựa chọn của bạn",
+        "summaryHeader": "Tóm tắt giá",
+        "originalPrice": "Giá gốc",
+        "discount": "Giảm giá",
+        "totalPrice": "Tổng giá",
+        "double": "Phòng đôi",
+        "quadruple": "Phòng bốn người"
     }
 }

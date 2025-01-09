@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateHotelDto } from './dto/create-hotel.dto';
 import { UpdateHotelDto } from './dto/update-hotel.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,6 +12,10 @@ import { MinioService } from '@/minio/minio.service';
 import { NotFoundException } from '@nestjs/common';
 import { SearchHotelDto } from './dto/search-hotel.dto';
 import { DetailHotelDto } from './dto/detail-hotel.dto';
+import { ConfigService } from '@nestjs/config';
+import { ImageService } from '../image/image.service';
+import { LocationsService } from '../location/locations.service';
+import { Location } from '../location/entities/location.entity';
 
 
 @Injectable()
@@ -23,6 +27,8 @@ export class HotelsService {
     @InjectRepository(Hotel)
     private readonly hotelRepository: Repository<Hotel>,
 
+    private readonly imageService: ImageService,
+
     @InjectRepository(Room)
     private readonly roomRepository: Repository<Room>,
 
@@ -30,6 +36,7 @@ export class HotelsService {
     private readonly roomTypeRepository: Repository<RoomType>,
 
     private readonly minioService: MinioService,
+    private readonly locationService: LocationsService
   ) { }
 
   create(createHotelDto: CreateHotelDto) {
@@ -503,6 +510,83 @@ export class HotelsService {
       };
     } catch (error) {
       console.error('Error in findOne method:', error);
+      throw new HttpException(
+        {
+          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error. Please try again later.',
+          error: error.message || 'Unknown error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async addBasicInfo(createHotelDto : CreateHotelDto, userId : string) {
+    const hotel = {...createHotelDto, ownerId: userId, discount: 0};
+    const location = {
+      name: hotel.ward,
+      district: hotel.district,
+      city: hotel.city,
+      detailAddress: hotel.detailAddress
+    };
+    try {
+      const queryBuilder = await this.hotelRepository.createQueryBuilder()
+        .insert()
+        .into('hotel')
+        .values({
+          name: hotel.name,
+          description: hotel.description,
+          discount: hotel.discount,
+          owner: {id: hotel.ownerId},
+          phone: hotel.phone,
+          email: hotel.email,
+          star: hotel.star,
+        })
+        .execute();
+
+      const hotelId = queryBuilder.raw[0].id;
+      const locationId = await (await this.locationService.add(location)).raw[0].id;
+
+      const queryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.manager.query(`
+        INSERT INTO hotels_locations("hotelId", "locationId")
+        VALUES (${hotelId}, ${locationId})  
+      `);
+
+      queryRunner.release();
+      
+      return {
+        status: 200,
+        message: "Successfully",
+        hotel: hotelId
+      }
+    } catch (error) {
+      console.error('Error when add basic info for hotel:', error);
+      throw new HttpException(
+        {
+          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error. Please try again later.',
+          error: error.message || 'Unknown error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async uploadImages(images : Express.Multer.File[], hotelId : string) {
+    try {
+      const hotel = await this.hotelRepository.findOneBy({ id: +hotelId });
+      if (!hotel) {
+        throw new BadRequestException('Hotel does not exist');
+      }
+      const res = await this.imageService.uploadHotelImages(images, hotel);
+      return {
+        status: 200,
+        message: "Successfully",
+        images: res
+      }
+    } catch (error) {
+      console.error('Error when upload hotel images:', error);
       throw new HttpException(
         {
           status_code: HttpStatus.INTERNAL_SERVER_ERROR,

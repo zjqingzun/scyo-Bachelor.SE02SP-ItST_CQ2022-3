@@ -1,0 +1,43 @@
+<<<<<<< HEAD
+import { OmitType, PartialType } from "@nestjs/mapped-types";
+import { CreateUserDto } from "./create-user.dto";
+import { IsNotEmpty } from "class-validator";
+import { Transform } from "class-transformer";
+import * as moment from "moment";
+=======
+import { OmitType, PartialType } from '@nestjs/mapped-types';
+import { CreateUserDto } from './create-user.dto';
+import { IsNotEmpty } from 'class-validator';
+import { Transform } from 'class-transformer';
+import moment from 'moment';
+>>>>>>> 381726d3c32819a06c7a2e1e16a2922161e95c4a
+
+export class UpdateUserDto extends OmitType(PartialType(CreateUserDto), [
+  'password',
+]) {
+  @IsNotEmpty()
+  id: number;
+
+<<<<<<< HEAD
+    name?: string;
+    email?: string;
+    phone?: string;
+
+    @Transform(({ value }) => {
+        return moment(value, "DD/MM/YYYY").toDate()})
+    dob?: Date;
+    cccd?: string;
+}
+=======
+  name?: string;
+  email?: string;
+  phone?: string;
+
+  @Transform(({ value }) => {
+    return moment(value, 'DD/MM/YYYY').toDate();
+  })
+  dob?: Date;
+
+  cccd?: string;
+}
+>>>>>>> 381726d3c32819a06c7a2e1e16a2922161e95c4a

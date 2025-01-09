@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateHotelDto } from './dto/create-hotel.dto';
 import { UpdateHotelDto } from './dto/update-hotel.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 
 import { Hotel } from './entities/hotel.entity';
 import { RoomType } from '../room_type/entites/room_type.entity';
@@ -18,6 +18,8 @@ import { DetailHotelDto } from './dto/detail-hotel.dto';
 export class HotelsService {
 
   constructor(
+    private dataSource : DataSource,
+
     @InjectRepository(Hotel)
     private readonly hotelRepository: Repository<Hotel>,
 
@@ -34,8 +36,43 @@ export class HotelsService {
     return 'This action adds a new hotel';
   }
 
-  findAll() {
-    return `This action returns all hotels`;
+  async findAll(req) {
+    try {
+      const {page = 1, limit = 5, sortBy = 'id', order = 'ASC', searchTerm} = req.query;
+      const queryBuilder = this.hotelRepository.createQueryBuilder('hotel')
+          .select([
+              'hotel.id',
+              'hotel.name',
+              'u.name',
+              'l.*'
+          ])
+          .innerJoin('hotels_locations', 'hl', 'hl."hotelId" = hotel.id')
+          .innerJoin('user', 'u', 'u.id = hotel."ownerId"')
+          .innerJoin('location', 'l', 'l.id = hl."localtionId"');
+
+      queryBuilder.orderBy(`hotel.${sortBy}`, order === 'ASC' ? 'ASC' : 'DESC');
+
+      const [hotels, total] = await queryBuilder
+          .take(+limit)
+          .skip((+page - 1) * +limit)
+          .getManyAndCount();
+      return {
+        page: page,
+        per_page: limit,
+        total,
+        total_pages: Math.ceil(total / +limit),
+        hotels
+      };
+    } catch (error) {
+      console.error('Error fetching all hotels:', error);
+      throw new HttpException(
+        {
+          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   update(id: number, updateHotelDto: UpdateHotelDto) {
@@ -47,7 +84,7 @@ export class HotelsService {
   }
 
   // HOME - TOP 10 RATING HOTEL BY REVIEW
-  async getTopTenRatingHotel() {
+  async getTopTenRatingHotel(userId: number) {
     try {
       const queryBuilder = await this.hotelRepository
         .createQueryBuilder('hotel')
@@ -75,6 +112,17 @@ export class HotelsService {
 
       const result = await Promise.all(
         hotels.map(async (hotel) => {
+          let isFav = false;
+          if (userId) {
+            const queryRunner = this.dataSource.createQueryRunner();
+            const res = await queryRunner.query(`
+              SELECT *
+              FROM "user_favouriteHotel" where "hotelId" = ${hotel.id}
+            `);
+              if (res.length > 0) {
+                isFav = true;
+              }
+          }
           const presignedImages = await Promise.all(
             hotel.images.map((url) => {
               if (url.startsWith("https://cf.bstatic.com/xdata")) {
@@ -87,6 +135,7 @@ export class HotelsService {
 
           return {
             id: hotel.id,
+            isFav,
             name: hotel.name,
             star: hotel.star,
             address: hotel.address,
@@ -117,7 +166,7 @@ export class HotelsService {
   }
 
   // SEARCH - SEARCH HOTEL 
-  async findAvailableHotels(searchHotelDto: SearchHotelDto) {
+  async findAvailableHotels(searchHotelDto: SearchHotelDto, userId : number) {
     const { city, checkInDate, checkOutDate, roomType2, roomType4, minRating, minStar, minPrice, maxPrice, page, per_page } = searchHotelDto;
     // console.log('DTO: ', searchHotelDto);
 
@@ -256,6 +305,17 @@ export class HotelsService {
       // const hotels = await queryBuilder.getRawMany();
       const result = await Promise.all(
         hotels.map(async (hotel) => {
+          let isFav = false;
+          if (userId) {
+            const queryRunner = this.dataSource.createQueryRunner();
+            const res = await queryRunner.query(`
+              SELECT *
+              FROM "user_favouriteHotel" where "hotelId" = ${hotel.id}
+            `);
+              if (res.length > 0) {
+                isFav = true;
+              }
+          }
           const presignedImages = await Promise.all(
             hotel.images.map((url) => {
               if (url.startsWith("https://cf.bstatic.com/xdata")) {
@@ -268,6 +328,7 @@ export class HotelsService {
 
           return {
             id: hotel.id,
+            isFav,
             name: hotel.name,
             star: hotel.star,
             address: hotel.address,

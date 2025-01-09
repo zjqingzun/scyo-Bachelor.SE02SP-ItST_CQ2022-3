@@ -19,8 +19,13 @@ export class Review {
     })
     createdAt: string
 
+    @Column({name: "userId"})
+    userId: number;
+
+    @Column({name: "hotelId"})
+    hotelId: number;
+
     @ManyToOne(() => User, (user) => user.reviews)
-    @JoinColumn({name: "userId"})
     user: User;
 
     @ManyToOne(() => Hotel, (hotel) => hotel.reviews)

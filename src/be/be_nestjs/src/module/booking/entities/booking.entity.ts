@@ -1,5 +1,6 @@
 import { Bill } from "@/module/bill/entities/bill.entity";
 import { BookingDetail } from "@/module/booking_detail/entities/booking_detail.entity";
+import { BookingRoom } from "@/module/booking_room/entities/booking_room.entity";
 import { Hotel } from "@/module/hotel/entities/hotel.entity";
 import { Payment } from "@/module/payment/entities/payment.entity";
 import { Room } from "@/module/room/entities/room.entity";
@@ -48,4 +49,7 @@ export class Booking {
 
     @OneToMany(() => BookingDetail, (bookingDetail) => bookingDetail.booking)
     bookingDetails: BookingDetail[];
+
+    @OneToMany(() => BookingRoom, (bookingRoom) => bookingRoom.booking)
+    bookingRooms: BookingRoom[];
 }

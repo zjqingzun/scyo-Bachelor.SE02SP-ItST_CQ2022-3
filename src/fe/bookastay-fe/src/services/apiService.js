@@ -32,8 +32,9 @@ const getHotels = async (
         minRating: 0,
         minStar: 0,
         page: 1,
-        per_page: 3,
-    }
+        per_page: 6,
+    },
+    userId
 ) => {
     const params = new URLSearchParams({
         city: query?.city || "",
@@ -46,14 +47,66 @@ const getHotels = async (
         minRating: query?.minRating || 0,
         minStar: query?.minStar || 0,
         page: query?.page || 1,
-        per_page: query?.per_page || 3,
+        per_page: query?.per_page || 6,
     });
 
-    return await axios.get(`/hotels/search?${params.toString()}`);
+    return await axios.get(`/hotels/search/${userId}?${params.toString()}`);
 };
 
-const getRecommendHotels = async () => {
-    return await axios.get(`/hotels/recommended-hotel`);
+// Homepage api
+const getRecommendHotels = async (userId) => {
+    return await axios.get(`/hotels/recommended-hotel/${userId}`);
 };
 
-export { userLogin, getProfile, getRefreshToken, userRegister, getHotels, getRecommendHotels };
+// FAV
+const addFavorite = async (userId, hotelId) => {
+    return await axios.get(`/user/addFav?userId=${userId}&hotelId=${hotelId}`);
+};
+
+const removeFavorite = async (userId, hotelId) => {
+    return await axios.get(`/user/deleteFav?userId=${userId}&hotelId=${hotelId}`);
+};
+
+const getAllFavorite = async ({ userId, page = 1, limit = 6, sortBy = "name", order = "ASC" }) => {
+    const params = new URLSearchParams({
+        userId: userId,
+        page: page || 1,
+        limit: limit || 6,
+        sortBy: sortBy || "name",
+        order: order || "ASC",
+    });
+
+    return await axios.get(`/user/fav?${params.toString()}`);
+};
+
+// Profile
+
+const updateProfile = async (data) => {
+    return await axios.post("/user/update", data);
+};
+
+const updateAvatar = async (email, file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return await axios.post(`/user/avatar/upload/${email}`, formData);
+};
+
+const getAvatarUrl = async (email) => {
+    return await axios.get(`/user/avatar/url/${email}`);
+};
+
+export {
+    userLogin,
+    getProfile,
+    getRefreshToken,
+    userRegister,
+    getHotels,
+    getRecommendHotels,
+    addFavorite,
+    removeFavorite,
+    getAllFavorite,
+    updateAvatar,
+    getAvatarUrl,
+    updateProfile,
+};

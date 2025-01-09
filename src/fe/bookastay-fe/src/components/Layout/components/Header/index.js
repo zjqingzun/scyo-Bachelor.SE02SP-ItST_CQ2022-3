@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
 import { Dropdown as BDropdown } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import { Drawer, Avatar, Dropdown } from "antd";
+import { Link, useNavigate } from "react-router-dom";
+import { Drawer, Avatar, Dropdown, Menu } from "antd";
 import { DownOutlined, LoginOutlined, SettingOutlined } from "@ant-design/icons";
 
 import icons from "~/assets/icon";
@@ -43,6 +43,7 @@ const Header = () => {
     const userInfo = useSelector((state) => state.account.userInfo);
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const [language, setLanguage] = useState("English");
 
@@ -68,9 +69,34 @@ const Header = () => {
         dispatch(setCurrency(currency, currencyValue));
     };
 
+    const handleNavigateLoginHotelOwner = (e) => {
+        e.preventDefault();
+        navigate("/hotel-owner/login");
+    };
+
     // console.log("currency", currency);
     // console.log("baseCurrency", baseCurrency);
 
+    const handleMenuClick = ({ key }) => {
+        switch (key) {
+            case "2":
+                navigate("/account-setting");
+                break;
+            case "3":
+                console.log("Billing clicked");
+                break;
+            case "4":
+                console.log("Settings clicked");
+                break;
+            case "5":
+                dispatch(doLogout());
+                break;
+            default:
+                break;
+        }
+    };
+
+    // Menu items
     const items = [
         {
             key: "1",
@@ -82,7 +108,17 @@ const Header = () => {
         },
         {
             key: "2",
-            label: "Profile",
+            label: (
+                <a
+                    href="#!"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        navigate("/account-setting");
+                    }}
+                >
+                    Profile
+                </a>
+            ),
             extra: "⌘P",
         },
         {
@@ -103,14 +139,16 @@ const Header = () => {
             key: "5",
             icon: <LoginOutlined />,
             label: (
-                <span
-                    onClick={() => {
+                <a
+                    href="#!"
+                    onClick={(e) => {
+                        e.preventDefault();
                         dispatch(doLogout());
                     }}
                     style={{ color: "#f5222d" }}
                 >
                     Logout
-                </span>
+                </a>
             ),
             extra: "⌘L",
         },
@@ -124,7 +162,13 @@ const Header = () => {
                 </Link>
 
                 <div className="header__actions">
-                    <a href="#!" className="header__list-property-btn d-none d-md-block">
+                    <a
+                        href="#!"
+                        className="header__list-property-btn d-none d-md-block"
+                        onClick={(e) => {
+                            handleNavigateLoginHotelOwner(e);
+                        }}
+                    >
                         {t("header.listYourProperty")}
                     </a>
 
@@ -219,7 +263,7 @@ const Header = () => {
                     </a> */}
 
                     {userInfo && userInfo.email ? (
-                        <Dropdown menu={{ items }}>
+                        <Dropdown menu={{ items }} trigger={["click"]}>
                             <Avatar
                                 style={{ cursor: "pointer" }}
                                 src={
@@ -231,7 +275,14 @@ const Header = () => {
                             </Avatar>
                         </Dropdown>
                     ) : (
-                        <a href="/login" className="header__sign-in-btn">
+                        <a
+                            href="#!"
+                            className="header__sign-in-btn"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                navigate("/login");
+                            }}
+                        >
                             {t("header.signIn")}
                         </a>
                     )}
@@ -260,7 +311,11 @@ const Header = () => {
                 </Link>
 
                 <div className="d-flex flex-column gap-3 mt-3">
-                    <a href="#!" className="header__list-property-btn">
+                    <a
+                        href="#!"
+                        className="header__list-property-btn"
+                        onClick={(e) => handleNavigateLoginHotelOwner(e)}
+                    >
                         {t("header.listYourProperty")}
                     </a>
 

@@ -1,25 +1,43 @@
-import React, { useState } from "react";
-import './account.css';
+import React, { useEffect, useRef, useState } from "react";
+import "./account.css";
 import getFontSizes from "antd/es/theme/themes/shared/genFontSizes";
+import { useDispatch, useSelector } from "react-redux";
+import { DatePicker, Space } from "antd";
+import locale from "antd/es/date-picker/locale/vi_VN";
+
+import { formatDate } from "~/utils/datetime";
+import { updateAvatar, updateProfile } from "~/services/apiService";
+import dayjs from "dayjs";
+import { doGetAccount } from "~/redux/action/accountAction";
 
 const AccountSetting = () => {
+    const dispatch = useDispatch();
+    const userInfo = useSelector((state) => state.account.userInfo);
+
     const [isModalOpen, setModalOpen] = useState(false);
     const [currentField, setCurrentField] = useState("");
     const [currentValue, setCurrentValue] = useState("");
     const [personalDetails, setPersonalDetails] = useState({
-        name: "Tran Thao Ngan",
-        email: "ndjncscjdj@gmail.com",
-        phone: "0192837465",
-        dob: "01/01/2000",
-        identify: "123456789412",
+        avatar:
+            userInfo?.avatar || "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png",
+        name: userInfo?.name || "Tran Thao Ngan",
+        email: userInfo?.email || "ndjncscjdj@gmail.com",
+        phone: userInfo?.phone || "0192837465",
+        dob: userInfo?.dob || "01/01/2000",
+        identify: userInfo?.cccd || "123456789412",
         password: "**********",
     });
+
+    const fileRef = useRef(null);
 
     // Hàm mở modal
     const openModal = (field, value) => {
         setCurrentField(field);
         setCurrentValue(value);
-        setModalOpen(true);
+
+        if (field !== "dob") {
+            setModalOpen(true);
+        }
     };
 
     // Hàm đóng modal
@@ -30,107 +48,236 @@ const AccountSetting = () => {
     };
 
     // Hàm lưu thay đổi
-    const handleSave = () => {
+    const handleSave = async () => {
         if (currentField) {
+            const oldDetails = { ...personalDetails };
+
             setPersonalDetails((prevDetails) => ({
                 ...prevDetails,
                 [currentField]: currentValue,
             }));
+            // Gọi API cập nhật thông tin
+            let data = {
+                ...personalDetails,
+                [currentField]: currentValue,
+            };
+            data.id = userInfo.id;
+            data.cccd = data.identify;
+            data.dob = formatDate(data.dob);
+
+            delete data.password;
+            delete data.identify;
+            delete data.avatar;
+
+            const res = await updateProfile(data);
+
+            if (+res.status !== 201) {
+                setPersonalDetails(oldDetails);
+            } else {
+                dispatch(doGetAccount());
+            }
         }
         closeModal();
     };
 
+    const handleChangeAvatar = (e) => {
+        fileRef.current.click();
+
+        fileRef.current.onchange = async (e) => {
+            const file = e.target.files[0];
+
+            const res = await updateAvatar(userInfo.email, file);
+
+            dispatch(doGetAccount());
+        };
+    };
+
+    const handleChangeDate = (date, dateString) => {
+        setCurrentField("dob");
+        setCurrentValue(date);
+    };
+
+    useEffect(() => {
+        if (currentField === "dob") {
+            handleSave();
+        }
+    }, [currentField, currentValue]);
+
+    // render when userInfo is updated
+    useEffect(() => {
+        setPersonalDetails({
+            avatar: userInfo?.avatar || "",
+            name: userInfo?.name || "",
+            email: userInfo?.email || "",
+            phone: userInfo?.phone || "",
+            dob: userInfo?.dob || "",
+            identify: userInfo?.cccd || "",
+            password: "**********",
+        });
+    }, [userInfo]);
+
     return (
         <div className="m-5 py-5">
-            <h1 className="mb-5 mx-5">Account Setting</h1>
+            <div className="row">
+                <h1 className="mb-2 mt-3">Account Setting</h1>
+                <div className="col-9" style={{ marginTop: "40px", marginBottom: "40px" }}>
+                    {/* Personal Details */}
+                    <section className="p-5 shadow me-5">
+                        <h2>Personal details</h2>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>{personalDetails.name}</td>
+                                    <td style={{ textAlign: "right" }}>
+                                        <button
+                                            onClick={() => openModal("name", personalDetails.name)}
+                                        >
+                                            Edit
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Email address</td>
+                                    <td>{personalDetails.email}</td>
+                                    <td style={{ textAlign: "right" }}>
+                                        <button
+                                            onClick={() =>
+                                                openModal("email", personalDetails.email)
+                                            }
+                                        >
+                                            Edit
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Phone number</td>
+                                    <td>{personalDetails.phone}</td>
+                                    <td style={{ textAlign: "right" }}>
+                                        <button
+                                            onClick={() =>
+                                                openModal("phone", personalDetails.phone)
+                                            }
+                                        >
+                                            Edit
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Identify number</td>
+                                    <td>{personalDetails.identify}</td>
+                                    <td style={{ textAlign: "right" }}>
+                                        <button
+                                            onClick={() =>
+                                                openModal("dob", personalDetails.identify)
+                                            }
+                                        >
+                                            Edit
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Date of birth</td>
+                                    <td>
+                                        <Space
+                                            direction="vertical"
+                                            size={12}
+                                            style={{ marginBottom: "10px" }}
+                                        >
+                                            <DatePicker
+                                                value={dayjs(personalDetails.dob)}
+                                                locale={locale}
+                                                onChange={handleChangeDate}
+                                                size="large"
+                                                needConfirm
+                                                allowClear={false}
+                                            />
+                                        </Space>
+                                    </td>
+                                    {/* <td style={{ textAlign: "right" }}>
+                                        <button
+                                            onClick={() => openModal("dob", personalDetails.dob)}
+                                        >
+                                            Edit
+                                        </button>
+                                    </td> */}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
+                <div className="col-3 d-flex flex-column justify-content-center align-items-center">
+                    <div
+                        className="avatar-frame"
+                        style={{
+                            width: "200px",
+                            height: "200px",
+                            borderRadius: "50%",
+                        }}
+                    >
+                        <img
+                            src={
+                                personalDetails.avatar ||
+                                "https://scontent.fsgn8-1.fna.fbcdn.net/v/t39.30808-6/472219740_1936837300138014_2401011983813679479_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeG6Fmr-BAQKdhh2ewaDivFosRYc2nCLHvuxFhzacIse-2uRmjAejNA4nBgfdDmQzbIaTKDnhaICQ5oDE7fVkWm7&_nc_ohc=ErLnqiDVoKwQ7kNvgHBkrVN&_nc_oc=AdhkO5jqzhPpwYA7roi8a2CGbn7kVSeOIRWiPrMHuRs_QTvl56H3uNzS1Mm-oFM743ZOV0aJWNER-n3kweF_QClX&_nc_zt=23&_nc_ht=scontent.fsgn8-1.fna&_nc_gid=A5noT5KVoCb-elQhCLTXe85&oh=00_AYDVpELzxAX2_3rzhoAKLwi82sMDQ5wNtMuc42R9krOuCA&oe=67849507"
+                            }
+                            alt="Avatar"
+                            className="img-fluid shadow"
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                borderRadius: "50%",
+                            }}
+                        />
+                    </div>
+                    <button className="mt-2" onClick={(e) => handleChangeAvatar(e)}>
+                        Change
+                    </button>
+                    <input ref={fileRef} type="file" className="d-none" />
+                </div>
+            </div>
 
-            {/* Personal Details */}
-            <section className="p-5 mx-5 shadow" style={{ marginTop: "40px" }}>
-                <h2>Personal details</h2>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>Name</td>
-                            <td>{personalDetails.name}</td>
-                            <td style={{ textAlign: "right" }}>
-                                <button onClick={() => openModal("name", personalDetails.name)}>Edit</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Email address</td>
-                            <td>{personalDetails.email}</td>
-                            <td style={{ textAlign: "right" }}>
-                                <button onClick={() => openModal("email", personalDetails.email)}>Edit</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Phone number</td>
-                            <td>{personalDetails.phone}</td>
-                            <td style={{ textAlign: "right" }}>
-                                <button onClick={() => openModal("phone", personalDetails.phone)}>Edit</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Identify number</td>
-                            <td>{personalDetails.identify}</td>
-                            <td style={{ textAlign: "right" }}>
-                                <button onClick={() => openModal("dob", personalDetails.identify)}>Edit</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Date of birth</td>
-                            <td>{personalDetails.dob}</td>
-                            <td style={{ textAlign: "right" }}>
-                                <button onClick={() => openModal("dob", personalDetails.dob)}>Edit</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
-
-            {/* Security Settings */}
-            <section className="p-5 mx-5 shadow" style={{ marginTop: "60px", marginBottom: "50px" }}>
-                <h2>Security settings</h2>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                    <tbody>
-                        <tr>
-                            <td>Sign-in email</td>
-                            <td>{personalDetails.email}</td>
-                            <td style={{ textAlign: "right" }}>
-                                <button onClick={() => openModal("phone", personalDetails.email)}>Change</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Password</td>
-                            <td>********</td>
-                            <td style={{ textAlign: "right" }}>
-                                <button onClick={() => openModal("password", personalDetails.password)}>Edit</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Delete account</td>
-                            <td>Permanently delete your account</td>
-                            <td style={{ textAlign: "right" }}>
-                                <button style={{ color: "red" }}>Delete</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
+            <button
+                className="btn btn-danger my-5 fs-2"
+                style={{ padding: "8px 20px", borderRadius: "10px" }}
+            >
+                Delete account permanently
+            </button>
 
             {/* Modal */}
             {isModalOpen && (
                 <div style={modalStyles.overlay}>
                     <div style={modalStyles.modal}>
                         <h2 className="mb-4">Edit {currentField}</h2>
-                        <input
-                            type="text"
-                            value={currentValue}
-                            onChange={(e) => setCurrentValue(e.target.value)}
-                            style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
-                        />
-                        <button className="btn btn-primary fs-4 py-2 px-4" onClick={handleSave} style={modalStyles.buttonSave}>Save</button>
-                        <button className="btn btn-danger fs-4 py-2 px-4" onClick={closeModal} style={modalStyles.buttonCancel}>Cancel</button>
+                        {currentField !== "dob" ? (
+                            <input
+                                type="text"
+                                value={currentValue}
+                                onChange={(e) => setCurrentValue(e.target.value)}
+                                style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
+                            />
+                        ) : (
+                            <Space direction="vertical" size={12} style={{ marginBottom: "10px" }}>
+                                <DatePicker
+                                    locale={locale}
+                                    onChange={handleChangeDate}
+                                    needConfirm
+                                />
+                            </Space>
+                        )}
+                        <button
+                            className="btn btn-primary fs-4 py-2 px-4"
+                            onClick={handleSave}
+                            style={modalStyles.buttonSave}
+                        >
+                            Save
+                        </button>
+                        <button
+                            className="btn btn-danger fs-4 py-2 px-4"
+                            onClick={closeModal}
+                            style={modalStyles.buttonCancel}
+                        >
+                            Cancel
+                        </button>
                     </div>
                 </div>
             )}

@@ -1,6 +1,7 @@
 import { memo, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 import icons from "~/assets/icon";
@@ -13,6 +14,8 @@ import geocodeAddress from "~/utils/geocodeAddress";
 import staticImages from "~/assets/image";
 import "leaflet/dist/leaflet.css";
 import "./HotelCard.scss";
+import { addFavorite, getAllFavorite, removeFavorite } from "~/services/apiService";
+import { addDays, formatDate } from "~/utils/datetime";
 
 const HotelAfterSearchCard = ({
     name,
@@ -22,7 +25,34 @@ const HotelAfterSearchCard = ({
     averageRating: rating,
     totalReviews: review,
     star,
+    id,
+    description,
+    isFav,
+    checkInDate,
+    checkOutDate,
+    numOfPeople,
 }) => {
+    const navigate = useNavigate();
+    const handleBookNow = () => {
+        navigate(`/hotel/${id}`, {
+            state: {
+                id,
+                name,
+                address,
+                images,
+                price,
+                rating,
+                review,
+                star,
+                description,
+                isFav,
+                checkInDate: checkInDate || formatDate(new Date(), "yyyy-mm-dd"),
+                checkOutDate: checkOutDate || formatDate(addDays(new Date(), 2), "yyyy-mm-dd"),
+                numOfPeople: numOfPeople,
+            },
+        }); // Chuyển hướng đến route chi tiết khách sạn
+    };
+
     const { t } = useTranslation();
 
     const currency = useSelector((state) => state.currency.currency);
@@ -30,7 +60,7 @@ const HotelAfterSearchCard = ({
 
     const userInfo = useSelector((state) => state.account.userInfo);
 
-    const [isFavorite, setIsFavorite] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(isFav);
 
     const [nowPrice, setNowPrice] = useState(price);
 
@@ -65,10 +95,21 @@ const HotelAfterSearchCard = ({
     const handleShowMapModel = async (address) => {
         mapPositionRef.current = await geocodeAddress(address);
 
-        // console.log(mapPositionRef.current);
-
         setShowMapModal(true);
     };
+
+    // test get all favorite
+    // useEffect(() => {
+    //     if (userInfo.email) {
+    //         getAllFavorite({ userId: userInfo.id, page: 1, limit: 6, sortBy: "name", order: "ASC" })
+    //             .then((res) => {
+    //                 const favoriteList = res.data.hotels;
+    //                 const isFav = favoriteList.some((fav) => fav.id === id);
+    //                 setIsFavorite(isFav);
+    //             })
+    //             .catch((err) => console.log(err));
+    //     }
+    // }, [userInfo.email]);
 
     return (
         <div className="hotel-card hotel-card--after-search">
@@ -97,14 +138,22 @@ const HotelAfterSearchCard = ({
                 </Modal.Body>
             </Modal>
             <div className="hotel-card__image-wrap">
-                {userInfo.email && (
-                    <a href="#!" style={{ display: "block", height: "100%" }}>
-                        <img src={images[0]} alt={name} className="hotel-card__image" />
-                    </a>
-                )}
+                <a href="#!" style={{ display: "block", height: "100%" }}>
+                    <img src={images[0]} alt={name} className="hotel-card__image" />
+                </a>
 
-                <button onClick={() => setIsFavorite(!isFavorite)} className="hotel-card__favorite">
-                    {!isFavorite ? (
+                <button
+                    onClick={() => {
+                        if (isFavorite) {
+                            removeFavorite(userInfo.id, id);
+                        } else {
+                            addFavorite(userInfo.id, id);
+                        }
+                        setIsFavorite(!isFavorite);
+                    }}
+                    className={`hotel-card__favorite ${userInfo.email ? "" : "d-none"}`}
+                >
+                    {userInfo.email && !isFavorite && (
                         <svg
                             className="hotel-card__favorite-icon"
                             xmlns="http://www.w3.org/2000/svg"
@@ -112,7 +161,8 @@ const HotelAfterSearchCard = ({
                         >
                             <path d="M225.8 468.2l-2.5-2.3L48.1 303.2C17.4 274.7 0 234.7 0 192.8l0-3.3c0-70.4 50-130.8 119.2-144C158.6 37.9 198.9 47 231 69.6c9 6.4 17.4 13.8 25 22.3c4.2-4.8 8.7-9.2 13.5-13.3c3.7-3.2 7.5-6.2 11.5-9c0 0 0 0 0 0C313.1 47 353.4 37.9 392.8 45.4C462 58.6 512 119.1 512 189.5l0 3.3c0 41.9-17.4 81.9-48.1 110.4L288.7 465.9l-2.5 2.3c-8.2 7.6-19 11.9-30.2 11.9s-22-4.2-30.2-11.9zM239.1 145c-.4-.3-.7-.7-1-1.1l-17.8-20-.1-.1s0 0 0 0c-23.1-25.9-58-37.7-92-31.2C81.6 101.5 48 142.1 48 189.5l0 3.3c0 28.5 11.9 55.8 32.8 75.2L256 430.7 431.2 268c20.9-19.4 32.8-46.7 32.8-75.2l0-3.3c0-47.3-33.6-88-80.1-96.9c-34-6.5-69 5.4-92 31.2c0 0 0 0-.1 .1s0 0-.1 .1l-17.8 20c-.3 .4-.7 .7-1 1.1c-4.5 4.5-10.6 7-16.9 7s-12.4-2.5-16.9-7z" />
                         </svg>
-                    ) : (
+                    )}
+                    {userInfo.email && isFavorite && (
                         <svg
                             className="hotel-card__favorite-icon"
                             xmlns="http://www.w3.org/2000/svg"
@@ -174,7 +224,9 @@ const HotelAfterSearchCard = ({
                         </span>
                     </div>
 
-                    <button className="hotel-card__btn ms-auto">{t("hotelCard.BookNow")}</button>
+                    <button className="hotel-card__btn ms-auto" onClick={handleBookNow}>
+                        {t("hotelCard.BookNow")}
+                    </button>
                 </div>
             </div>
         </div>

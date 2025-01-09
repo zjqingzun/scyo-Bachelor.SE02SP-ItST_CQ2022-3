@@ -15,6 +15,8 @@ import geocodeAddress from "~/utils/geocodeAddress";
 import staticImages from "~/assets/image";
 import "leaflet/dist/leaflet.css";
 import "./HotelCard.scss";
+import { addFavorite, getAllFavorite, removeFavorite } from "~/services/apiService";
+import { addDays, formatDate } from "~/utils/datetime";
 
 const HotelAfterSearchCard = ({
     name,
@@ -25,7 +27,6 @@ const HotelAfterSearchCard = ({
     totalReviews: review,
     star,
     id,
-
 }) => {
     const location = useLocation();
 
@@ -57,7 +58,7 @@ const HotelAfterSearchCard = ({
 
     const userInfo = useSelector((state) => state.account.userInfo);
 
-    const [isFavorite, setIsFavorite] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(isFav);
 
     const [nowPrice, setNowPrice] = useState(price);
 
@@ -95,6 +96,19 @@ const HotelAfterSearchCard = ({
         setShowMapModal(true);
     };
 
+    // test get all favorite
+    // useEffect(() => {
+    //     if (userInfo.email) {
+    //         getAllFavorite({ userId: userInfo.id, page: 1, limit: 6, sortBy: "name", order: "ASC" })
+    //             .then((res) => {
+    //                 const favoriteList = res.data.hotels;
+    //                 const isFav = favoriteList.some((fav) => fav.id === id);
+    //                 setIsFavorite(isFav);
+    //             })
+    //             .catch((err) => console.log(err));
+    //     }
+    // }, [userInfo.email]);
+
     return (
         <div className="hotel-card hotel-card--after-search">
             <Modal centered show={showMapModal} onHide={handleCloseMapModel}>
@@ -127,7 +141,14 @@ const HotelAfterSearchCard = ({
                 </a>
 
                 <button
-                    onClick={() => setIsFavorite(!isFavorite)}
+                    onClick={() => {
+                        if (isFavorite) {
+                            removeFavorite(userInfo.id, id);
+                        } else {
+                            addFavorite(userInfo.id, id);
+                        }
+                        setIsFavorite(!isFavorite);
+                    }}
                     className={`hotel-card__favorite ${userInfo.email ? "" : "d-none"}`}
                 >
                     {userInfo.email && !isFavorite && (
@@ -204,7 +225,6 @@ const HotelAfterSearchCard = ({
                     <button className="hotel-card__btn ms-auto" onClick={handleBookNow}>
                         {t("hotelCard.BookNow")}
                     </button>
-
                 </div>
             </div>
         </div>

@@ -1,10 +1,15 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import './hotelDetails.css';
+import React, { useEffect, useRef, useMemo, useCallback } from "react";
+import "./hotelDetails.css";
 import icons from "~/assets/icon";
-import SearchBarNoLocation from '~/components/SearchBarNoLocation';
+import SearchBarNoLocation from "~/components/SearchBarNoLocation";
+import { getHotelDetail } from "~/services/apiService";
+import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
+import { useSelector } from "react-redux";
 
-const HotelDetail = () => {
+const HotelDetails = () => {
     const { id } = useParams();
     const location = useLocation();
 
@@ -110,7 +115,6 @@ const HotelDetail = () => {
     } = hotelDetails;
 
     const displayedImages = showAllImages ? images : images.slice(0, 5);
-
     return (
         <div className="mx-auto p-5">
             <div className="row px-5 py-2">
@@ -164,8 +168,16 @@ const HotelDetail = () => {
                 <div className="row my-5">
                     <p className="fs-3"> {description} </p>
                 </div>
-                <div className='search my-5'>
-                    <SearchBarNoLocation border-radius={12} />
+                <div className="my-5 search">
+                    <SearchBarNoLocation
+                        border-radius={12}
+                        searchData={{
+                            startDate: checkInDate,
+                            endDate: checkOutDate,
+                            numOfPeople: numOfPeople,
+                        }}
+                        handleSearch={handleSearch}
+                    />
                 </div>
                 <div className="px-2 my-5 py-5">
                     <div className="card shadow p-3">
@@ -232,53 +244,54 @@ const HotelDetail = () => {
                         </div>
                     </div>
                 </div>
-            </div>
-            <div className="px-5 py-4">
-            <p className="mb-5" style={{ fontSize: "30px", fontWeight: "bold" }}>Customer Reviews</p>
-                {/* Reviews Section */}
-                <div className="reviews-section">
-                    {reviews.length > 0 ? (
-                        reviews.map((review) => (
-                            <div className="review-card" key={review.id}>
-                                <div className="profile-pic">
-                                    <img
-                                        src={review.avatar}
-                                        alt="Profile"
-                                        className="avatar-image"
-                                    />
+                <div className="px-5 py-4">
+                    <p className="mb-5" style={{ fontSize: "30px", fontWeight: "bold" }}>Customer Reviews</p>
+                    {/* Reviews Section */}
+                    <div className="reviews-section">
+                        {reviews.length > 0 ? (
+                            reviews.map((review) => (
+                                <div className="review-card" key={review.id}>
+                                    <div className="profile-pic">
+                                        <img
+                                            src={review.avatar}
+                                            alt="Profile"
+                                            className="avatar-image"
+                                        />
+                                    </div>
+                                    <div className="name mb-2 fs-2 fw-bold">{review.name}</div>
+                                    <div className="stars">
+                                        {Array.from({ length: 5 }).map((_, index) => {
+                                            const isFullStar = review.rate >= index + 1;
+                                            const isHalfStar = review.rate > index && review.rate < index + 1;
+                                            return isFullStar ? (
+                                                <img
+                                                    key={index}
+                                                    src={icons.starYellowIcon}
+                                                    alt="Star"
+                                                    className="star-icon"
+                                                />
+                                            ) : (
+                                                <img
+                                                    key={index}
+                                                    src={icons.starEmptyIcon}
+                                                    alt="Empty Star"
+                                                    className="star-gray-icon"
+                                                />
+                                            );
+                                        })}
+                                    </div>
+                                    <div className="comment">{review.comment}</div>
                                 </div>
-                                <div className="name mb-2 fs-2 fw-bold">{review.name}</div>
-                                <div className="stars">
-                                    {Array.from({ length: 5 }).map((_, index) => {
-                                        const isFullStar = review.rate >= index + 1;
-                                        const isHalfStar = review.rate > index && review.rate < index + 1;
-                                        return isFullStar ? (
-                                            <img
-                                                key={index}
-                                                src={icons.starYellowIcon}
-                                                alt="Star"
-                                                className="star-icon"
-                                            />
-                                        ) : (
-                                            <img
-                                                key={index}
-                                                src={icons.starEmptyIcon}
-                                                alt="Empty Star"
-                                                className="star-gray-icon"
-                                            />
-                                        );
-                                    })}
-                                </div>
-                                <div className="comment">{review.comment}</div>
-                            </div>
-                        ))
-                    ) : (
-                        <p>No reviews available.</p>
-                    )}
+                            ))
+                        ) : (
+                            <p>No reviews available.</p>
+                        )}
+                    </div>
                 </div>
             </div>
+            );
         </div>
     );
 };
 
-export default HotelDetail;
+export default HotelDetails;

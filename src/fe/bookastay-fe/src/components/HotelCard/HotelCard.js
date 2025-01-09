@@ -4,23 +4,53 @@ import { useTranslation } from "react-i18next";
 
 import { useSelector } from "react-redux";
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
+import { addFavorite, getAllFavorite, removeFavorite } from "~/services/apiService";
+import { useNavigate } from "react-router-dom";
+import { addDays, formatDate } from "~/utils/datetime";
 
 const HotelCard = ({
+    id,
     name,
     address,
+    star,
+    description,
     images,
     minRoomPrice: price,
     averageRating: rating,
     totalReviews: review,
+    isFav,
+    checkInDate = null,
+    checkOutDate = null,
 }) => {
     const { t } = useTranslation();
+
+    const navigate = useNavigate();
+
+    const handleBookNow = () => {
+        navigate(`/hotel/${id}`, {
+            state: {
+                id,
+                name,
+                address,
+                images,
+                price,
+                rating,
+                review,
+                star,
+                description,
+                isFav,
+                checkInDate: checkInDate || formatDate(addDays(new Date(), 0), "yyyy-mm-dd"),
+                checkOutDate: checkOutDate || formatDate(addDays(new Date(), 2), "yyyy-mm-dd"),
+            },
+        }); // Chuyển hướng đến route chi tiết khách sạn
+    };
 
     const currency = useSelector((state) => state.currency.currency);
     const exchangeRate = useSelector((state) => state.currency.exchangeRate);
 
     const userInfo = useSelector((state) => state.account.userInfo);
 
-    const [isFavorite, setIsFavorite] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(isFav);
 
     const [nowPrice, setNowPrice] = useState(price);
 
@@ -52,15 +82,41 @@ const HotelCard = ({
         handleChangeCurrency();
     }, [currency]);
 
+    // test get all favorite
+    // useEffect(() => {
+    //     if (userInfo.email) {
+    //         getAllFavorite({ userId: userInfo.id, page: 1, limit: 6, sortBy: "name", order: "ASC" })
+    //             .then((res) => {
+    //                 const favoriteList = res.data.hotels;
+    //                 const isFav = favoriteList.some((fav) => fav.id === id);
+    //                 setIsFavorite(isFav);
+    //             })
+    //             .catch((err) => console.log(err));
+    //     }
+    // }, [userInfo.email]);
+
     return (
         <div className="hotel-card">
             <div className="hotel-card__image-wrap">
-                <a href="#!">
+                <a
+                    href="#!"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        handleBookNow();
+                    }}
+                >
                     <img src={images[0]} alt={name} className="hotel-card__image" />
                 </a>
 
                 <button
-                    onClick={() => setIsFavorite(!isFavorite)}
+                    onClick={() => {
+                        if (isFavorite) {
+                            removeFavorite(userInfo.id, id);
+                        } else {
+                            addFavorite(userInfo.id, id);
+                        }
+                        setIsFavorite(!isFavorite);
+                    }}
                     className={`hotel-card__favorite ${userInfo.email ? "" : "d-none"}`}
                 >
                     {userInfo.email && !isFavorite && (
@@ -95,7 +151,10 @@ const HotelCard = ({
                 </p>
                 <div className="hotel-card__row">
                     <span className="hotel-card__price">{formatCurrency(nowPrice, currency)}</span>
-                    <button className="hotel-card__btn ms-auto mt-3">
+                    <button
+                        className="hotel-card__btn ms-auto mt-3"
+                        onClick={() => handleBookNow()}
+                    >
                         {t("hotelCard.BookNow")}
                     </button>
                 </div>

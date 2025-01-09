@@ -172,7 +172,7 @@ const Header = ({ toggle = () => {} }) => {
                 </div>
 
                 {userInfo && userInfo.email ? (
-                    <Dropdown menu={{ items }}>
+                    <Dropdown menu={{ items }} trigger={["click"]}>
                         <Avatar
                             style={{ cursor: "pointer" }}
                             src={

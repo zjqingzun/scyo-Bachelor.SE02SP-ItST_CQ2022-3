@@ -1,5 +1,5 @@
 import axios from "~/utils/axiosCustomize";
-import { userLogin, getProfile } from "~/services/apiService";
+import { userLogin, getProfile, getAvatarUrl } from "~/services/apiService";
 
 export const USER_LOGIN_REQUEST = "USER_LOGIN_REQUEST";
 export const USER_LOGIN_SUCCESS = "USER_LOGIN_SUCCESS";
@@ -92,9 +92,18 @@ export const doGetAccount = () => {
             const refreshToken = localStorage.getItem("refresh_token");
 
             if (response && response.email) {
+                const getAvatarUrlRes = await getAvatarUrl(response.email);
+
+                let avatar = getAvatarUrlRes?.url || "";
+
+                let user = {
+                    ...response,
+                    avatar,
+                };
+
                 dispatch({
                     type: USER_LOGIN_SUCCESS,
-                    user: response || {},
+                    user: user || {},
                     accessToken,
                     refreshToken,
                     isLoading: false,

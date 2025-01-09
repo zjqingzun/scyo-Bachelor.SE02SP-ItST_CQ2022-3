@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   ParseIntPipe,
+  Req,
 } from '@nestjs/common';
 import { Public } from '@/helpers/decorator/public';
 
@@ -27,9 +28,10 @@ export class HotelsController {
     return this.hotelsService.create(createHotelDto);
   }
 
-  @Get()
-  findAll() {
-    return this.hotelsService.findAll();
+  @Get('getAll')
+  @Public()
+  findAll(@Req() req) {
+    return this.hotelsService.findAll(req);
   }
 
   @Patch(':id')
@@ -43,17 +45,17 @@ export class HotelsController {
   }
 
   // [GET]: /hotels/recommended-hotel
-  @Get('recommended-hotel')
+  @Get('recommended-hotel/:userId')
   @Public()
-  async recommendedHotel() {
-    return await this.hotelsService.getTopTenRatingHotel();
+  async recommendedHotel(@Param('userId') userId: string) {
+    return await this.hotelsService.getTopTenRatingHotel(+userId);
   }
 
   // [GET]: /hotels?city=...&checkInDate=...&checkOutDate=...&roomType2=...&roomType4=...&minPrice=...&maxPrice=...&minRating=...&minStar=...&page=...&perPage=...
-  @Get('search')
+  @Get('search/:userId')
   @Public()
-  async findAvailableHotels(@Query() searchHotelDto: SearchHotelDto) {
-    return await this.hotelsService.findAvailableHotels(searchHotelDto);
+  async findAvailableHotels(@Param('userId') userId: string, @Query() searchHotelDto: SearchHotelDto) {
+    return await this.hotelsService.findAvailableHotels(searchHotelDto, +userId);
   }
 
   // [GET]: /hotels/:id?checkInDate=...&checkOutDate=...&roomType2=...&roomType4=...

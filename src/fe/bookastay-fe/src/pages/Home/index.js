@@ -6,6 +6,7 @@ import SearchBar from "../../components/SearchBar";
 import HotelCard from "../../components/HotelCard/HotelCard";
 import { useNavigate } from "react-router-dom";
 import { getRecommendHotels } from "~/services/apiService";
+import { useSelector } from "react-redux";
 
 const MockData = [
     {
@@ -57,6 +58,8 @@ const MockDestination = [
 const Home = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
+
+    const userInfo = useSelector((state) => state.account.userInfo);
 
     const [recommendHotels, setRecommendHotels] = useState([]);
     const [images, setImages] = useState(MockData);
@@ -151,7 +154,7 @@ const Home = () => {
     useEffect(() => {
         const fetchRecommendHotels = async () => {
             try {
-                const response = await getRecommendHotels();
+                const response = await getRecommendHotels(userInfo.id);
 
                 if (response.status_code === 200 && response.data) {
                     setRecommendHotels(response.data);

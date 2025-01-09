@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import React, { useRef, useMemo, useCallback } from "react";
@@ -12,6 +11,41 @@ import { useSelector } from "react-redux";
 const HotelDetails = () => {
     const { id } = useParams();
     const location = useLocation();
+
+    const { checkInDate, checkOutDate, numOfPeople, isFav } = location.state || {};
+
+    const currency = useSelector((state) => state.currency.currency);
+    const exchangeRate = useSelector((state) => state.currency.exchangeRate);
+    const [roomPrice1Now, setRoomPrice1Now] = useState(0);
+    const [roomPrice2Now, setRoomPrice2Now] = useState(0);
+    const newCurrency = useRef("VND");
+    const roomPrice1 = useRef(0);
+    const roomPrice2 = useRef(0);
+
+    const handleChangeCurrency = useCallback(() => {
+        if (currency !== newCurrency.current) {
+            if (currency === "VND") {
+                setRoomPrice1Now(roomPrice1.current);
+                setRoomPrice2Now(roomPrice2.current);
+            } else {
+                setRoomPrice1Now(
+                    convertCurrency(roomPrice1Now, newCurrency.current, currency, exchangeRate)
+                );
+                setRoomPrice2Now(
+                    convertCurrency(roomPrice2Now, newCurrency.current, currency, exchangeRate)
+                );
+            }
+
+            newCurrency.current = currency;
+        }
+    }, [currency, exchangeRate, roomPrice1, roomPrice1Now, roomPrice2, roomPrice2Now]);
+
+    useEffect(() => {
+        handleChangeCurrency();
+    }, [currency, handleChangeCurrency]);
+
+    // const [roomPrice1, setRoomPrice1] = useState(0);
+    // const [roomPrice2, setRoomPrice2] = useState(0);
 
     const [hotelDetails, setHotelDetails] = useState(null);
     const [reviews, setReviews] = useState([]);
@@ -50,7 +84,6 @@ const HotelDetails = () => {
                 ...prevCounts,
                 [id]: newCount,
             };
-
         });
     };
 
@@ -72,6 +105,18 @@ const HotelDetails = () => {
                 );
                 const data = await response.json();
                 if (data.status_code === 200) {
+                    // Lưu giá phòng hiện tại để chuyển đổi tiền tệ
+                    roomPrice1.current = data.data.room_types[0].price;
+                    roomPrice2.current = data.data.room_types[1].price;
+
+                    if (checkWeekend(checkInDate) || checkWeekend(checkOutDate)) {
+                        setRoomPrice1Now(data.data.room_types[0].weekend_price);
+                        setRoomPrice2Now(data.data.room_types[1].weekend_price);
+                    } else {
+                        setRoomPrice1Now(data.data.room_types[0].price);
+                        setRoomPrice2Now(data.data.room_types[1].price);
+                    }
+
                     setHotelDetails(data.data);
                 } else {
                     console.error("Error fetching hotel details");
@@ -90,10 +135,10 @@ const HotelDetails = () => {
                 if (data.status_code === 200) {
                     setReviews(data.data.reviews);
                 } else {
-                    console.error('Failed to fetch reviews:', data.message);
+                    console.error("Failed to fetch reviews:", data.message);
                 }
             } catch (error) {
-                console.error('Error fetching reviews:', error);
+                console.error("Error fetching reviews:", error);
             }
         };
 
@@ -105,25 +150,24 @@ const HotelDetails = () => {
 
     if (!hotelDetails) return <div>No details available</div>;
 
-    const {
-        name,
-        address,
-        description,
-        star,
-        images,
-        room_types,
-    } = hotelDetails;
+    const { name, address, description, star, images, room_types } = hotelDetails;
 
     const displayedImages = showAllImages ? images : images.slice(0, 5);
-    
+
     return (
         <div className="mx-auto p-5">
             <div className="row px-5 py-2">
                 <div className="col-md-10 pb-3 d-flex flex-column">
-                    <h1 className='mt-5' style={{ fontWeight: "bold", fontSize: "40px" }}>{name}</h1>
+                    <h1 className="mt-5" style={{ fontWeight: "bold", fontSize: "40px" }}>
+                        {name}
+                    </h1>
                     <div className="d-flex align-items-center mt-3">
-                        <img src={icons.locationIcon} alt="Location" className="location-icon me-3" />
-                        <p className='pt-3 fs-3'>{address}</p>
+                        <img
+                            src={icons.locationIcon}
+                            alt="Location"
+                            className="location-icon me-3"
+                        />
+                        <p className="pt-3 fs-3">{address}</p>
                     </div>
                 </div>
                 <div className="col-md-2 d-flex justify-content-end">
@@ -132,7 +176,7 @@ const HotelDetails = () => {
                         alt="Heart"
                         className="heart-icon me-3"
                         onClick={handleToggleHeart}
-                        style={{ cursor: 'pointer' }}
+                        style={{ cursor: "pointer" }}
                     />
                 </div>
             </div>
@@ -150,7 +194,11 @@ const HotelDetails = () => {
                             ))}
                         </div>
                         {images.length > 5 && (
-                            <button className="btn btn-primary mt-5" style={{ fontSize: "18px", padding: "7px 20px" }} onClick={toggleImageView}>
+                            <button
+                                className="btn btn-primary mt-5"
+                                style={{ fontSize: "18px", padding: "7px 20px" }}
+                                onClick={toggleImageView}
+                            >
                                 {showAllImages ? "See Less" : "See More"}
                             </button>
                         )}
@@ -160,7 +208,13 @@ const HotelDetails = () => {
                     <h2>Rating overall:</h2>
                     <div className="star-rating py-2 mb-5">
                         {Array.from({ length: star }, (_, index) => (
-                            <img key={index} src={icons.starYellowIcon} alt="Star" className="star-icon mt-2" style={{ width: "40px" }} />
+                            <img
+                                key={index}
+                                src={icons.starYellowIcon}
+                                alt="Star"
+                                className="star-icon mt-2"
+                                style={{ width: "40px" }}
+                            />
                         ))}
                     </div>
                 </div>
@@ -196,7 +250,11 @@ const HotelDetails = () => {
                                     {room_types.map((room) => (
                                         <tr key={room.id}>
                                             <td className="py-4">
-                                                <strong>{room.type === 2 ? "Room type 2" : "Room type 4"}</strong>
+                                                <strong>
+                                                    {room.type === 2
+                                                        ? "Room type 2"
+                                                        : "Room type 4"}
+                                                </strong>
                                             </td>
                                             <td className="py-4">
                                                 <span className="fs-2">
@@ -205,23 +263,45 @@ const HotelDetails = () => {
                                             </td>
                                             <td className="py-4">
                                                 <span>
-                                                    VND {isWeekend ? room.weekend_price.toLocaleString() : room.price.toLocaleString()}
+                                                    {formatCurrency(
+                                                        room.type === 2
+                                                            ? roomPrice1Now
+                                                            : roomPrice2Now,
+                                                        newCurrency.current
+                                                    )}
                                                 </span>
                                             </td>
                                             <td className="py-4">
                                                 <div className="d-flex align-items-center">
                                                     <button
-                                                        onClick={() => handleRoomCountChange(room.id, -1, room.numberOfRoom2)}
+                                                        onClick={() =>
+                                                            handleRoomCountChange(
+                                                                room.id,
+                                                                -1,
+                                                                room.numberOfRoom2
+                                                            )
+                                                        }
                                                         className="btn btn-outline-secondary"
                                                         disabled={(roomCounts[room.id] || 0) <= 0}
                                                     >
                                                         -
                                                     </button>
-                                                    <span className="mx-3">{roomCounts[room.id] || 0}</span>
+                                                    <span className="mx-3">
+                                                        {roomCounts[room.id] || 0}
+                                                    </span>
                                                     <button
-                                                        onClick={() => handleRoomCountChange(room.id, 1, room.numberOfRoom2)}
+                                                        onClick={() =>
+                                                            handleRoomCountChange(
+                                                                room.id,
+                                                                1,
+                                                                room.numberOfRoom2
+                                                            )
+                                                        }
                                                         className="btn btn-outline-secondary"
-                                                        disabled={(roomCounts[room.id] || 0) >= room.numberOfRoom2}
+                                                        disabled={
+                                                            (roomCounts[room.id] || 0) >=
+                                                            room.numberOfRoom2
+                                                        }
                                                     >
                                                         +
                                                     </button>
@@ -234,19 +314,30 @@ const HotelDetails = () => {
                             <div className="text-end mt-3">
                                 <p>
                                     Total: VND{" "}
-                                    {room_types.reduce((total, room) => {
-                                        const count = roomCounts[room.id] || 0;
-                                        const price = isWeekend ? room.weekend_price : room.price;
-                                        return total + count * price;
-                                    }, 0).toLocaleString()}
+                                    {room_types
+                                        .reduce((total, room) => {
+                                            const count = roomCounts[room.id] || 0;
+                                            const price = isWeekend
+                                                ? room.weekend_price
+                                                : room.price;
+                                            return total + count * price;
+                                        }, 0)
+                                        .toLocaleString()}
                                 </p>
-                                <button className="btn btn-success" style={{ fontSize: "20px", padding: "5px 15px" }}>Reserve</button>
+                                <button
+                                    className="btn btn-success"
+                                    style={{ fontSize: "20px", padding: "5px 15px" }}
+                                >
+                                    Reserve
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className="px-5 py-4">
-                    <p className="mb-5" style={{ fontSize: "30px", fontWeight: "bold" }}>Customer Reviews</p>
+                    <p className="mb-5" style={{ fontSize: "30px", fontWeight: "bold" }}>
+                        Customer Reviews
+                    </p>
                     {/* Reviews Section */}
                     <div className="reviews-section">
                         {reviews.length > 0 ? (
@@ -263,7 +354,8 @@ const HotelDetails = () => {
                                     <div className="stars">
                                         {Array.from({ length: 5 }).map((_, index) => {
                                             const isFullStar = review.rate >= index + 1;
-                                            const isHalfStar = review.rate > index && review.rate < index + 1;
+                                            const isHalfStar =
+                                                review.rate > index && review.rate < index + 1;
                                             return isFullStar ? (
                                                 <img
                                                     key={index}

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './dashboard.css';
 
 function Dashboard() {
@@ -13,11 +13,44 @@ function Dashboard() {
     { id: 7, mail: 'owner7@example.com', name: 'Hotel XYS', location: 'City C', time: '14:00 27/12/2024', read: true },
   ]);
 
+  const [totals, setTotals] = useState({
+    hotels: 0,
+    users: 0,
+    hoteliers: 0,
+  });
+
   const navigate = useNavigate();
 
   const handleRowClick = (app) => {
     navigate(`/admin/request/${app.id}`);
   };
+
+  useEffect(() => {
+    fetchTotals();
+  }, []);
+
+  const fetchTotals = async () => {
+    try {
+      const hotelsResponse = await fetch('http://localhost:3001/api/hotels/getAll');
+      const hotelsData = await hotelsResponse.json();
+      console.log(hotelsData);
+
+      const usersResponse = await fetch('http://localhost:3001/api/user/getAll/user');
+      const usersData = await usersResponse.json();
+
+      const hoteliersResponse = await fetch('http://localhost:3001/api/user/getAll/hotelier');
+      const hoteliersData = await hoteliersResponse.json();
+
+      setTotals({
+        hotels: hotelsData.total || 0,
+        users: usersData.total || 0,
+        hoteliers: hoteliersData.total || 0,
+      });
+    } catch (error) {
+      console.error('Error fetching totals:', error);
+    }
+  };
+
 
   return (
     <div className='dashboard d-flex flex-column px-5 py-3 m-5'>
@@ -25,15 +58,15 @@ function Dashboard() {
       <div className="d-flex justify-content-between mb-5">
         <div className="text-white p-4 rounded text-center box" style={{ width: '20%' }}>
           <h3>Total Hotels</h3>
-          <h1>100</h1>
+          <h1>{ totals.hotels }</h1>
         </div>
         <div className="text-white p-4 rounded text-center box" style={{ width: '20%' }}>
           <h3>Total Users</h3>
-          <h1>2342</h1>
+          <h1>{ totals.users }</h1>
         </div>
         <div className="text-white p-4 rounded text-center box" style={{ width: '20%' }}>
           <h3>Total Owners</h3>
-          <h1>2342</h1>
+          <h1>{ totals.hoteliers }</h1>
         </div>
         <div className="text-white p-4 rounded text-center box" style={{ width: '20%' }}>
           <h3>Total Requests</h3>

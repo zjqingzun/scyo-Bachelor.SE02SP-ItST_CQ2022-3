@@ -94,6 +94,7 @@ export class UserService {
       ORDER BY ${sortBy} ${order}
       LIMIT ${take} OFFSET ${skip}
     `);
+    await queryRunner.release();
     return {
       status: 200,
       message: 'Successfully',
@@ -294,6 +295,7 @@ export class UserService {
     await queryRunner.manager.query(
       `INSERT INTO users_roles("userId", "roleId") VALUES(${userId}, ${roleObj[0].id})`,
     );
+    await queryRunner.release();
   }
 
   async getRole(userId: number) {
@@ -306,6 +308,7 @@ export class UserService {
             WHERE "userId" = ${userId}
           ) ur JOIN role r ON ur."roleId" = r.id
     `);
+    await queryRunner.release();
     return role[0].name;
   }
 
@@ -358,6 +361,7 @@ export class UserService {
         DELETE FROM "user_favouriteHotel"
         WHERE "userId" = ${userId} AND "hotelId" = ${hotelId}
       `);
+      await queryRunner.release();
       return {
         status: 200,
         message: 'Successfully',
@@ -383,4 +387,21 @@ export class UserService {
 
     return hotelier;
   }
+
+  async totalUsers() {
+    const roles = ['user']; 
+
+    const queryBuilder = this.usersRepository.createQueryBuilder('user')
+        .innerJoin('users_roles', 'ur', 'ur."userId" = user.id')
+        .innerJoin('role', 'r', 'ur."roleId" = r.id')
+        .where('r.name IN (:...roles)', { roles });
+
+    const total = await queryBuilder.getCount();
+
+    return {
+        status: 200,
+        totalUsers: total 
+    };
+  }
+
 }

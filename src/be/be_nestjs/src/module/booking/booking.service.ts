@@ -269,6 +269,7 @@ export class BookingService {
       }
       const bookingData = JSON.parse(bookingDT);
       const note = JSON.parse(noteDT);
+      console.log('NOTE: ', note);
   
       let status = '';
       if (paymentMethod === 'cash') {
@@ -302,10 +303,18 @@ export class BookingService {
     }
   }
 
-  private async saveBooking(bookingData: any, status: string, note: string) {
+  private async saveBooking(bookingData: any, status: string, note) {
     try {
       console.log('BOOKING DATA: ', bookingData);
       console.log('BOOKING DATA USER ID: ', bookingData.userId);
+      console.log('BOOKING DATA BEFORE QUERY: ', {
+        userId: bookingData.userId,
+        hotelId: bookingData.hotelId,
+        checkInDate: bookingData.checkInDate,
+        checkOutDate: bookingData.checkOutDate,
+        status: status,
+        note: note
+      });
       const bookingQuery = await this.bookingRepository
         .createQueryBuilder()
         .insert()

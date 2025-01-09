@@ -59,5 +59,30 @@
         "hours": "Hours",
         "minutes": "Minutes",
         "seconds": "Seconds"
+    },
+    "reserve": {
+        "detailHeader": "Enter your details",
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone",
+        "identityNumber": "Identity Number",
+        "specialRequests": "Special Requests (optional)",
+        "paymentHeader": "Choose your payment method",
+        "cash": "Cash",
+        "back": "Back",
+        "next": "Next",
+        "finish": "Finish",
+        "bookingHeader": "Your booking details",
+        "hotel": "Hotel",
+        "yourChoice": "Your choice",
+        "room": "Room",
+        "rooms": "Rooms",
+        "changeYourChoice": "Change your choice",
+        "summaryHeader": "Price Summary",
+        "originalPrice": "Original Price",
+        "discount": "Discount",
+        "totalPrice": "Total Price",
+        "double": "Double Room",
+        "quadruple": "Quadruple Room"
     }
 }

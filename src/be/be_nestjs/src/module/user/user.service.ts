@@ -387,4 +387,37 @@ export class UserService {
 
     return hotelier;
   }
+
+  async totalUsers() {
+    const roles = ['user']; 
+
+    const queryBuilder = this.usersRepository.createQueryBuilder('user')
+        .innerJoin('users_roles', 'ur', 'ur."userId" = user.id')
+        .innerJoin('role', 'r', 'ur."roleId" = r.id')
+        .where('r.name IN (:...roles)', { roles });
+
+    const total = await queryBuilder.getCount();
+
+    return {
+        status: 200,
+        totalUsers: total 
+    };
+  }
+
+  async totalHotels() {
+    const roles = ['hotelier']; 
+
+    const queryBuilder = this.usersRepository.createQueryBuilder('user')
+        .innerJoin('users_roles', 'ur', 'ur."userId" = user.id')
+        .innerJoin('role', 'r', 'ur."roleId" = r.id')
+        .where('r.name IN (:...roles)', { roles });
+
+    const total = await queryBuilder.getCount();
+
+    return {
+        status: 200,
+        totalHotels: total 
+    };
+  }
+
 }

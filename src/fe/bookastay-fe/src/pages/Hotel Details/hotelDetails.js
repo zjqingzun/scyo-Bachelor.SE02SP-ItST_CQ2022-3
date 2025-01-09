@@ -107,6 +107,30 @@ const HotelDetails = () => {
         handleChangeCurrency();
     }, [currency, handleChangeCurrency]);
 
+    const handleSearch = useCallback(async (data) => {
+        const { startDate, endDate, numOfPeople } = data;
+
+        const response = await getHotelDetail(id, {
+            checkInDate: startDate,
+            checkOutDate: endDate,
+            roomType2: numOfPeople.roomType2,
+            roomType4: numOfPeople.roomType4,
+        });
+
+        console.log(">>> Hotel detail: ", response.data);
+
+        setRoomPrice1(response.data.room_types[0].price);
+        setRoomPrice1Now(response.data.room_types[0].price);
+
+        setRoomPrice2(response.data.room_types[1].price);
+        setRoomPrice2Now(response.data.room_types[1].price);
+
+        setRoom1Count(numOfPeople.roomType2);
+        setRoom2Count(numOfPeople.roomType4);
+
+        setHotelDetail(response.data);
+    }, []);
+
     return (
         <div className="mx-auto p-5">
             <div className="row px-5 py-2">
@@ -184,6 +208,7 @@ const HotelDetails = () => {
                             endDate: checkOutDate,
                             numOfPeople: numOfPeople,
                         }}
+                        handleSearch={handleSearch}
                     />
                 </div>
 

@@ -1,132 +1,176 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './manageUsers.css';
 import icons from "~/assets/icon";
 
 function ManageUsers() {
-  const [applications, setApplications] = useState([
-    { id: 1, name: 'John Doe', email: 'john.doe@example.com', phone: '123-456-7890', dob: '1990-01-15', cccd: '012345678901' },
-    { id: 2, name: 'Emily Smith', email: 'emily.smith@example.com', phone: '987-654-3210', dob: '1992-03-20', cccd: '012345678902' },
-    { id: 3, name: 'Michael Johnson', email: 'michael.johnson@example.com', phone: '456-789-1234', dob: '1988-07-11', cccd: '012345678903' },
-    { id: 4, name: 'Emma Wilson', email: 'emma.wilson@example.com', phone: '789-123-4567', dob: '1995-10-05', cccd: '012345678904' },
-    { id: 5, name: 'Olivia Brown', email: 'olivia.brown@example.com', phone: '321-654-9870', dob: '1991-12-22', cccd: '012345678905' },
-    { id: 6, name: 'Sophia Davis', email: 'sophia.davis@example.com', phone: '654-321-0987', dob: '1993-05-18', cccd: '012345678906' },
-    { id: 7, name: 'Liam Martinez', email: 'liam.martinez@example.com', phone: '890-123-4567', dob: '1989-08-09', cccd: '012345678907' },
-    { id: 8, name: 'Isabella Garcia', email: 'isabella.garcia@example.com', phone: '123-890-4567', dob: '1996-02-14', cccd: '012345678908' },
-    { id: 9, name: 'Mason Martinez', email: 'mason.martinez@example.com', phone: '567-123-8904', dob: '1990-11-03', cccd: '012345678909' },
-    { id: 10, name: 'Lucas Clark', email: 'lucas.clark@example.com', phone: '890-456-1237', dob: '1987-09-25', cccd: '012345678910' },
-    { id: 11, name: 'Charlotte Rodriguez', email: 'charlotte.rodriguez@example.com', phone: '345-678-9012', dob: '1994-04-07', cccd: '012345678911' },
-    { id: 12, name: 'Aiden Lopez', email: 'aiden.lopez@example.com', phone: '789-012-3456', dob: '1992-06-12', cccd: '012345678912' },
-    { id: 13, name: 'Amelia Hernandez', email: 'amelia.hernandez@example.com', phone: '456-789-0123', dob: '1993-03-30', cccd: '012345678913' },
-    { id: 14, name: 'Benjamin Hill', email: 'benjamin.hill@example.com', phone: '678-901-2345', dob: '1985-07-19', cccd: '012345678914' },
-    { id: 15, name: 'Mia Lee', email: 'mia.lee@example.com', phone: '234-567-8901', dob: '1998-01-10', cccd: '012345678915' },
-
-
-  ]);
-
+  const [applications, setApplications] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 10; // Số lượng người dùng trên mỗi trang
+  const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [totalUsers, setTotalUsers] = useState(0); // State để lưu tổng số người dùng
 
-  const totalPages = Math.ceil(applications.length / itemsPerPage);
+  const [inputPage, setInputPage] = useState(''); // Input cho số trang
+  const handleInputPageChange = (e) => {
+    setInputPage(e.target.value);
+  };
 
-  const displayedApplications = applications.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  // Hàm fetch data từ API
+  const fetchUsers = async (page, limit) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`http://localhost:3001/api/user/getAll/user?page=${page}&limit=${limit}`);
+      const data = await response.json();
+
+      // Cập nhật state với dữ liệu từ API
+      setApplications(data.users);
+      setTotalPages(data.total_pages);
+      setTotalUsers(data.total); // Lấy tổng số người dùng từ API
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Gọi fetchUsers khi trang hoặc itemsPerPage thay đổi
+  useEffect(() => {
+    fetchUsers(currentPage, itemsPerPage);
+  }, [currentPage, itemsPerPage]);
 
   const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
+    if (newPage > 0 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  const handleGoToPage = () => {
+    const page = parseInt(inputPage, 10);
+    if (!isNaN(page) && page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    } else {
+      alert(`Please enter a valid page number between 1 and ${totalPages}`);
+    }
   };
 
   const [showModal, setShowModal] = useState(false);
 
   const handleDeleteClick = () => {
-    setShowModal(true); // Hiện modal
+    setShowModal(true);
   };
 
   const handleConfirmDelete = () => {
-    // Xử lý logic xóa tại đây
     console.log('Item deleted!');
-    setShowModal(false); // Ẩn modal
+    setShowModal(false);
   };
 
   const handleCancelDelete = () => {
-    setShowModal(false); // Đóng modal
+    setShowModal(false);
   };
 
   return (
     <div className="d-flex flex-column px-5 py-3 m-5 users">
-      <div className="title mb-4">Users</div>
-      <table className="table table-hover">
-        <thead className='table-dark fs-3'>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Date of birth</th>
-            <th>Identify</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {displayedApplications.map((app) => (
+      <div className='d-flex justify-content-between mb-3'>
+        <div className="title">Users</div>
+        <div className="text-white p-4 rounded text-center box" style={{ width: '20%' }}>
+          <h3>Total Users</h3>
+          <h1>{ totalUsers }</h1>
+        </div>
+      </div>
+      
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <>
+          <table className="table table-hover">
+            <thead className='table-dark fs-3'>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Date of birth</th>
+                <th>Identify</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {applications.map((app) => (
+                <tr
+                  key={app.id}
+                  style={{
+                    cursor: 'pointer',
+                  }}
+                >
+                  <td>{app.id}</td>
+                  <td>{app.name}</td>
+                  <td>{app.email}</td>
+                  <td>{app.phone}</td>
+                  <td>{new Date(app.dob).toLocaleDateString()}</td>
+                  <td>{app.cccd}</td>
+                  <td>
+                    <a style={{ cursor: 'pointer' }} onClick={handleDeleteClick}>
+                      <img src={icons.trashIcon} alt='Delete' className='icon trash-icon' />
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-            <tr
-              key={app.id}
-              style={{
-                cursor: 'pointer',
-              }}
+          {showModal && (
+            <div style={styles.modal}>
+              <div style={styles.modalContent}>
+                <p className='fs-3 mb-4 fw-semibold'>Are you sure to delete it?</p>
+                <button onClick={handleConfirmDelete} className='btn btn-danger me-3 mb-2 px-3 fs-3'>
+                  Yes
+                </button>
+                <button onClick={handleCancelDelete} className='btn btn-primary mb-2 px-3 fs-3'>
+                  No
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="d-flex justify-content-evenly align-items-center mt-4">
+            <button
+              className="btn" style={{ backgroundColor: '#1C2D6E' }}
+              disabled={currentPage === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
             >
-              <td>{app.id}</td>
-              <td>{app.name}</td>
-              <td>{app.email}</td>
-              <td>{app.phone}</td>
-              <td>{app.dob}</td>
-              <td>{app.cccd}</td>
-              <td>
-                <a style={{ cursor: 'pointer' }} onClick={handleDeleteClick}>
-                  <img src={icons.trashIcon} alt='Delete' class='icon trash-icon' />
-                </a>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {showModal && (
-        <div style={styles.modal}>
-          <div style={styles.modalContent}>
-            <p className='fs-3 mb-4 fw-semibold'>Are you sure to delete it?</p>
-            <button onClick={handleConfirmDelete} className='btn btn-danger me-3 mb-2 px-3 fs-3'>
-              Yes
+              <img src={icons.chevronLeftPinkIcon} className="left-icon icon m-2" />
             </button>
-            <button onClick={handleCancelDelete} className='btn btn-primary mb-2 px-3 fs-3'>
-              No
+            <span className="fs-2">
+              {currentPage} / {totalPages}
+            </span>
+            <div className="d-flex justify-content-center align-items-center">
+              <button
+                onClick={handleGoToPage}
+                className="btn btn-success mx-2 fs-4" style={{ padding: "5px 15px"}}
+              >
+                Go to
+              </button>
+              <input
+                type="number"
+                value={inputPage}
+                onChange={handleInputPageChange}
+                className="form-control mx-2 fs-4" 
+                placeholder="Enter page number"
+                style={{ width: '70px', padding: "5px 15px" }}
+              />
+            </div>
+            <button
+              className="btn" style={{ backgroundColor: '#1C2D6E' }}
+              disabled={currentPage === totalPages}
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
+              <img src={icons.chevronRightPinkIcon} className="right-icon icon m-2" />
             </button>
           </div>
-        </div>
+        </>
       )}
-
-      <div className="d-flex justify-content-evenly align-items-center mt-5">
-        <button
-          className="btn" style={{ backgroundColor: '#1C2D6E' }}
-          disabled={currentPage === 1}
-          onClick={() => handlePageChange(currentPage - 1)}
-        >
-          <img src={icons.chevronLeftPinkIcon} class="left-icon icon m-2"/>
-        </button>
-        <span className="fs-2">
-          {currentPage} / {totalPages}
-        </span>
-        <button
-          className="btn" style={{ backgroundColor: '#1C2D6E' }}
-          disabled={currentPage === totalPages}
-          onClick={() => handlePageChange(currentPage + 1)}
-        >
-          <img src={icons.chevronRightPinkIcon} class="right-icon icon m-2"/>
-        </button>
-      </div>
     </div>
   );
 }

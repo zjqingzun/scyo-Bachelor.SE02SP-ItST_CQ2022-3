@@ -44,13 +44,27 @@ export class BookingService {
     private readonly roomTypeRepository: Repository<RoomType>,
 
     private readonly minioService: MinioService,
-  ) { }
+  ) {}
 
-  async create(createBookingDto: CreateBookingDto, req: Request, res: Response) {
+  async create(
+    createBookingDto: CreateBookingDto,
+    req: Request,
+    res: Response,
+  ) {
     try {
-      const { hotelId, checkInDate, checkOutDate, roomType2, roomType4, type2Price, type4Price, sumPrice, userId } = createBookingDto;
+      const {
+        hotelId,
+        checkInDate,
+        checkOutDate,
+        roomType2,
+        roomType4,
+        type2Price,
+        type4Price,
+        sumPrice,
+        userId,
+      } = createBookingDto;
       // Tạm thời xử lý với phòng có trường là available trước
-      // Lấy ra danh sách phòng của khách sạn 
+      // Lấy ra danh sách phòng của khách sạn
       const availableRoomQuery = await this.roomRepository
         .createQueryBuilder('room')
         .leftJoin('room.hotel', 'hotel')
@@ -59,7 +73,7 @@ export class BookingService {
           'room.name AS name',
           'room.type AS type',
           'room.status AS status',
-          'room.hotelId AS hotelid'
+          'room.hotelId AS hotelid',
         ])
         .where('hotel.id = :hotelId', { hotelId })
         .andWhere('room.status = :status', { status: 'available' });
@@ -75,16 +89,16 @@ export class BookingService {
           '(booking.checkinTime >= :checkOutDate OR booking.checkoutTime <= :checkInDate)',
           {
             checkInDate,
-            checkOutDate
-          }
+            checkOutDate,
+          },
         )
         .select([
           'room.id AS id',
           'room.name AS name',
           'room.type AS type',
           'room.status AS status',
-          'room.hotelId AS hotelid'
-        ])
+          'room.hotelId AS hotelid',
+        ]);
 
       const canBooking = await canBookingQuery.getRawMany();
       console.log('CAN BOOKING: ', canBooking);
@@ -92,8 +106,8 @@ export class BookingService {
       const rooms = [...availableRoom, ...canBooking];
       console.log('ALL AVAILABLE ROOMS: ', rooms);
       // Lấy ra phòng loại 2 và 4
-      const roomsType2 = rooms.filter(room => room.type === 2);
-      const roomsType4 = rooms.filter(room => room.type === 4);
+      const roomsType2 = rooms.filter((room) => room.type === 2);
+      const roomsType4 = rooms.filter((room) => room.type === 4);
 
       const getRandomRooms = (roomsList: any[], count: number) => {
         const shuffled = roomsList.sort(() => 0.5 - Math.random());
@@ -106,7 +120,7 @@ export class BookingService {
       const selectedRooms = [...randomRoomsType2, ...randomRoomsType4];
       console.log('SELECTED ROOMS: ', selectedRooms);
 
-      const roomIds = selectedRooms.map(room => room.id);
+      const roomIds = selectedRooms.map((room) => room.id);
       await this.roomRepository
         .createQueryBuilder()
         .update()
@@ -140,7 +154,6 @@ export class BookingService {
         message: 'Booking data saved to cookie',
         bookingData,
       });
-
     } catch (error) {
       console.error('Error booking hotels:', error);
 
@@ -160,24 +173,30 @@ export class BookingService {
       const bookingData = req.cookies['bookingData'];
 
       if (!bookingData) {
-        throw new HttpException('Booking data not found in cookies', HttpStatus.NOT_FOUND);
+        throw new HttpException(
+          'Booking data not found in cookies',
+          HttpStatus.NOT_FOUND,
+        );
       }
 
       const parsedBookingData = JSON.parse(bookingData);
       const currentTime = Date.now();
 
       // Kiểm tra xem cookie có hết hạn chưa (5 phút trong trường hợp này)
-      const isExpired = currentTime - parsedBookingData.createdAt > 5 * 60 * 1000;
+      const isExpired =
+        currentTime - parsedBookingData.createdAt > 5 * 60 * 1000;
 
       if (isExpired) {
-        throw new HttpException('Booking data has expired', HttpStatus.FORBIDDEN);
+        throw new HttpException(
+          'Booking data has expired',
+          HttpStatus.FORBIDDEN,
+        );
       }
 
       return res.status(HttpStatus.OK).json({
         message: 'Booking data is valid',
         bookingData: parsedBookingData,
       });
-
     } catch (error) {
       console.error('Error checking booking:', error);
 
@@ -187,11 +206,14 @@ export class BookingService {
     }
   }
 
-  async getInformation(req: Request){
+  async getInformation(req: Request) {
     try {
       const bookingDT = req.cookies['bookingData'];
       if (!bookingDT) {
-        throw new HttpException('Booking data not found in cookies', HttpStatus.NOT_FOUND);
+        throw new HttpException(
+          'Booking data not found in cookies',
+          HttpStatus.NOT_FOUND,
+        );
       }
       const bookingData = JSON.parse(bookingDT);
       console.log('BOOKING DATA: ', bookingData);
@@ -207,26 +229,26 @@ export class BookingService {
           'hotel.name AS name',
           'location.detailAddress AS address',
         ])
-        .where('hotel.id = :hotelId', { hotelId })
+        .where('hotel.id = :hotelId', { hotelId });
       const hotel = await hotelQuery.getRawOne();
       // console.log('HOTEL: ', hotel);
-      
+
       // Lấy ra thông tin người dùng
       const userId = bookingData.userId;
       const userQuery = await this.userRepository
-      .createQueryBuilder('user')
-      .select([
-        'user.name AS name',
-        'user.email AS email',
-        'user.phone AS phone'
-      ])
-      .where('user.id = :userId', { userId })
+        .createQueryBuilder('user')
+        .select([
+          'user.name AS name',
+          'user.email AS email',
+          'user.phone AS phone',
+        ])
+        .where('user.id = :userId', { userId });
       const user = await userQuery.getRawOne();
       // console.log('USER: ', user);
 
       const data = {
         hotel: hotel,
-        checkInDate: bookingData.checkInDate,  
+        checkInDate: bookingData.checkInDate,
         checkOutDate: bookingData.checkOutDate,
         roomType2: bookingData.roomType2,
         type2Price: bookingData.type2Price,
@@ -236,10 +258,10 @@ export class BookingService {
         user: user,
       };
 
-      return ({
+      return {
         message: 'Get information from cookie successfully',
         data,
-      });
+      };
     } catch (error) {
       console.error('Error booking hotels:', error);
 
@@ -253,7 +275,7 @@ export class BookingService {
     }
   }
 
-  async addNote(res: Response, note: string){
+  async addNote(res: Response, note: string) {
     try {
       res.cookie('note', JSON.stringify(note), {
         maxAge: 5 * 60 * 1000,
@@ -262,7 +284,7 @@ export class BookingService {
 
       return res.status(HttpStatus.OK).json({
         message: 'Note added successfully to booking data',
-        note
+        note,
       });
     } catch (error) {
       console.error('Error booking hotels:', error);
@@ -277,31 +299,39 @@ export class BookingService {
     }
   }
 
-  async processPayment(req: Request, res: Response, paymentMethod){
+  async processPayment(req: Request, res: Response, paymentMethod) {
     try {
       // console.log('PAYMENTMETHOD: ', paymentMethod);
       // Kiểm tra xem có thông tin booking trong cookie không
       const bookingDT = req.cookies['bookingData'];
       const noteDT = req.cookies['note'];
       if (!bookingDT || !noteDT) {
-        throw new HttpException('Booking data not found in cookies', HttpStatus.NOT_FOUND);
+        throw new HttpException(
+          'Booking data not found in cookies',
+          HttpStatus.NOT_FOUND,
+        );
       }
       const bookingData = JSON.parse(bookingDT);
       const note = JSON.parse(noteDT);
       // console.log('NOTE: ', note);
-  
+
       let status = '';
       if (paymentMethod === 'cash') {
         status = 'unpaid';
         // console.log('VAO DUOC PAYMENT CASH');
         // console.log('BOOKING DATA TRUOC KHI VAO: ', bookingData);
-        await this.saveDataIntoDatabase(bookingData, status, note, paymentMethod);
-      
+        await this.saveDataIntoDatabase(
+          bookingData,
+          status,
+          note,
+          paymentMethod,
+        );
+
         return res.status(HttpStatus.OK).json({
           message: 'Cash successful, information saved to database.',
         });
       }
-  
+
       if (paymentMethod === 'momo') {
         // Tạm thời chưa xử lý
         const amount = bookingData.sumPrice;
@@ -313,10 +343,9 @@ export class BookingService {
           paymentUrl,
         });
       }
-  
+
       // Trả về lỗi nếu phương thức thanh toán không hợp lệ
       throw new HttpException('Invalid payment method', HttpStatus.BAD_REQUEST);
-      
     } catch (error) {
       console.error('Error processing payment:', error);
       throw new HttpException(
@@ -329,20 +358,27 @@ export class BookingService {
     }
   }
 
-  private async createMomoPayment(amount: number, orderInfo: string): Promise<string> {
+  private async createMomoPayment(
+    amount: number,
+    orderInfo: string,
+  ): Promise<string> {
     const partnerCode = 'MOMO';
     const accessKey = process.env.MOMO_ACCESS_KEY;
     const secretKey = process.env.MOMO_SECRET_KEY;
     const redirectUrl = 'http://localhost:3000';
-    const ipnUrl = 'https://240b-2402-800-6315-309c-9cdf-3795-d2c5-46c.ngrok-free.app/callback';
+    const ipnUrl =
+      'https://240b-2402-800-6315-309c-9cdf-3795-d2c5-46c.ngrok-free.app/callback';
     const requestId = `${partnerCode}-${new Date().getTime()}`;
     const orderId = requestId;
     const requestType = 'captureWallet';
     const extraData = '';
-  
+
     const rawSignature = `accessKey=${accessKey}&amount=${amount}&extraData=${extraData}&ipnUrl=${ipnUrl}&orderId=${orderId}&orderInfo=${orderInfo}&partnerCode=${partnerCode}&redirectUrl=${redirectUrl}&requestId=${requestId}&requestType=${requestType}`;
-    const signature = crypto.createHmac('sha256', secretKey).update(rawSignature).digest('hex');
-  
+    const signature = crypto
+      .createHmac('sha256', secretKey)
+      .update(rawSignature)
+      .digest('hex');
+
     const requestBody = {
       partnerCode,
       partnerName: 'YourPartnerName',
@@ -359,49 +395,61 @@ export class BookingService {
       autoCapture: true,
       signature,
     };
-  
+
     try {
-      const response = await axios.post('https://test-payment.momo.vn/v2/gateway/api/create', requestBody, {
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await axios.post(
+        'https://test-payment.momo.vn/v2/gateway/api/create',
+        requestBody,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
         },
-      });
-  
+      );
+
       if (response.data && response.data.payUrl) {
         return response.data.payUrl;
       } else {
         throw new Error('Failed to get payment URL from MoMo.');
       }
     } catch (error) {
-      console.error('Error creating MoMo payment:', error.response?.data || error.message);
-      throw new HttpException('Error creating MoMo payment', HttpStatus.INTERNAL_SERVER_ERROR);
+      console.error(
+        'Error creating MoMo payment:',
+        error.response?.data || error.message,
+      );
+      throw new HttpException(
+        'Error creating MoMo payment',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async updatePaymentStatus(req: Request, res: Response, detailPay) {
     const bookingDT = req.cookies['bookingData'];
-      const noteDT = req.cookies['note'];
-      if (!bookingDT || !noteDT) {
-        throw new HttpException('Booking data not found in cookies', HttpStatus.NOT_FOUND);
-      }
-      const bookingData = JSON.parse(bookingDT);
-      const note = JSON.parse(noteDT);
-      // console.log('NOTE: ', note);
-      const paymentStatus = detailPay.status;
-      let status = '';
-      if(paymentStatus === 'success'){
-        status = 'paid';
-        this.saveDataIntoDatabase(bookingData, status, note, 'momo');
-        return res.status(HttpStatus.OK).json({
-          message: 'Payment success, save data into database',
-          data: { status, bookingData },
-        });
-      }
-      else if(paymentStatus === 'fail'){
-        return res.status(HttpStatus.BAD_REQUEST).json({
-          message: 'Payment failed, please try again.',
-        });
-      }
+    const noteDT = req.cookies['note'];
+    if (!bookingDT || !noteDT) {
+      throw new HttpException(
+        'Booking data not found in cookies',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    const bookingData = JSON.parse(bookingDT);
+    const note = JSON.parse(noteDT);
+    // console.log('NOTE: ', note);
+    const paymentStatus = detailPay.status;
+    let status = '';
+    if (paymentStatus === 'success') {
+      status = 'paid';
+      this.saveDataIntoDatabase(bookingData, status, note, 'momo');
+      return res.status(HttpStatus.OK).json({
+        message: 'Payment success, save data into database',
+        data: { status, bookingData },
+      });
+    } else if (paymentStatus === 'fail') {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: 'Payment failed, please try again.',
+      });
+    }
   }
 
   private async saveBooking(bookingData: any, status: string, note) {
@@ -411,51 +459,50 @@ export class BookingService {
       const checkInDate = bookingData.checkInDate;
       const checkOutDate = bookingData.checkOutDate;
       const bookingQuery = await this.bookingRepository
-      .createQueryBuilder()
-      .insert()
-      .into('booking')
-      .values({
-        user: { id: userId }, 
-        hotel: { id: hotelId }, 
-        checkinTime: checkInDate,
-        checkoutTime: checkOutDate,
-        status: status,
-        note: note.note,
-      })
-      .returning('id')
-      .execute();
-  
+        .createQueryBuilder()
+        .insert()
+        .into('booking')
+        .values({
+          user: { id: userId },
+          hotel: { id: hotelId },
+          checkinTime: checkInDate,
+          checkoutTime: checkOutDate,
+          status: status,
+          note: note.note,
+        })
+        .returning('id')
+        .execute();
+
       return bookingQuery.raw[0].id; // Trả về bookingId để sử dụng ở các bước tiếp theo
-  
     } catch (error) {
       console.error('Error saving booking:', error);
       throw error;
     }
   }
-  
+
   private async saveBookingDetail(bookingId: number, bookingData: any) {
     try {
       console.log('BOOKING ID BEFORE QUERY: ', bookingId);
       console.log('BOOKING DATA: ', bookingData);
       const bookingDetailQuery = await this.bookingDetailRepository
-      .createQueryBuilder()
-      .insert()
-      .into(BookingDetail)
-      .values([
-        {
-          booking: { id: bookingId }, 
-          type: '2', 
-          nums: bookingData.roomType2,
-          price: bookingData.type2Price,
-        },
-        {
-          booking: { id: bookingId },
-          type: '4',
-          nums: bookingData.roomType4,
-          price: bookingData.type4Price,
-        },
-      ])
-      .execute();
+        .createQueryBuilder()
+        .insert()
+        .into(BookingDetail)
+        .values([
+          {
+            booking: { id: bookingId },
+            type: '2',
+            nums: bookingData.roomType2,
+            price: bookingData.type2Price,
+          },
+          {
+            booking: { id: bookingId },
+            type: '4',
+            nums: bookingData.roomType4,
+            price: bookingData.type4Price,
+          },
+        ])
+        .execute();
     } catch (error) {
       console.error('Error saving booking detail:', error);
       throw error;
@@ -468,12 +515,14 @@ export class BookingService {
         .createQueryBuilder()
         .insert()
         .into(BookingRoom)
-        .values(bookingData.rooms.map((room) => ({
-          booking: {id: bookingId}, 
-          type: room.type,
-          room_name: room.name,
-          room: { id: room.id },
-        })))
+        .values(
+          bookingData.rooms.map((room) => ({
+            booking: { id: bookingId },
+            type: room.type,
+            room_name: room.name,
+            room: { id: room.id },
+          })),
+        )
         .execute();
     } catch (error) {
       console.error('Error saving booking detail:', error);
@@ -481,7 +530,12 @@ export class BookingService {
     }
   }
 
-  private async createPayment(bookingId: number, bookingData: any, paymentMethod: string, status: string) {
+  private async createPayment(
+    bookingId: number,
+    bookingData: any,
+    paymentMethod: string,
+    status: string,
+  ) {
     try {
       const paymentQuery = await this.paymentRepository
         .createQueryBuilder()
@@ -491,7 +545,7 @@ export class BookingService {
           method: paymentMethod,
           status: status,
           booking: { id: bookingId },
-          totalCost: bookingData.sumPrice
+          totalCost: bookingData.sumPrice,
         })
         .execute();
     } catch (error) {
@@ -499,8 +553,13 @@ export class BookingService {
       throw error;
     }
   }
-  
-  private async saveDataIntoDatabase(bookingData: any, status: string, note: string, paymentMethod: string) {
+
+  private async saveDataIntoDatabase(
+    bookingData: any,
+    status: string,
+    note: string,
+    paymentMethod: string,
+  ) {
     try {
       const bookingId = await this.saveBooking(bookingData, status, note);
       console.log('BOOKING ID: ', bookingId);
@@ -542,11 +601,11 @@ export class BookingService {
 //     const bookingQuery = await this.bookingRepository
 //       .createQueryBuilder()
 //       .insert()
-//       .into('booking') 
+//       .into('booking')
 //       .values({
 //         hotelId: bookingData.hotelId,
 //         userId: bookingData.userId,
-//         createdAt: Date.now(), 
+//         createdAt: Date.now(),
 //         checkInDate: bookingData.checkInDate,
 //         checkOutDate: bookingData.checkOutDate,
 //         status: status,
@@ -554,7 +613,7 @@ export class BookingService {
 //         note: note
 //       })
 //       .returning('id')
-//       .execute(); 
+//       .execute();
 //       const bookingId = bookingQuery.raw[0].id;
 
 //       const bookingDetailQuery = await this.bookingDetailRepository
@@ -564,14 +623,14 @@ export class BookingService {
 //       .into('booking_detail')
 //       .values([
 //         {
-//           bookingId: bookingId, 
-//           type: 2,               
+//           bookingId: bookingId,
+//           type: 2,
 //           nums: bookingData.roomType2,
 //           price: bookingData.type2Price
 //         },
 //         {
-//           bookingId: bookingId,  
-//           type: 4,               
+//           bookingId: bookingId,
+//           type: 4,
 //           nums: bookingData.roomType4,
 //           price: bookingData.type4Price
 //         }
@@ -579,7 +638,6 @@ export class BookingService {
 //       .execute();
 
 //       // Chỗ này xử lý lưu vào bảng booking_room (Lấy các phòng ở trong list selected lưu vào)
-      
 
 //   } catch (error) {
 //     console.error('Error saving booking with query builder:', error);

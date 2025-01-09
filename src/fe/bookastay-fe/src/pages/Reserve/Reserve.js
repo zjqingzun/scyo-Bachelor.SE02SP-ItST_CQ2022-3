@@ -181,6 +181,11 @@ const Reserve = () => {
                 const res = await paymentBooking(paymentMethod);
 
                 console.log(">>> res", res);
+
+                if (res.paymentUrl) {
+                    // open in current tab
+                    window.open(res.paymentUrl, "_self");
+                }
             } catch (error) {
                 console.log(">>> error", error);
                 toast.error("Failed to payment booking");

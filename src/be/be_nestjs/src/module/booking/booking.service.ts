@@ -190,7 +190,7 @@ export class BookingService {
         ])
         .where('hotel.id = :hotelId', { hotelId })
       const hotel = await hotelQuery.getRawOne();
-      console.log('HOTEL: ', hotel);
+      // console.log('HOTEL: ', hotel);
       
       // Lấy ra thông tin người dùng
       const userId = bookingData.userId;
@@ -203,7 +203,7 @@ export class BookingService {
       ])
       .where('user.id = :userId', { userId })
       const user = await userQuery.getRawOne();
-      console.log('USER: ', user);
+      // console.log('USER: ', user);
 
       const data = {
         hotel: hotel,
@@ -274,7 +274,7 @@ export class BookingService {
       let status = '';
       if (paymentMethod === 'cash') {
         status = 'unpaid';
-        console.log('VAO DUOC PAYMENT CASH');
+        // console.log('VAO DUOC PAYMENT CASH');
         console.log('BOOKING DATA TRUOC KHI VAO: ', bookingData);
         await this.saveDataIntoDatabase(bookingData, status, note);
       
@@ -305,75 +305,57 @@ export class BookingService {
 
   private async saveBooking(bookingData: any, status: string, note) {
     try {
-      console.log('BOOKING DATA: ', bookingData);
-      console.log('BOOKING DATA USER ID: ', bookingData.userId);
-      console.log('BOOKING DATA BEFORE QUERY: ', {
-        userId: bookingData.userId,
-        hotelId: bookingData.hotelId,
-        checkInDate: bookingData.checkInDate,
-        checkOutDate: bookingData.checkOutDate,
-        status: status,
-        note: note
-      });
+      const userId = bookingData.userId;
+      const hotelId = bookingData.hotelId;
+      const checkInDate = bookingData.checkInDate;
+      const checkOutDate = bookingData.checkOutDate;
       const bookingQuery = await this.bookingRepository
-        .createQueryBuilder()
-        .insert()
-        .into('booking')
-        .values({
-          userId: bookingData.userId,
-          hotelId: bookingData.hotelId,
-          checkInDate: bookingData.checkInDate,
-          checkOutDate: bookingData.checkOutDate,
-          status: status,
-          note: note
-        })
-        .returning('id')
-        .execute();
+      .createQueryBuilder()
+      .insert()
+      .into('booking')
+      .values({
+        user: { id: userId }, 
+        hotel: { id: hotelId }, 
+        checkinTime: checkInDate,
+        checkoutTime: checkOutDate,
+        status: status,
+        note: note.note,
+      })
+      .returning('id')
+      .execute();
   
       return bookingQuery.raw[0].id; // Trả về bookingId để sử dụng ở các bước tiếp theo
   
     } catch (error) {
       console.error('Error saving booking:', error);
-      throw new HttpException(
-        {
-          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
-          message: 'Internal server error while saving booking.',
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw error;
     }
   }
   
   private async saveBookingDetail(bookingId: number, bookingData: any) {
     try {
       const bookingDetailQuery = await this.bookingDetailRepository
-        .createQueryBuilder()
-        .insert()
-        .into('booking_detail')
-        .values([
-          {
-            bookingId: bookingId,
-            type: 2,
-            nums: bookingData.roomType2,
-            price: bookingData.type2Price
-          },
-          {
-            bookingId: bookingId,
-            type: 4,
-            nums: bookingData.roomType4,
-            price: bookingData.type4Price
-          }
-        ])
-        .execute();
+      .createQueryBuilder()
+      .insert()
+      .into(BookingDetail)
+      .values([
+        {
+          booking: { id: bookingId }, 
+          type: '2', 
+          nums: bookingData.roomType2,
+          price: bookingData.type2Price,
+        },
+        {
+          booking: { id: bookingId },
+          type: '4',
+          nums: bookingData.roomType4,
+          price: bookingData.type4Price,
+        },
+      ])
+      .execute();
     } catch (error) {
       console.error('Error saving booking detail:', error);
-      throw new HttpException(
-        {
-          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
-          message: 'Internal server error while saving booking detail.',
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw error;
     }
   }
   

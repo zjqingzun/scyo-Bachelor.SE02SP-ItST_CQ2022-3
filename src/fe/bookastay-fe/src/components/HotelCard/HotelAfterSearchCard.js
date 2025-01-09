@@ -27,6 +27,7 @@ const HotelAfterSearchCard = ({
     totalReviews: review,
     star,
     id,
+    isFav,
 }) => {
     const location = useLocation();
 

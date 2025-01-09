@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import React, { useEffect, useRef, useMemo, useCallback } from "react";
+import React, { useRef, useMemo, useCallback } from "react";
 import "./hotelDetails.css";
 import icons from "~/assets/icon";
 import SearchBarNoLocation from "~/components/SearchBarNoLocation";
@@ -115,6 +115,7 @@ const HotelDetails = () => {
     } = hotelDetails;
 
     const displayedImages = showAllImages ? images : images.slice(0, 5);
+    
     return (
         <div className="mx-auto p-5">
             <div className="row px-5 py-2">
@@ -171,12 +172,12 @@ const HotelDetails = () => {
                 <div className="my-5 search">
                     <SearchBarNoLocation
                         border-radius={12}
-                        searchData={{
-                            startDate: checkInDate,
-                            endDate: checkOutDate,
-                            numOfPeople: numOfPeople,
-                        }}
-                        handleSearch={handleSearch}
+                        // searchData={{
+                        //     startDate: checkInDate,
+                        //     endDate: checkOutDate,
+                        //     numOfPeople: numOfPeople,
+                        // }}
+                        // handleSearch={handleSearch}
                     />
                 </div>
                 <div className="px-2 my-5 py-5">

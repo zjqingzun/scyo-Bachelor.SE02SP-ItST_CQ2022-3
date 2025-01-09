@@ -1,27 +1,36 @@
-import { OmitType, PartialType } from "@nestjs/mapped-types";
-import { Booking } from "../entities/booking.entity";
-import { IsDateString, IsInt, IsNotEmpty, IsOptional } from "class-validator";
-import { Transform } from "class-transformer";
+import { IsDateString, IsInt, IsEmail, IsOptional, IsString, Min, IsNumber } from "class-validator";
+import { Transform } from 'class-transformer';
 
-export class CreateBookingDto extends OmitType(PartialType(Booking), []) {
-    @Transform(({ value }) => (value ? parseInt(value, 10) : 1))
+export class CreateBookingDto {
     @IsInt()
-    @IsNotEmpty()
-    userId: number;
-
-    @Transform(({ value }) => (value ? parseInt(value, 10) : 1))
-    @IsInt()
-    @IsNotEmpty()
     hotelId: number;
 
-    @IsDateString()
-    @IsNotEmpty()
-    checkinTime: string;
+    @IsInt()
+    userId: number;
 
     @IsDateString()
-    @IsNotEmpty()
-    checkoutTime: string;
+    checkInDate?: string;
 
-    @IsOptional()
-    note: string;
+    @IsDateString()
+    checkOutDate?: string;
+
+    @Transform(({ value }) => (value ? parseInt(value, 10) : undefined))
+    @IsInt()
+    roomType2?: number;
+
+    @Transform(({ value }) => (value ? parseInt(value, 10) : undefined))
+    @IsInt()
+    roomType4?: number;
+
+    @IsNumber()
+    @Min(0)
+    type2Price: number;
+
+    @IsNumber()
+    @Min(0)
+    type4Price: number;
+
+    @IsNumber()
+    @Min(0)
+    sumPrice: number;
 }

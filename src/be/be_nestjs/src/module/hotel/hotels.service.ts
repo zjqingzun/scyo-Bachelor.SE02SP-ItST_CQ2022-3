@@ -143,9 +143,10 @@ export class HotelsService {
               SELECT *
               FROM "user_favouriteHotel" where "hotelId" = ${hotel.id}
             `);
-              if (res.length > 0) {
-                isFav = true;
-              }
+            if (res.length > 0) {
+              isFav = true;
+            }
+            await queryRunner.release();
           }
           const presignedImages = await Promise.all(
             hotel.images.map((url) => {
@@ -336,9 +337,10 @@ export class HotelsService {
               SELECT *
               FROM "user_favouriteHotel" where "hotelId" = ${hotel.id}
             `);
-              if (res.length > 0) {
-                isFav = true;
-              }
+            if (res.length > 0) {
+              isFav = true;
+            }
+            await queryRunner.release();
           }
           const presignedImages = await Promise.all(
             hotel.images.map((url) => {

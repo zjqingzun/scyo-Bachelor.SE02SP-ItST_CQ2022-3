@@ -50,10 +50,9 @@ import { BookingRoomModule } from './module/booking_room/booking_room.module';
         synchronize: false,
         logging: ['query', 'error'],
         extra: {
-          max: 50,
-          min: 2,
-          idleTimeoutMillis: 15000, 
-          query_timeout: 10000,
+          max: 10,
+          min: 0,
+          idleTimeoutMillis: 10000, 
         },
       }),
       inject: [ConfigService],

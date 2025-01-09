@@ -52,6 +52,10 @@ function Login() {
         console.log(">>> login res", res);
 
         if (res && res.EC === 0) {
+            const { accessToken, refreshToken } = res.DT;
+            localStorage.setItem("accessToken", accessToken);
+            localStorage.setItem("refreshToken", refreshToken);
+            
             toast.success("Login successfully!");
             navigate("/admin/dashboard");
         } else {

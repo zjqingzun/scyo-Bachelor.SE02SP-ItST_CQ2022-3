@@ -10,9 +10,10 @@ import { Room } from '../room/entities/room.entity';
 import { User } from '../user/entities/user.entity';
 import { BookingDetail } from '../booking_detail/entities/booking_detail.entity';
 import { BookingRoom } from '../booking_room/entities/booking_room.entity';
+import { Payment } from '../payment/entities/payment.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Booking, Hotel, RoomType, Room, User, BookingDetail, BookingRoom])],
+  imports: [TypeOrmModule.forFeature([Booking, Hotel, RoomType, Room, User, BookingDetail, BookingRoom, Payment])],
   controllers: [BookingController],
   providers: [BookingService, MinioService],
 })

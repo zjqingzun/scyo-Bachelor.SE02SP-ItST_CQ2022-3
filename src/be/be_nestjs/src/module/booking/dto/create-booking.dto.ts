@@ -3,7 +3,7 @@ import { Transform } from 'class-transformer';
 
 export class CreateBookingDto {
     @IsInt()
-    idHotel: number;
+    hotelId: number;
 
     @IsInt()
     userId: number;
@@ -21,6 +21,14 @@ export class CreateBookingDto {
     @Transform(({ value }) => (value ? parseInt(value, 10) : undefined))
     @IsInt()
     roomType4?: number;
+
+    @IsNumber()
+    @Min(0)
+    type2Price: number;
+
+    @IsNumber()
+    @Min(0)
+    type4Price: number;
 
     @IsNumber()
     @Min(0)

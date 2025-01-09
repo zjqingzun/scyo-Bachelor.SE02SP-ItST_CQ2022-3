@@ -30,9 +30,6 @@ export class Booking {
     checkoutTime: string;
 
     @Column()
-    nums: number;
-
-    @Column()
     status: string;
 
     @Column()

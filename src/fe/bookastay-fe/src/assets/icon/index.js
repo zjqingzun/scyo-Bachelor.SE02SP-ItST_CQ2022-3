@@ -14,6 +14,7 @@ const icons = {
     starYellowIcon: require("~/assets/icon/star-solid (1).svg").default,
     starHalfIcon: require("~/assets/icon/star-half-stroke-solid.svg").default,
     starHalfYellowIcon: require("~/assets/icon/star-half-stroke-solid (1).svg").default,
+    starEmptyIcon: require("~/assets/icon/star-regular.svg").default,
     clockRotateLeftIcon: require("~/assets/icon/clock-rotate-left-solid.svg").default,
     searchIcon: require("~/assets/icon/magnifying-glass-solid.svg").default,
     redHeartIcon: require("~/assets/icon/red-heart.svg").default,

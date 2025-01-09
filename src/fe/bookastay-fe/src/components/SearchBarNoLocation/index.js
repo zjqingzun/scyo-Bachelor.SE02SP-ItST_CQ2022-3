@@ -85,7 +85,7 @@ const SearchBarNoLocation = (props) => {
 
     const handleClickSearchBtn = () => {
         if (window.location.pathname === "/") {
-            navigate("/after-search", {
+            navigate("/hotel/:id", {
                 state: {
                     startDate: startDate || formatDate(new Date()),
                     endDate: endDate || formatDate(addDays(new Date(), 2)),
@@ -262,10 +262,10 @@ const SearchBarNoLocation = (props) => {
                     </div>
                 </div>
                 <div
-                    className="search-bar__button"
+                    className="search-bar__btn ms-auto"
                     onClick={() => handleClickSearchBtn()}
                 >
-                    <span>{t("searchBar.search")}</span>
+                    <span className="mt-2">{t("searchBar.search")}</span>
                 </div>
             </div>
         </div>

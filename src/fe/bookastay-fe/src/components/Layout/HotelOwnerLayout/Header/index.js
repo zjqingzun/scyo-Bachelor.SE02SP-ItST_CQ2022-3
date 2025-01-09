@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { Avatar, Dropdown } from "antd";
 import { LoginOutlined, SettingOutlined } from "@ant-design/icons";
 import { GiHamburgerMenu } from "react-icons/gi";
+import { useNavigate } from "react-router-dom";
 
 import icons from "~/assets/icon";
 import { setCurrency } from "~/redux/action/currencyAction";
@@ -39,6 +40,7 @@ const CustomToggleForCurrency = React.forwardRef(({ children, onClick }, ref) =>
 // ));
 
 const Header = ({ toggle = () => {} }) => {
+    const navigate = useNavigate();
     const { t, i18n } = useTranslation();
     const currency = useSelector((state) => state.currency.currency);
     const userInfo = useSelector((state) => state.account.userInfo);

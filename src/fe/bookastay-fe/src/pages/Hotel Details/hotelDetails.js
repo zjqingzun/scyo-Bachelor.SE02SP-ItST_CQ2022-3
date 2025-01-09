@@ -9,6 +9,7 @@ const HotelDetail = () => {
     const location = useLocation();
 
     const [hotelDetails, setHotelDetails] = useState(null);
+    const [reviews, setReviews] = useState([]);
     const [isLoaded, setIsLoaded] = useState(false);
     const [isHearted, setIsHearted] = useState(false);
     const [showAllImages, setShowAllImages] = useState(false);
@@ -77,6 +78,21 @@ const HotelDetail = () => {
             }
         };
 
+        const fetchReviews = async () => {
+            try {
+                const response = await fetch(`http://localhost:3001/api/review/${id}`);
+                const data = await response.json();
+                if (data.status_code === 200) {
+                    setReviews(data.data.reviews);
+                } else {
+                    console.error('Failed to fetch reviews:', data.message);
+                }
+            } catch (error) {
+                console.error('Error fetching reviews:', error);
+            }
+        };
+
+        fetchReviews();
         fetchHotelDetails();
     }, [id, location.state]);
 
@@ -98,14 +114,14 @@ const HotelDetail = () => {
     return (
         <div className="mx-auto p-5">
             <div className="row px-5 py-2">
-                <div className="col-md-8 pe-5">
+                <div className="col-md-10 pb-3 d-flex flex-column">
                     <h1 className='mt-5' style={{ fontWeight: "bold", fontSize: "40px" }}>{name}</h1>
+                    <div className="d-flex align-items-center mt-3">
+                        <img src={icons.locationIcon} alt="Location" className="location-icon me-3" />
+                        <p className='pt-3 fs-3'>{address}</p>
+                    </div>
                 </div>
-                <div className="col-md-8 pb-3 d-flex">
-                    <img src={icons.locationIcon} alt="Location" className="location-icon me-3" />
-                    <p className='pt-3'>{address}</p>
-                </div>
-                <div className="col-md-4 d-flex justify-content-end">
+                <div className="col-md-2 d-flex justify-content-end">
                     <img
                         src={isHearted ? icons.redHeartIcon : icons.heartIcon}
                         alt="Heart"
@@ -215,6 +231,50 @@ const HotelDetail = () => {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div className="px-5 py-4">
+            <p className="mb-5" style={{ fontSize: "30px", fontWeight: "bold" }}>Customer Reviews</p>
+                {/* Reviews Section */}
+                <div className="reviews-section">
+                    {reviews.length > 0 ? (
+                        reviews.map((review) => (
+                            <div className="review-card" key={review.id}>
+                                <div className="profile-pic">
+                                    <img
+                                        src={review.avatar}
+                                        alt="Profile"
+                                        className="avatar-image"
+                                    />
+                                </div>
+                                <div className="name mb-2 fs-2 fw-bold">{review.name}</div>
+                                <div className="stars">
+                                    {Array.from({ length: 5 }).map((_, index) => {
+                                        const isFullStar = review.rate >= index + 1;
+                                        const isHalfStar = review.rate > index && review.rate < index + 1;
+                                        return isFullStar ? (
+                                            <img
+                                                key={index}
+                                                src={icons.starYellowIcon}
+                                                alt="Star"
+                                                className="star-icon"
+                                            />
+                                        ) : (
+                                            <img
+                                                key={index}
+                                                src={icons.starEmptyIcon}
+                                                alt="Empty Star"
+                                                className="star-gray-icon"
+                                            />
+                                        );
+                                    })}
+                                </div>
+                                <div className="comment">{review.comment}</div>
+                            </div>
+                        ))
+                    ) : (
+                        <p>No reviews available.</p>
+                    )}
                 </div>
             </div>
         </div>

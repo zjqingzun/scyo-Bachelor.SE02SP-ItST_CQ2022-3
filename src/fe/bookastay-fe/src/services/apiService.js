@@ -33,7 +33,8 @@ const getHotels = async (
         minStar: 0,
         page: 1,
         per_page: 6,
-    }
+    },
+    userId
 ) => {
     const params = new URLSearchParams({
         city: query?.city || "",
@@ -49,12 +50,31 @@ const getHotels = async (
         per_page: query?.per_page || 6,
     });
 
-    return await axios.get(`/hotels/search?${params.toString()}`);
+    return await axios.get(`/hotels/search/${userId}?${params.toString()}`);
+};
+
+const getHotelDetail = async (
+    hotelId,
+    query = {
+        checkInDate: "",
+        checkOutDate: "",
+        roomType2: 0,
+        roomType4: 0,
+    }
+) => {
+    const params = new URLSearchParams({
+        checkInDate: query?.checkInDate || "",
+        checkOutDate: query?.checkOutDate || "",
+        roomType2: query?.roomType2 || 0,
+        roomType4: query?.roomType4 || 0,
+    });
+
+    return await axios.get(`/hotels/${hotelId}?${params.toString()}`);
 };
 
 // Homepage api
-const getRecommendHotels = async () => {
-    return await axios.get(`/hotels/recommended-hotel`);
+const getRecommendHotels = async (userId) => {
+    return await axios.get(`/hotels/recommended-hotel/${userId}`);
 };
 
 // FAV
@@ -101,6 +121,7 @@ export {
     getRefreshToken,
     userRegister,
     getHotels,
+    getHotelDetail,
     getRecommendHotels,
     addFavorite,
     removeFavorite,

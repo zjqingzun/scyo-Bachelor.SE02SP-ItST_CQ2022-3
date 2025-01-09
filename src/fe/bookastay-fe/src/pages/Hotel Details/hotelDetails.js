@@ -1,71 +1,125 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useLocation } from "react-router-dom";
 import './hotelDetails.css';
 import icons from "~/assets/icon";
 import SearchBarNoLocation from '~/components/SearchBarNoLocation';
-import { ro } from 'date-fns/locale';
-import { useParams } from "react-router-dom";
 
-const HotelDetails = () => {
+const HotelDetail = () => {
+    const { id } = useParams();
     const location = useLocation();
-    const { name, address, images, price, rating, review, star, id, description } = location.state || {};
 
-    const [room1Count, setRoom1Count] = useState(0);
-    const [room2Count, setRoom2Count] = useState(0);
-    const roomPrice1 = 500000;
-    const roomPrice2 = 800000;
+    const [hotelDetails, setHotelDetails] = useState(null);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [isHearted, setIsHearted] = useState(false);
+    const [showAllImages, setShowAllImages] = useState(false);
 
-    const handleIncrease = (room, setRoomCount) => {
-        setRoomCount((prev) => prev + 1);
+    const [roomCounts, setRoomCounts] = useState({});
+    const [isWeekend, setIsWeekend] = useState(false);
+
+    // Hàm kiểm tra ngày cuối tuần
+    const checkWeekend = (date) => {
+        const day = new Date(date).getDay();
+        return day === 6 || day === 0; // Thứ 7 hoặc Chủ nhật
     };
 
-    const handleDecrease = (room, setRoomCount) => {
-        setRoomCount((prev) => (prev > 1 ? prev - 1 : 0));
+    const handleToggleHeart = () => {
+        setIsHearted((prev) => !prev);
     };
 
-    const totalRooms = room1Count + room2Count;
-    const totalPrice = room1Count * roomPrice1 + room2Count * roomPrice2;
-
-    const [isActive, setIsActive] = useState(false);
-
-    const handleHeartClick = () => {
-        setIsActive(!isActive);
+    const toggleImageView = () => {
+        setShowAllImages((prev) => !prev);
     };
 
-    const [showAll, setShowAll] = useState(false);
+    // Hàm thay đổi số lượng phòng
+    const handleRoomCountChange = (id, increment, maxRooms) => {
+        setRoomCounts((prevCounts) => {
+            const currentCount = prevCounts[id] || 0;
+            const newCount = currentCount + increment;
 
-    const visibleImages = showAll ? images : images.slice(0, 4);
+            if (newCount < 0 || newCount > maxRooms) {
+                return prevCounts; // Không cho phép giảm dưới 0 hoặc vượt quá số phòng tối đa
+            }
 
+            return {
+                ...prevCounts,
+                [id]: newCount,
+            };
+
+        });
+    };
+
+    useEffect(() => {
+        const {
+            checkInDate = "2025-01-01",
+            checkOutDate = "2025-01-02",
+            roomType2 = 0,
+            roomType4 = 0,
+        } = location.state || {};
+
+        setIsWeekend(checkWeekend(checkInDate) || checkWeekend(checkOutDate));
+
+        const fetchHotelDetails = async () => {
+            setIsLoaded(false);
+            try {
+                const response = await fetch(
+                    `http://localhost:3001/api/hotels/${id}?checkInDate=${checkInDate}&checkOutDate=${checkOutDate}&roomType2=${roomType2}&roomType4=${roomType4}`
+                );
+                const data = await response.json();
+                if (data.status_code === 200) {
+                    setHotelDetails(data.data);
+                } else {
+                    console.error("Error fetching hotel details");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            } finally {
+                setIsLoaded(true);
+            }
+        };
+
+        fetchHotelDetails();
+    }, [id, location.state]);
+
+    if (!isLoaded) return <div>Loading...</div>;
+
+    if (!hotelDetails) return <div>No details available</div>;
+
+    const {
+        name,
+        address,
+        description,
+        star,
+        images,
+        room_types,
+    } = hotelDetails;
+
+    const displayedImages = showAllImages ? images : images.slice(0, 5);
 
     return (
         <div className="mx-auto p-5">
             <div className="row px-5 py-2">
                 <div className="col-md-8 pe-5">
-                    <h1 className='mt-5'>{name}</h1>
+                    <h1 className='mt-5' style={{ fontWeight: "bold", fontSize: "40px" }}>{name}</h1>
                 </div>
                 <div className="col-md-8 pb-3 d-flex">
                     <img src={icons.locationIcon} alt="Location" className="location-icon me-3" />
                     <p className='pt-3'>{address}</p>
                 </div>
                 <div className="col-md-4 d-flex justify-content-end">
-                    <i
-                        id="heartIcon"
-                        className={`heart-icon ${isActive ? 'fa-solid' : 'fa-regular'} fa-heart`}
-                        onClick={handleHeartClick}
-                        style={{
-                            color: isActive ? 'red' : 'black',
-                            fontSize: isActive ? '24px' : '20px',
-                            cursor: 'pointer',
-                        }}
-                    ></i>
-                    <i className="fa-solid fa-share-nodes ps-3"></i>
+                    <img
+                        src={isHearted ? icons.redHeartIcon : icons.heartIcon}
+                        alt="Heart"
+                        className="heart-icon me-3"
+                        onClick={handleToggleHeart}
+                        style={{ cursor: 'pointer' }}
+                    />
                 </div>
             </div>
-            <div className="row px-5 py-3 mb-5">
+            <div className="row px-5 py-2">
                 <div className="col-md-8 pe-5">
                     <div className="image-gallery">
                         <div className="image-grid">
-                            {visibleImages.map((url, index) => (
+                            {displayedImages.map((url, index) => (
                                 <img
                                     key={index}
                                     src={url}
@@ -74,258 +128,90 @@ const HotelDetails = () => {
                                 />
                             ))}
                         </div>
-                        {images.length > 5 && !showAll && (
-                            <button onClick={() => setShowAll(true)} className="see-more-btn">
-                                See more
-                            </button>
-                        )}
-                        {showAll && (
-                            <button onClick={() => setShowAll(false)} className="see-less-btn">
-                                See less
+                        {images.length > 5 && (
+                            <button className="btn btn-primary mt-5" style={{ fontSize: "18px", padding: "7px 20px" }} onClick={toggleImageView}>
+                                {showAllImages ? "See Less" : "See More"}
                             </button>
                         )}
                     </div>
                 </div>
                 <div className="col-md-4 ps-5">
                     <h2>Rating overall:</h2>
-                    <div className="star-rating py-2">
-                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                        <img src={icons.starHalfYellowIcon} alt="Star" className="star-half-yellow-icon" />
+                    <div className="star-rating py-2 mb-5">
+                        {Array.from({ length: star }, (_, index) => (
+                            <img key={index} src={icons.starYellowIcon} alt="Star" className="star-icon mt-2" style={{ width: "40px" }} />
+                        ))}
                     </div>
-                    <p className="fs-3"> {description} </p>
-
-                    <button className="btn btn-primary fs-3 py-2 px-5 mt-5">Reserve</button>
                 </div>
             </div>
-
             <div className="px-5 py-4">
-                <div className='mx-5 search'>
+                <div className="row my-5">
+                    <p className="fs-3"> {description} </p>
+                </div>
+                <div className='search my-5'>
                     <SearchBarNoLocation border-radius={12} />
                 </div>
-
-                <div className="px-2 my-5 pb-5">
+                <div className="px-2 my-5 py-5">
                     <div className="card shadow p-3">
                         <div className="card-body">
                             <table className="table">
                                 <thead>
                                     <tr>
-                                        <th>Room type</th>
-                                        <th>Number of guest</th>
-                                        <th>Today's price</th>
+                                        <th className="fs-1">Room type</th>
+                                        <th className="fs-1">Number of guest</th>
+                                        <th className="fs-1">Today's price</th>
+                                        <th className="fs-1">Quantity</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {/* Room 1 */}
-                                    <tr>
-                                        <td>
-                                            <strong>One-Bedroom Apartment</strong>
-                                        </td>
-                                        <td>
-                                            <span className="fs-4">👤👤</span>
-                                        </td>
-                                        <td>
-                                            <div className="d-flex align-items-center">
-                                                <div className="me-3">
-                                                    <span>VND {roomPrice1.toLocaleString()}</span>
-                                                </div>
-                                                <div className="d-flex align-items-center ms-3">
+                                    {room_types.map((room) => (
+                                        <tr key={room.id}>
+                                            <td className="py-4">
+                                                <strong>{room.type === 2 ? "Room type 2" : "Room type 4"}</strong>
+                                            </td>
+                                            <td className="py-4">
+                                                <span className="fs-2">
+                                                    {room.type === 2 ? "👤👤" : "👤👤👤👤"}
+                                                </span>
+                                            </td>
+                                            <td className="py-4">
+                                                <span>
+                                                    VND {isWeekend ? room.weekend_price.toLocaleString() : room.price.toLocaleString()}
+                                                </span>
+                                            </td>
+                                            <td className="py-4">
+                                                <div className="d-flex align-items-center">
                                                     <button
+                                                        onClick={() => handleRoomCountChange(room.id, -1, room.numberOfRoom2)}
                                                         className="btn btn-outline-secondary"
-                                                        onClick={() => handleDecrease("room1", setRoom1Count)}
+                                                        disabled={(roomCounts[room.id] || 0) <= 0}
                                                     >
                                                         -
                                                     </button>
-                                                    <input
-                                                        type="text"
-                                                        value={room1Count}
-                                                        readOnly
-                                                        className="form-control mx-2 text-center"
-                                                        style={{ width: "50px" }}
-                                                    />
+                                                    <span className="mx-3">{roomCounts[room.id] || 0}</span>
                                                     <button
+                                                        onClick={() => handleRoomCountChange(room.id, 1, room.numberOfRoom2)}
                                                         className="btn btn-outline-secondary"
-                                                        onClick={() => handleIncrease("room1", setRoom1Count)}
+                                                        disabled={(roomCounts[room.id] || 0) >= room.numberOfRoom2}
                                                     >
                                                         +
                                                     </button>
                                                 </div>
-                                            </div>
-                                            <p className="mt-2">
-                                                = VND {(room1Count * roomPrice1).toLocaleString()}
-                                            </p>
-                                        </td>
-                                    </tr>
-
-                                    {/* Room 2 */}
-                                    <tr>
-                                        <td>
-                                            <strong>One-Bedroom Apartment</strong>
-                                        </td>
-                                        <td>
-                                            <span className="fs-4">👤👤👤👤</span>
-                                        </td>
-                                        <td>
-                                            <div className="d-flex align-items-center">
-                                                <div className="me-3">
-                                                    <span>VND {roomPrice2.toLocaleString()}</span>
-                                                </div>
-                                                <div className="d-flex align-items-center ms-3">
-                                                    <button
-                                                        className="btn btn-outline-secondary"
-                                                        onClick={() => handleDecrease("room2", setRoom2Count)}
-                                                    >
-                                                        -
-                                                    </button>
-                                                    <input
-                                                        type="text"
-                                                        value={room2Count}
-                                                        readOnly
-                                                        className="form-control mx-2 text-center"
-                                                        style={{ width: "50px" }}
-                                                    />
-                                                    <button
-                                                        className="btn btn-outline-secondary"
-                                                        onClick={() => handleIncrease("room2", setRoom2Count)}
-                                                    >
-                                                        +
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <p className="mt-2">
-                                                = VND {(room2Count * roomPrice2).toLocaleString()}
-                                            </p>
-                                        </td>
-                                    </tr>
+                                            </td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
-
-                            {/* Summary Section */}
-                            <div className="text-end">
-                                <h5>
-                                    {totalRooms} rooms for VND {totalPrice.toLocaleString()}
-                                </h5>
-                                <p>Includes taxes and charges</p>
-                                <button className="btn btn-primary fs-3 py-2 px-5 mt-2">Reserve</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="px-2 my-5 pb-5">
-                    <div className="review-container d-flex flex-column align-items-center mx-auto">
-                        <div className="rating-header d-flex align-items-center mb-5 mt-3">
-                            <div className="score fw-bold">4.4</div>
-                            <div>
-                                <div className="review-text">Very good</div>
-                                <div className="review-count">132 reviews</div>
-                            </div>
-                        </div>
-
-                        <div className="review-slider d-flex align-items-center mb-5 pb-5">
-                            <div className="arrow">
-                                <img src={icons.chevronLeftIcon} alt="Arrow" className="arrow-left-icon" />
-                            </div>
-
-                            <div className="review-card-container">
-                                <div className="review-card">
-                                    <div className="profile-pic"></div>
-                                    <div className="name">Customer's name</div>
-                                    <div className="stars">
-                                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                                        <img src={icons.starHalfYellowIcon} alt="Star" className="star-half-yellow-icon" />
-                                    </div>
-                                    <div className="comment">Comment sth here...</div>
-                                </div>
-
-                                <div className="review-card">
-                                    <div className="profile-pic"></div>
-                                    <div className="name">Customer's name</div>
-                                    <div className="stars">
-                                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                                        <img src={icons.starHalfYellowIcon} alt="Star" className="star-half-yellow-icon" />
-                                    </div>
-                                    <div className="comment">Comment sth here...</div>
-                                </div>
-
-                                <div className="review-card">
-                                    <div className="profile-pic"></div>
-                                    <div className="name">Customer's name</div>
-                                    <div className="stars">
-                                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                                        <img src={icons.starHalfYellowIcon} alt="Star" className="star-half-yellow-icon" />
-                                    </div>
-                                    <div className="comment">Comment sth here...</div>
-                                </div>
-
-                                <div className="review-card">
-                                    <div className="profile-pic"></div>
-                                    <div className="name">Customer's name</div>
-                                    <div className="stars">
-                                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                                        <img src={icons.starYellowIcon} alt="Star" className="star-icon" />
-                                        <img src={icons.starYellowIcon} alt="Star" className="star-half-yellow-icon" />
-                                    </div>
-                                    <div className="comment">Comment sth here...</div>
-                                </div>
-                            </div>
-
-                            <div className="arrow">
-                                <img src={icons.chevronRightIcon} alt="Arrow" className="arrow-right-icon" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="px-2 my-5 pb-5">
-                    <div className="row g-0 align-items-center">
-                        <div className="col-md-4 text-bg-light text-center">
-                            <div className="fs-1 h-100">
-                                Q&A
-                            </div>
-                        </div>
-
-                        <div className="col-md-8 accordion accordion-flush">
-                            <div className="accordion-item">
-                                <h2 className="accordion-header">
-                                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-                                        Accordion Item #1
-                                    </button>
-                                </h2>
-                                <div id="flush-collapseOne" className="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-                                    <div className="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> className. This is the first item's accordion body.</div>
-                                </div>
-                            </div>
-                            <div className="accordion-item">
-                                <h2 className="accordion-header">
-                                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
-                                        Accordion Item #2
-                                    </button>
-                                </h2>
-                                <div id="flush-collapseTwo" className="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-                                    <div className="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> className. This is the second item's accordion body. Let's imagine this being filled with some actual content.</div>
-                                </div>
-                            </div>
-                            <div className="accordion-item">
-                                <h2 className="accordion-header">
-                                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
-                                        Accordion Item #3
-                                    </button>
-                                </h2>
-                                <div id="flush-collapseThree" className="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-                                    <div className="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> className. This is the third item's accordion body. Nothing more exciting happening here in terms of content, but just filling up the space to make it look, at least at first glance, a bit more representative of how this would look in a real-world application.</div>
-                                </div>
+                            <div className="text-end mt-3">
+                                <p>
+                                    Total: VND{" "}
+                                    {room_types.reduce((total, room) => {
+                                        const count = roomCounts[room.id] || 0;
+                                        const price = isWeekend ? room.weekend_price : room.price;
+                                        return total + count * price;
+                                    }, 0).toLocaleString()}
+                                </p>
+                                <button className="btn btn-success" style={{ fontSize: "20px", padding: "5px 15px" }}>Reserve</button>
                             </div>
                         </div>
                     </div>
@@ -335,4 +221,4 @@ const HotelDetails = () => {
     );
 };
 
-export default HotelDetails;
+export default HotelDetail;

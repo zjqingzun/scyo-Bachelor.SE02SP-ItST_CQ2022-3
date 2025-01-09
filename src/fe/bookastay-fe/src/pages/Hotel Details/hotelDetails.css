@@ -62,8 +62,8 @@
 
 .see-more-btn,
 .see-less-btn {
-    margin-top: 10px;
-    padding: 10px 20px;
+    margin-top: 25px;
+    padding: 8px 20px;
     background-color: #007bff;
     color: white;
     border: none;
@@ -75,8 +75,6 @@
 .see-less-btn:hover {
     background-color: #0056b3;
 }
-
-
 
 
 .rating-header {
@@ -141,7 +139,11 @@
 .star-icon,
 .star-half-icon,
 .star-half-yellow-icon {
-    width: 25px;
+    width: 20px;
     margin-right: 10px;
     margin-bottom: 15px;
+}
+
+.heart-icon {
+    width: 40px;
 }

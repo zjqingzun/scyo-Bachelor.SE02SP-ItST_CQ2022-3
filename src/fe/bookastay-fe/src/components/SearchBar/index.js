@@ -242,49 +242,6 @@ const SearchBar = (props) => {
                                 </button>
                             </div>
                         </div>
-                        {/* <div className="search-bar__people-popup-item">
-                            <label htmlFor="children">Children</label>
-                            <div className="number-select">
-                                <button
-                                    className="number-select__btn"
-                                    onClick={() =>
-                                        setNumOfPeople((prev) => ({
-                                            ...prev,
-                                            children: prev.children > 0 ? prev.children - 1 : 0,
-                                        }))
-                                    }
-                                >
-                                    <svg
-                                        style={{
-                                            fill: numOfPeople.children === 0 ? "#ccc" : "",
-                                        }}
-                                        className="number-select__btn-icon"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 448 512"
-                                    >
-                                        <path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z" />
-                                    </svg>
-                                </button>
-                                <span>{numOfPeople.children}</span>
-                                <button
-                                    className="number-select__btn"
-                                    onClick={() =>
-                                        setNumOfPeople((prev) => ({
-                                            ...prev,
-                                            children: Number(prev.children) + 1,
-                                        }))
-                                    }
-                                >
-                                    <svg
-                                        className="number-select__btn-icon"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 448 512"
-                                    >
-                                        <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div> */}
                         <div className="search-bar__people-popup-item">
                             <label htmlFor="room">{t("searchBar.quadruple")}</label>
                             <div className="number-select">

@@ -60,6 +60,7 @@ const AfterSearch = () => {
             return;
         }
 
+        const { destination, startDate, endDate, numOfPeople } = location.state || {};
         setIsLoaded(true);
 
         try {

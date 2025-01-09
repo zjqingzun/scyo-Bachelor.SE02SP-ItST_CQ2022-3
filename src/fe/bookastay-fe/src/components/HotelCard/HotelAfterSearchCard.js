@@ -2,6 +2,7 @@ import { memo, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 import icons from "~/assets/icon";
@@ -24,13 +25,29 @@ const HotelAfterSearchCard = ({
     totalReviews: review,
     star,
     id,
-    description
+
 }) => {
+    const location = useLocation();
+
     const navigate = useNavigate();
     const handleBookNow = () => {
+        
         navigate(`/hotel/${id}`, {
-            state: { id, name, address, images, price, rating, review, star, description },
-        }); // Chuyển hướng đến route chi tiết khách sạn
+            state: {
+                id,
+                name,
+                address,
+                images,
+                price,
+                rating,
+                review,
+                star,
+                checkInDate: location.state?.startDate, // Truyền từ location.state
+                checkOutDate: location.state?.endDate,
+                roomType2: location.state?.numOfPeople?.roomType2,
+                roomType4: location.state?.numOfPeople?.roomType4,
+            },
+        });
     };
 
     const { t } = useTranslation();

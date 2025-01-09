@@ -52,4 +52,7 @@ export class Booking {
 
     @OneToMany(() => BookingRoom, (bookingRoom) => bookingRoom.booking)
     bookingRooms: BookingRoom[];
+
+    @OneToMany(() => Payment, (payment) => payment.booking)
+    payments: Payment[];
 }

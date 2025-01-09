@@ -117,4 +117,16 @@ export class UserController {
       hotelierId as unknown as number,
     );
   }
+
+  @Get('admin/dashboard/t/user')
+  @Public()
+  async getTotalUsers() {
+    return await this.userService.totalUsers();
+  }
+
+  @Get('admin/dashboard/t/hotel')
+  @Public()
+  async getTotalHotels() {
+    return await this.userService.totalHotels();
+  }
 }

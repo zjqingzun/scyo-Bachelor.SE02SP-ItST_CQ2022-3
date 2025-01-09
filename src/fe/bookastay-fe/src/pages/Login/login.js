@@ -62,7 +62,7 @@ function Login() {
 
     return (
         <div className="d-flex justify-content-center align-items-center body">
-            <div className="login-container shadow-lg">
+            <div className="login-container shadow-lg" style={{ backgroundColor: "#fff", padding: "40px", color: "#000", height: "100%" }}>
                 <h1 className="text-center login-title mb-3">LOGIN</h1>
                 <form onSubmit={handleSubmit} className="d-flex flex-column py-3">
                     {errorMessage && (

@@ -57,12 +57,33 @@ function ManageUsers() {
 
   const [showModal, setShowModal] = useState(false);
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = (userId) => {
+    setSelectedUserId(userId);
     setShowModal(true);
   };
 
-  const handleConfirmDelete = () => {
-    console.log('Item deleted!');
+  const handleConfirmDelete = async () => {
+    if (selectedUserId) {
+      try {
+        const response = await fetch(`http://localhost:3001/api/user/delete/${selectedUserId}`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          alert('User deleted successfully!');
+          // Cập nhật danh sách người dùng
+          fetchUsers(currentPage, itemsPerPage);
+        } else {
+          const errorData = await response.json();
+          alert(`Error deleting user: ${errorData.message}`);
+        }
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        alert('An error occurred while deleting the user.');
+      } finally {
+        setShowModal(false); // Đóng modal
+      }
+    }
     setShowModal(false);
   };
 
@@ -76,10 +97,10 @@ function ManageUsers() {
         <div className="title">Users</div>
         <div className="text-white p-4 rounded text-center box" style={{ width: '20%' }}>
           <h3>Total Users</h3>
-          <h1>{ totalUsers }</h1>
+          <h1>{totalUsers}</h1>
         </div>
       </div>
-      
+
       {loading ? (
         <p>Loading...</p>
       ) : (
@@ -111,7 +132,7 @@ function ManageUsers() {
                   <td>{new Date(app.dob).toLocaleDateString()}</td>
                   <td>{app.cccd}</td>
                   <td>
-                    <a style={{ cursor: 'pointer' }} onClick={handleDeleteClick}>
+                    <a style={{ cursor: 'pointer' }} onClick={() => handleDeleteClick(app.id)}>
                       <img src={icons.trashIcon} alt='Delete' className='icon trash-icon' />
                     </a>
                   </td>
@@ -148,7 +169,7 @@ function ManageUsers() {
             <div className="d-flex justify-content-center align-items-center">
               <button
                 onClick={handleGoToPage}
-                className="btn btn-success mx-2 fs-4" style={{ padding: "5px 15px"}}
+                className="btn btn-success mx-2 fs-4" style={{ padding: "5px 15px" }}
               >
                 Go to
               </button>
@@ -156,7 +177,7 @@ function ManageUsers() {
                 type="number"
                 value={inputPage}
                 onChange={handleInputPageChange}
-                className="form-control mx-2 fs-4" 
+                className="form-control mx-2 fs-4"
                 placeholder="Enter page number"
                 style={{ width: '70px', padding: "5px 15px" }}
               />

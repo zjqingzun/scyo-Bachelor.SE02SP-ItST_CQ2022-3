@@ -10,8 +10,14 @@ export const convertCurrency = (amount, fromCurrency, toCurrency, exchangeRate) 
 };
 
 export const formatCurrency = (amount, currency, baseCurrency) => {
-    return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: currency,
-    }).format(amount);
+    const isVND = currency === "VND";
+
+    const formattedAmount = new Intl.NumberFormat("en-US").format(amount);
+
+    return isVND
+        ? `VND ${formattedAmount}`
+        : new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: currency,
+          }).format(amount);
 };

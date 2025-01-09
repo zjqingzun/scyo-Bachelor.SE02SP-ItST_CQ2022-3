@@ -160,7 +160,7 @@ const HotelDetails = () => {
                     <h2>Rating overall:</h2>
                     <div className="star-rating py-2 mb-5">
                         {Array.from({ length: star }, (_, index) => (
-                            <img key={index} src={icons.starYellowIcon} alt="Star" className="star-icon mt-2" style={{ width: "40px" }} />
+                            <img key={index} src={icons.starYellowIcon} alt="Star" className="star-icon mt-2" style={{ width: "50px" }} />
                         ))}
                     </div>
                 </div>
@@ -290,7 +290,6 @@ const HotelDetails = () => {
                     </div>
                 </div>
             </div>
-            );
         </div>
     );
 };

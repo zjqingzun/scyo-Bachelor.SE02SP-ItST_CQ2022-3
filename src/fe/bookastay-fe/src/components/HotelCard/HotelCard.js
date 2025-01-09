@@ -5,18 +5,45 @@ import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 import { addFavorite, getAllFavorite, removeFavorite } from "~/services/apiService";
+import { useNavigate } from "react-router-dom";
+import { addDays, formatDate } from "~/utils/datetime";
 
 const HotelCard = ({
     id,
     name,
     address,
+    star,
+    description,
     images,
     minRoomPrice: price,
     averageRating: rating,
     totalReviews: review,
     isFav,
+    checkInDate = null,
+    checkOutDate = null,
 }) => {
     const { t } = useTranslation();
+
+    const navigate = useNavigate();
+
+    const handleBookNow = () => {
+        navigate(`/hotel/${id}`, {
+            state: {
+                id,
+                name,
+                address,
+                images,
+                price,
+                rating,
+                review,
+                star,
+                description,
+                isFav,
+                checkInDate: checkInDate || formatDate(addDays(new Date(), 0), "yyyy-mm-dd"),
+                checkOutDate: checkOutDate || formatDate(addDays(new Date(), 2), "yyyy-mm-dd"),
+            },
+        }); // Chuyển hướng đến route chi tiết khách sạn
+    };
 
     const currency = useSelector((state) => state.currency.currency);
     const exchangeRate = useSelector((state) => state.currency.exchangeRate);
@@ -71,7 +98,13 @@ const HotelCard = ({
     return (
         <div className="hotel-card">
             <div className="hotel-card__image-wrap">
-                <a href="#!">
+                <a
+                    href="#!"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        handleBookNow();
+                    }}
+                >
                     <img src={images[0]} alt={name} className="hotel-card__image" />
                 </a>
 
@@ -118,7 +151,10 @@ const HotelCard = ({
                 </p>
                 <div className="hotel-card__row">
                     <span className="hotel-card__price">{formatCurrency(nowPrice, currency)}</span>
-                    <button className="hotel-card__btn ms-auto mt-3">
+                    <button
+                        className="hotel-card__btn ms-auto mt-3"
+                        onClick={() => handleBookNow()}
+                    >
                         {t("hotelCard.BookNow")}
                     </button>
                 </div>

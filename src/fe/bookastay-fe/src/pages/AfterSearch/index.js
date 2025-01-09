@@ -211,7 +211,12 @@ const AfterSearch = () => {
                                 {filteredHotels.length > 0 ? (
                                     filteredHotels.map((hotel) => (
                                         <div key={hotel.id} className="col">
-                                            <HotelCard {...hotel} />
+                                            <HotelCard
+                                                {...hotel}
+                                                checkInDate={location.state.startDate}
+                                                checkOutDate={location.state.endDate}
+                                                numOfPeople={location.state.numOfPeople}
+                                            />
                                         </div>
                                     ))
                                 ) : (

@@ -15,6 +15,7 @@ import staticImages from "~/assets/image";
 import "leaflet/dist/leaflet.css";
 import "./HotelCard.scss";
 import { addFavorite, getAllFavorite, removeFavorite } from "~/services/apiService";
+import { addDays, formatDate } from "~/utils/datetime";
 
 const HotelAfterSearchCard = ({
     name,
@@ -27,11 +28,28 @@ const HotelAfterSearchCard = ({
     id,
     description,
     isFav,
+    checkInDate,
+    checkOutDate,
+    numOfPeople,
 }) => {
     const navigate = useNavigate();
     const handleBookNow = () => {
         navigate(`/hotel/${id}`, {
-            state: { id, name, address, images, price, rating, review, star, description },
+            state: {
+                id,
+                name,
+                address,
+                images,
+                price,
+                rating,
+                review,
+                star,
+                description,
+                isFav,
+                checkInDate: checkInDate || formatDate(new Date(), "yyyy-mm-dd"),
+                checkOutDate: checkOutDate || formatDate(addDays(new Date(), 2), "yyyy-mm-dd"),
+                numOfPeople: numOfPeople,
+            },
         }); // Chuyển hướng đến route chi tiết khách sạn
     };
 

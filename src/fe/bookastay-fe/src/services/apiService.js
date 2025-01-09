@@ -115,6 +115,23 @@ const getAvatarUrl = async (email) => {
     return await axios.get(`/user/avatar/url/${email}`);
 };
 
+// Booking
+const startBooking = async (data) => {
+    const {
+        hotelId,
+        checkInDate,
+        checkOutDate,
+        roomType2,
+        type2Price,
+        roomType4,
+        type4Price,
+        sumPrice,
+        userId,
+    } = data;
+
+    return await axios.post("/booking/start", data);
+};
+
 export {
     userLogin,
     getProfile,
@@ -129,4 +146,5 @@ export {
     updateAvatar,
     getAvatarUrl,
     updateProfile,
+    startBooking,
 };

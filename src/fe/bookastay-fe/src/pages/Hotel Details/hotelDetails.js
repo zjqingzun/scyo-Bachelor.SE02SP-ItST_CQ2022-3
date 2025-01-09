@@ -1,21 +1,23 @@
 import { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import React, { useRef, useMemo, useCallback } from "react";
 import "./hotelDetails.css";
 import icons from "~/assets/icon";
 import SearchBarNoLocation from "~/components/SearchBarNoLocation";
-import { getHotelDetail } from "~/services/apiService";
+import { getHotelDetail, startBooking } from "~/services/apiService";
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 import { useSelector } from "react-redux";
 
 const HotelDetails = () => {
     const { id } = useParams();
     const location = useLocation();
+    const navigate = useNavigate();
 
     const { checkInDate, checkOutDate, numOfPeople, isFav } = location.state || {};
 
     const currency = useSelector((state) => state.currency.currency);
     const exchangeRate = useSelector((state) => state.currency.exchangeRate);
+    const userInfo = useSelector((state) => state.account.userInfo);
 
     const newCurrency = useRef("VND");
 
@@ -208,6 +210,41 @@ const HotelDetails = () => {
 
     const displayedImages = showAllImages ? images : images.slice(0, 5);
 
+    const handleReserve = async () => {
+        const data = {
+            hotelId: +id,
+            checkInDate: new Date(checkInDate).toISOString(),
+            checkOutDate: new Date(checkOutDate).toISOString(),
+            roomType2: 2,
+            type2Price: roomPrice1,
+            roomType4: 4,
+            type4Price: roomPrice2,
+            sumPrice: room_types.reduce((total, room) => {
+                const count = roomCounts[room.id] || 0;
+                const price = isWeekend ? room.weekend_price : room.price;
+                return total + count * price;
+            }, 0),
+            userId: +userInfo.id,
+        };
+
+        const res = await startBooking(data);
+
+        const numberOfRoom2 =
+            roomCounts[hotelDetails.room_types.find((room) => room.type === 2).id] || 0;
+        const numberOfRoom4 =
+            roomCounts[hotelDetails.room_types.find((room) => room.type === 4).id] || 0;
+
+        console.log(">>> Start booking response: ", res);
+
+        navigate("/reserve", {
+            state: {
+                ...res.bookingData,
+                numberOfRoom2: numberOfRoom2,
+                numberOfRoom4: numberOfRoom4,
+            },
+        });
+    };
+
     return (
         <div className="mx-auto p-5">
             <div className="row px-5 py-2">
@@ -381,6 +418,7 @@ const HotelDetails = () => {
                                 <button
                                     className="btn btn-success"
                                     style={{ fontSize: "20px", padding: "5px 15px" }}
+                                    onClick={() => handleReserve()}
                                 >
                                     Reserve
                                 </button>

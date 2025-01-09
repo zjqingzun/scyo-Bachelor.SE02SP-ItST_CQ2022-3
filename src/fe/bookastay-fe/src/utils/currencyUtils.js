@@ -6,11 +6,11 @@ export const convertCurrency = (amount, fromCurrency, toCurrency, exchangeRate) 
     const decimalAmount = new Decimal(amount);
     const rate = new Decimal(exchangeRate[fromCurrency][toCurrency]);
 
-    console.log(">>> fromCurrency", fromCurrency);
-    console.log(">>> toCurrency", toCurrency);
-    console.log(">>> rate", rate.toNumber());
-    console.log(">>> decimalAmount", decimalAmount.toNumber());
-    console.log(">>> decimalAmount * rate", decimalAmount.mul(rate).toNumber());
+    // console.log(">>> fromCurrency", fromCurrency);
+    // console.log(">>> toCurrency", toCurrency);
+    // console.log(">>> rate", rate.toNumber());
+    // console.log(">>> decimalAmount", decimalAmount.toNumber());
+    // console.log(">>> decimalAmount * rate", decimalAmount.mul(rate).toNumber());
 
     return decimalAmount.mul(rate).toNumber();
 };

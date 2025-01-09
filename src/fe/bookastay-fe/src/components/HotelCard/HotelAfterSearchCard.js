@@ -26,6 +26,7 @@ const HotelAfterSearchCard = ({
     star,
     id,
     description,
+    isFav,
 }) => {
     const navigate = useNavigate();
     const handleBookNow = () => {
@@ -41,7 +42,7 @@ const HotelAfterSearchCard = ({
 
     const userInfo = useSelector((state) => state.account.userInfo);
 
-    const [isFavorite, setIsFavorite] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(isFav);
 
     const [nowPrice, setNowPrice] = useState(price);
 

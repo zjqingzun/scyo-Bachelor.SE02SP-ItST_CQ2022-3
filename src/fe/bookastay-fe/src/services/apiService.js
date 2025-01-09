@@ -33,7 +33,8 @@ const getHotels = async (
         minStar: 0,
         page: 1,
         per_page: 6,
-    }
+    },
+    userId
 ) => {
     const params = new URLSearchParams({
         city: query?.city || "",
@@ -49,12 +50,12 @@ const getHotels = async (
         per_page: query?.per_page || 6,
     });
 
-    return await axios.get(`/hotels/search?${params.toString()}`);
+    return await axios.get(`/hotels/search/${userId}?${params.toString()}`);
 };
 
 // Homepage api
-const getRecommendHotels = async () => {
-    return await axios.get(`/hotels/recommended-hotel`);
+const getRecommendHotels = async (userId) => {
+    return await axios.get(`/hotels/recommended-hotel/${userId}`);
 };
 
 // FAV

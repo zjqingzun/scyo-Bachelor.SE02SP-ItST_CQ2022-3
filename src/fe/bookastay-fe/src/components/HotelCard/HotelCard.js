@@ -14,6 +14,7 @@ const HotelCard = ({
     minRoomPrice: price,
     averageRating: rating,
     totalReviews: review,
+    isFav,
 }) => {
     const { t } = useTranslation();
 
@@ -22,7 +23,7 @@ const HotelCard = ({
 
     const userInfo = useSelector((state) => state.account.userInfo);
 
-    const [isFavorite, setIsFavorite] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(isFav);
 
     const [nowPrice, setNowPrice] = useState(price);
 

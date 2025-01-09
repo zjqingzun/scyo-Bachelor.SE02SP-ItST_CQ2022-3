@@ -11,6 +11,7 @@ import { HotelAfterSearchCard as HotelCard } from "~/components/HotelCard";
 
 import { getHotels } from "~/services/apiService";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 // This function converts the string to lowercase, then perform the conversion
 function toLowerCaseNonAccentVietnamese(str) {
@@ -39,6 +40,8 @@ function toLowerCaseNonAccentVietnamese(str) {
 const AfterSearch = () => {
     const location = useLocation();
 
+    const userInfo = useSelector((state) => state.account.userInfo);
+
     const [searchedHotel, setSearchedHotel] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(6);
@@ -63,19 +66,22 @@ const AfterSearch = () => {
         setIsLoaded(true);
 
         try {
-            const response = await getHotels({
-                city: location.state.destination ?? "",
-                checkInDate: location.state.startDate ?? "",
-                checkOutDate: location.state.endDate ?? "",
-                roomType2: location.state.numOfPeople?.roomType2 ?? 0,
-                roomType4: location.state.numOfPeople?.roomType4 ?? 0,
-                page: currentPage,
-                minPrice: filterData.minPrice || 0,
-                maxPrice: filterData.maxPrice || 0,
-                minRating: filterData.minRating || 0,
-                minStar: filterData.minStar || 0,
-                per_page: pageSize,
-            });
+            const response = await getHotels(
+                {
+                    city: location.state.destination ?? "",
+                    checkInDate: location.state.startDate ?? "",
+                    checkOutDate: location.state.endDate ?? "",
+                    roomType2: location.state.numOfPeople?.roomType2 ?? 0,
+                    roomType4: location.state.numOfPeople?.roomType4 ?? 0,
+                    page: currentPage,
+                    minPrice: filterData.minPrice || 0,
+                    maxPrice: filterData.maxPrice || 0,
+                    minRating: filterData.minRating || 0,
+                    minStar: filterData.minStar || 0,
+                    per_page: pageSize,
+                },
+                userInfo.id
+            );
 
             if (response.status_code === 200 && response.data) {
                 const data = response.data;

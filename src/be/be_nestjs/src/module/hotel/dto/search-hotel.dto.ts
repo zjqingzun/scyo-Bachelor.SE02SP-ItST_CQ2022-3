@@ -19,8 +19,8 @@ export class SearchHotelDto {
     @Transform(({ value }) => {
         if (!value || value.trim() === '') {
             const today = new Date();
-            const checkOutDate = new Date(today.setDate(today.getDate() + 3));
-            return checkOutDate.toISOString().split('T')[0]; // Ngày hôm nay + 3 ngày
+            const checkOutDate = new Date(today.setDate(today.getDate() + 2));
+            return checkOutDate.toISOString().split('T')[0]; // Ngày hôm nay + 2 ngày
         }
         return value;
     })

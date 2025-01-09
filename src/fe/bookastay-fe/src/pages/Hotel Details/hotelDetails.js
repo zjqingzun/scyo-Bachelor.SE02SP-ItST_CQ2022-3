@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import "./hotelDetails.css";
 import icons from "~/assets/icon";
 import SearchBarNoLocation from "~/components/SearchBarNoLocation";
-import { ro } from "date-fns/locale";
-import { useParams } from "react-router-dom";
+import { getHotelDetail } from "~/services/apiService";
+import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
+import { useSelector } from "react-redux";
 
 const HotelDetails = () => {
     const location = useLocation();
@@ -24,31 +25,87 @@ const HotelDetails = () => {
         numOfPeople,
     } = location.state || {};
 
-    const [room1Count, setRoom1Count] = useState(0);
-    const [room2Count, setRoom2Count] = useState(0);
-    const roomPrice1 = 500000;
-    const roomPrice2 = 800000;
+    const [room1Count, setRoom1Count] = useState(numOfPeople?.roomType2 || 1);
+    const [room2Count, setRoom2Count] = useState(numOfPeople?.roomType4 || 1);
+    const [roomPrice1, setRoomPrice1] = useState(0);
+    const [roomPrice2, setRoomPrice2] = useState(0);
 
-    const handleIncrease = (room, setRoomCount) => {
+    const handleIncrease = useCallback((setRoomCount) => {
         setRoomCount((prev) => prev + 1);
-    };
+    }, []);
 
-    const handleDecrease = (room, setRoomCount) => {
+    const handleDecrease = useCallback((setRoomCount) => {
         setRoomCount((prev) => (prev > 1 ? prev - 1 : 0));
-    };
+    }, []);
 
-    const totalRooms = room1Count + room2Count;
-    const totalPrice = room1Count * roomPrice1 + room2Count * roomPrice2;
+    const totalRooms = useMemo(() => room1Count + room2Count, [room1Count, room2Count]);
+    const totalPrice = useMemo(
+        () => room1Count * roomPrice1 + room2Count * roomPrice2,
+        [room1Count, room2Count, roomPrice1, roomPrice2]
+    );
 
     const [isActive, setIsActive] = useState(false);
 
-    const handleHeartClick = () => {
-        setIsActive(!isActive);
-    };
+    const handleHeartClick = useCallback(() => {
+        setIsActive((prev) => !prev);
+    }, []);
 
     const [showAll, setShowAll] = useState(false);
 
-    const visibleImages = showAll ? images : images.slice(0, 4);
+    const visibleImages = useMemo(() => (showAll ? images : images.slice(0, 4)), [showAll, images]);
+
+    const [hotelDetail, setHotelDetail] = useState({});
+
+    const fetchHotelDetail = useCallback(async () => {
+        const response = await getHotelDetail(id, {
+            checkInDate: checkInDate,
+            checkOutDate: checkOutDate,
+            roomType2: room1Count,
+            roomType4: room2Count,
+        });
+
+        console.log(">>> Hotel detail: ", response.data);
+
+        setRoomPrice1(response.data.room_types[0].price);
+        setRoomPrice1Now(response.data.room_types[0].price);
+
+        setRoomPrice2(response.data.room_types[1].price);
+        setRoomPrice2Now(response.data.room_types[1].price);
+
+        setHotelDetail(response.data);
+    }, [id, checkInDate, checkOutDate, room1Count, room2Count]);
+
+    useEffect(() => {
+        fetchHotelDetail();
+    }, [fetchHotelDetail]);
+
+    const currency = useSelector((state) => state.currency.currency);
+    const exchangeRate = useSelector((state) => state.currency.exchangeRate);
+    const [roomPrice1Now, setRoomPrice1Now] = useState(roomPrice1);
+    const [roomPrice2Now, setRoomPrice2Now] = useState(roomPrice2);
+    const newCurrency = useRef("VND");
+
+    const handleChangeCurrency = useCallback(() => {
+        if (currency !== newCurrency.current) {
+            if (currency === "VND") {
+                setRoomPrice1Now(roomPrice1);
+                setRoomPrice2Now(roomPrice2);
+            } else {
+                setRoomPrice1Now(
+                    convertCurrency(roomPrice1Now, newCurrency.current, currency, exchangeRate)
+                );
+                setRoomPrice2Now(
+                    convertCurrency(roomPrice2Now, newCurrency.current, currency, exchangeRate)
+                );
+            }
+
+            newCurrency.current = currency;
+        }
+    }, [currency, exchangeRate, roomPrice1, roomPrice1Now, roomPrice2, roomPrice2Now]);
+
+    useEffect(() => {
+        handleChangeCurrency();
+    }, [currency, handleChangeCurrency]);
 
     return (
         <div className="mx-auto p-5">
@@ -142,95 +199,80 @@ const HotelDetails = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {/* Room 1 */}
-                                    <tr>
-                                        <td>
-                                            <strong>One-Bedroom Apartment</strong>
-                                        </td>
-                                        <td>
-                                            <span className="fs-4">👤👤</span>
-                                        </td>
-                                        <td>
-                                            <div className="d-flex align-items-center">
-                                                <div className="me-3">
-                                                    <span>VND {roomPrice1.toLocaleString()}</span>
+                                    {hotelDetail?.room_types?.map((room, index) => (
+                                        <tr key={index}>
+                                            <td>
+                                                <strong>
+                                                    {+room.type === 2 ? "Double Room" : "Quad Room"}
+                                                </strong>
+                                            </td>
+                                            <td>
+                                                <span className="fs-4">
+                                                    {+room.type === 2 ? "👤👤" : "👤👤👤👤"}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div className="d-flex align-items-center">
+                                                    <div className="me-3">
+                                                        <span>
+                                                            {formatCurrency(
+                                                                +room.type === 2
+                                                                    ? roomPrice1Now
+                                                                    : roomPrice2Now,
+                                                                currency
+                                                            )}
+                                                        </span>
+                                                    </div>
+                                                    <div className="d-flex align-items-center ms-3">
+                                                        <button
+                                                            className="btn btn-outline-secondary"
+                                                            onClick={() =>
+                                                                handleDecrease(
+                                                                    +room.type === 2
+                                                                        ? setRoom1Count
+                                                                        : setRoom2Count
+                                                                )
+                                                            }
+                                                        >
+                                                            -
+                                                        </button>
+                                                        <input
+                                                            type="text"
+                                                            value={
+                                                                +room.type === 2
+                                                                    ? room1Count
+                                                                    : room2Count
+                                                            }
+                                                            readOnly
+                                                            className="form-control mx-2 text-center"
+                                                            style={{ width: "50px" }}
+                                                        />
+                                                        <button
+                                                            className="btn btn-outline-secondary"
+                                                            onClick={() =>
+                                                                handleIncrease(
+                                                                    +room.type === 2
+                                                                        ? setRoom1Count
+                                                                        : setRoom2Count
+                                                                )
+                                                            }
+                                                        >
+                                                            +
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                                <div className="d-flex align-items-center ms-3">
-                                                    <button
-                                                        className="btn btn-outline-secondary"
-                                                        onClick={() =>
-                                                            handleDecrease("room1", setRoom1Count)
-                                                        }
-                                                    >
-                                                        -
-                                                    </button>
-                                                    <input
-                                                        type="text"
-                                                        value={room1Count}
-                                                        readOnly
-                                                        className="form-control mx-2 text-center"
-                                                        style={{ width: "50px" }}
-                                                    />
-                                                    <button
-                                                        className="btn btn-outline-secondary"
-                                                        onClick={() =>
-                                                            handleIncrease("room1", setRoom1Count)
-                                                        }
-                                                    >
-                                                        +
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <p className="mt-2">
-                                                = VND {(room1Count * roomPrice1).toLocaleString()}
-                                            </p>
-                                        </td>
-                                    </tr>
-
-                                    {/* Room 2 */}
-                                    <tr>
-                                        <td>
-                                            <strong>One-Bedroom Apartment</strong>
-                                        </td>
-                                        <td>
-                                            <span className="fs-4">👤👤👤👤</span>
-                                        </td>
-                                        <td>
-                                            <div className="d-flex align-items-center">
-                                                <div className="me-3">
-                                                    <span>VND {roomPrice2.toLocaleString()}</span>
-                                                </div>
-                                                <div className="d-flex align-items-center ms-3">
-                                                    <button
-                                                        className="btn btn-outline-secondary"
-                                                        onClick={() =>
-                                                            handleDecrease("room2", setRoom2Count)
-                                                        }
-                                                    >
-                                                        -
-                                                    </button>
-                                                    <input
-                                                        type="text"
-                                                        value={room2Count}
-                                                        readOnly
-                                                        className="form-control mx-2 text-center"
-                                                        style={{ width: "50px" }}
-                                                    />
-                                                    <button
-                                                        className="btn btn-outline-secondary"
-                                                        onClick={() =>
-                                                            handleIncrease("room2", setRoom2Count)
-                                                        }
-                                                    >
-                                                        +
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <p className="mt-2">
-                                                = VND {(room2Count * roomPrice2).toLocaleString()}
-                                            </p>
-                                        </td>
-                                    </tr>
+                                                <p className="mt-2">
+                                                    ={" "}
+                                                    {formatCurrency(
+                                                        +room.type === 2
+                                                            ? roomPrice1Now * room1Count
+                                                            : roomPrice2Now * room2Count,
+                                                        currency
+                                                    )}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
 

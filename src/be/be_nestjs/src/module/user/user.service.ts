@@ -277,7 +277,13 @@ export class UserService {
     if ((await this.usersRepository.findBy({ id })).length === 0) {
       throw new BadRequestException(`user with id = ${id} not existed`);
     }
-    return await this.usersRepository.delete(id);
+    const res = await this.usersRepository.delete(id);
+    if (res.affected > 0) {
+      return {
+        status: 200,
+        message: "Delete user successfully"
+      };
+    }
   }
 
   async setRole(userId: number, role: string) {

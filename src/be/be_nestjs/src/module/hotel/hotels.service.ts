@@ -38,26 +38,32 @@ export class HotelsService {
 
   async findAll(req) {
     try {
-      const {page = 1, limit = 5, sortBy = 'id', order = 'ASC', searchTerm} = req.query;
+      const {page = 1, limit = 10, sortBy = 'id', order = 'ASC', searchTerm} = req.query;
       const queryBuilder = this.hotelRepository.createQueryBuilder('hotel')
-      .leftJoinAndSelect('hotels_locations', 'hl', 'hl."hotelId" = hotel.id')
-      .leftJoinAndSelect('user', 'u', 'u.id = hotel."ownerId"')
-      .leftJoinAndSelect('location', 'l', 'l.id = hl."locationId"')
-      .select([
-        'hotel.id',
-        'hotel.name',
-        'u.name',
-        'l.city'
-      ]);
+        .leftJoinAndSelect('hotels_locations', 'hl', 'hl."hotelId" = hotel.id')
+        .leftJoinAndSelect('user', 'u', 'u.id = hotel."ownerId"')
+        .leftJoinAndSelect('location', 'l', 'l.id = hl."locationId"')
+        .select([
+          'hotel.id',
+          'hotel.name',
+          'u.name',
+          'l.detailAddress'
+        ]);
 
       queryBuilder.orderBy(`hotel.${sortBy}`, order === 'ASC' ? 'ASC' : 'DESC');
 
-      const [hotels, total] = await queryBuilder
-          .take(+limit)
-          .skip((+page - 1) * +limit)
-          .getManyAndCount();
+      const res = await queryBuilder
+        .take(+limit)
+        .skip((+page - 1) * +limit)
+        .getRawAndEntities();
 
-      console.log(hotels);
+      const hotels = res.raw.map(entity => ({
+        id: entity.hotel_id,
+        name: entity.hotel_name,
+        hotelierName: entity.u_name,
+        location: entity.l_detailAddress
+      }));
+      const total = await this.hotelRepository.count();
 
       return {
         page: page,
@@ -82,8 +88,23 @@ export class HotelsService {
     return `This action updates a #${id} hotel`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} hotel`;
+  async remove(id: number) {
+    try {
+      const result = await this.hotelRepository.delete({ id: id });
+      if (result.affected === 0) {
+        return { status: 404, message: "Hotel not found" };
+      }
+      return { status: 200, message: "Delete hotel successfully" };
+    } catch (error) {
+      console.error('Error delete hotels:', error);
+      throw new HttpException(
+        {
+          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   // HOME - TOP 10 RATING HOTEL BY REVIEW

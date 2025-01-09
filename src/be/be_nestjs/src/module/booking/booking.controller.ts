@@ -14,7 +14,7 @@ export class BookingController {
   async check(
     @Req() req,
     @Res() res
-  ){
+  ) {
     return await this.bookingService.checkBooking(req, res);
   }
 
@@ -34,7 +34,7 @@ export class BookingController {
   @Public()
   async getInformation(
     @Req() req
-  ){
+  ) {
     return await this.bookingService.getInformation(req);
   }
 
@@ -44,7 +44,7 @@ export class BookingController {
   async addInformation(
     @Res() res,
     @Body() note: string
-  ){
+  ) {
     return await this.bookingService.addNote(res, note);
   }
 
@@ -54,8 +54,8 @@ export class BookingController {
   async finishBooking(
     @Body() body: { paymentMethod: string },
     @Req() req,
-    @Res() res,  
-  ){
+    @Res() res,
+  ) {
     const paymentMethod = body.paymentMethod;
     return this.bookingService.processPayment(req, res, paymentMethod);
   }
@@ -81,7 +81,7 @@ export class BookingController {
   }
 
   @Get('reservation')
-  async bookRoom(createBookingDto : CreateBookingDto) {
-    
+  async bookRoom(createBookingDto: CreateBookingDto) {
+
   }
 }

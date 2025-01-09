@@ -1,4 +1,5 @@
 import { Booking } from "@/module/booking/entities/booking.entity";
+import { BookingRoom } from "@/module/booking_room/entities/booking_room.entity";
 import { Hotel } from "@/module/hotel/entities/hotel.entity";
 import { RoomType } from "@/module/room_type/entites/room_type.entity";
 import { Service } from "@/module/service/entities/service.entity";
@@ -26,4 +27,7 @@ export class Room {
     @ManyToOne(() => RoomType, (roomType) => roomType.rooms)
     @JoinColumn({ name: "roomTypeId" }) 
     roomType: RoomType;
+
+    @OneToMany(() => BookingRoom, bookingRoom => bookingRoom.room) 
+    bookingRooms: BookingRoom[]; 
 }

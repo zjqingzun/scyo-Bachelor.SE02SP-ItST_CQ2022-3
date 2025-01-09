@@ -11,8 +11,7 @@ import { MinioService } from '@/minio/minio.service';
 import { User } from '../user/entities/user.entity';
 import { Request, Response } from 'express';
 import { BookingDetail } from '../booking_detail/entities/booking_detail.entity';
-import { BookingController } from './booking.controller';
-import { notEqual } from 'node:assert';
+import { BookingRoom } from '../booking_room/entities/booking_room.entity';
 
 @Injectable()
 export class BookingService {
@@ -23,6 +22,8 @@ export class BookingService {
     @InjectRepository(BookingDetail)
     private readonly bookingDetailRepository: Repository<BookingDetail>,
 
+    @InjectRepository(BookingRoom)
+    private readonly bookingRoomRepository: Repository<BookingRoom>,
 
     @InjectRepository(Hotel)
     private readonly hotelRepository: Repository<Hotel>,
@@ -42,22 +43,9 @@ export class BookingService {
   async create(createBookingDto: CreateBookingDto, req: Request, res: Response) {
     try {
       const { hotelId, checkInDate, checkOutDate, roomType2, roomType4, type2Price, type4Price, sumPrice, userId } = createBookingDto;
-      // const hotelQuery = await this.hotelRepository
-      //   .createQueryBuilder('hotel')
-      //   .leftJoinAndSelect('hotel.locations', 'location')
-      //   .select([
-      //     'hotel.id AS id',
-      //     'hotel.star AS star',
-      //     'hotel.name AS name',
-      //     'location.detailAddress AS address',
-      //   ])
-      //   .where('hotel.id = :idHotel', { hotelId })
-      // const hotel = await hotelQuery.getRawOne();
-      // console.log('HOTEL: ', hotel);
-
       // Tạm thời xử lý với phòng có trường là available trước
       // Lấy ra danh sách phòng của khách sạn 
-      const roomQuery = await this.roomRepository
+      const availableRoomQuery = await this.roomRepository
         .createQueryBuilder('room')
         .leftJoin('room.hotel', 'hotel')
         .select([
@@ -69,9 +57,34 @@ export class BookingService {
         ])
         .where('hotel.id = :hotelId', { hotelId })
         .andWhere('room.status = :status', { status: 'available' });
-      const rooms = await roomQuery.getRawMany();
-      console.log('ROOMS: ', rooms);
+      const availableRoom = await availableRoomQuery.getRawMany();
+      console.log('AVAILABLE ROOMS: ', availableRoom);
 
+      const canBookingQuery = await this.bookingRepository
+        .createQueryBuilder('booking')
+        .leftJoin('booking.bookingRooms', 'bookingRoom')
+        .leftJoin('bookingRoom.room', 'room')
+        .where('booking.hotelId = :hotelId', { hotelId })
+        .andWhere(
+          '(booking.checkinTime >= :checkOutDate OR booking.checkoutTime <= :checkInDate)',
+          {
+            checkInDate,
+            checkOutDate
+          }
+        )
+        .select([
+          'room.id AS id',
+          'room.name AS name',
+          'room.type AS type',
+          'room.status AS status',
+          'room.hotelId AS hotelid'
+        ])
+
+      const canBooking = await canBookingQuery.getRawMany();
+      console.log('CAN BOOKING: ', canBooking);
+
+      const rooms = [...availableRoom, ...canBooking];
+      console.log('ALL AVAILABLE ROOMS: ', rooms);
       // Lấy ra phòng loại 2 và 4
       const roomsType2 = rooms.filter(room => room.type === 2);
       const roomsType4 = rooms.filter(room => room.type === 4);
@@ -275,7 +288,7 @@ export class BookingService {
       if (paymentMethod === 'cash') {
         status = 'unpaid';
         // console.log('VAO DUOC PAYMENT CASH');
-        console.log('BOOKING DATA TRUOC KHI VAO: ', bookingData);
+        // console.log('BOOKING DATA TRUOC KHI VAO: ', bookingData);
         await this.saveDataIntoDatabase(bookingData, status, note);
       
         return res.status(HttpStatus.OK).json({
@@ -334,6 +347,8 @@ export class BookingService {
   
   private async saveBookingDetail(bookingId: number, bookingData: any) {
     try {
+      console.log('BOOKING ID BEFORE QUERY: ', bookingId);
+      console.log('BOOKING DATA: ', bookingData);
       const bookingDetailQuery = await this.bookingDetailRepository
       .createQueryBuilder()
       .insert()
@@ -358,16 +373,32 @@ export class BookingService {
       throw error;
     }
   }
+
+  private async saveBookingRoom(bookingId: number, bookingData: any) {
+    try {
+      const bookingRoomQuery = await this.bookingRoomRepository
+        .createQueryBuilder()
+        .insert()
+        .into(BookingRoom)
+        .values(bookingData.rooms.map((room) => ({
+          booking: {id: bookingId}, 
+          type: room.type,
+          room_name: room.name,
+          room: { id: room.id },
+        })))
+        .execute();
+    } catch (error) {
+      console.error('Error saving booking detail:', error);
+      throw error;
+    }
+  }
   
   private async saveDataIntoDatabase(bookingData: any, status: string, note: string) {
     try {
       const bookingId = await this.saveBooking(bookingData, status, note);
       console.log('BOOKING ID: ', bookingId);
       await this.saveBookingDetail(bookingId, bookingData);
-      // await saveBookingRooms(bookingId, selectedRooms);
-  
-      // Có thể làm thêm các việc xử lý khác nếu cần
-  
+      await this.saveBookingRoom(bookingId, bookingData);
     } catch (error) {
       console.error('Error saving data into database:', error);
       throw new HttpException(

@@ -109,7 +109,7 @@ export class InitialDatabase1730864137298 implements MigrationInterface {
           FOREIGN KEY ("hotelId") REFERENCES "hotel"("id") ON DELETE CASCADE
         );
       `);
-
+        
       // Tạo bảng "booking_detail"
       await queryRunner.query(`
         CREATE TABLE "booking_detail" (

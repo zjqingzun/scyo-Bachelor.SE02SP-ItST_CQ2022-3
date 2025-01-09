@@ -1,15 +1,33 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
+import { Public } from '@/helpers/decorator/public';
 
 @Controller('booking')
 export class BookingController {
-  constructor(private readonly bookingService: BookingService) {}
+  constructor(private readonly bookingService: BookingService) { }
 
-  @Post()
-  create(@Body() createBookingDto: CreateBookingDto) {
-    return this.bookingService.create(createBookingDto);
+  // [GET]: /booking
+  @Get()
+  @Public()
+  async check(
+    @Req() req,
+    @Res() res
+  ){
+    return await this.bookingService.checkBooking(req, res);
+  }
+
+
+  // [POST]: /booking/start
+  @Post('start')
+  @Public()
+  async create(
+    @Body() createBookingDto: CreateBookingDto,
+    @Req() req,
+    @Res() res
+  ) {
+    return await this.bookingService.create(createBookingDto, req, res);
   }
 
   @Get()

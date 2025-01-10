@@ -12,8 +12,4 @@ export class AppService {
   getHello(): string {
     return 'Hello World!';
   }
-
-  async checkDailyTask() {
-    return await this.dailyCheckService.updateWeekendPriceForHotel();
-  }
 }

@@ -125,4 +125,10 @@ export class HotelsController {
   async getDashboardRequest() {
     return await this.hotelsService.getRequest();
   }
+
+  @Get('updateHotelStatus/:hotelId/:status')
+  @Public()
+  async updateHotelStatus(@Param('hotelId') hotelId: number, @Param('status') status: string) {
+    return await this.hotelsService.updateHotelStatus(hotelId, status);
+  }
 }

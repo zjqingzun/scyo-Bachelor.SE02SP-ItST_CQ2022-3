@@ -171,6 +171,10 @@ const getBookingHistory = async (
     return await axios.get(`/booking/history?${params.toString()}`);
 };
 
+const deleteCookie = async () => {
+    return await axios.get("/callback/delete-cookie");
+};
+
 // Review
 const postReview = async (review) => {
     const data = {
@@ -244,6 +248,7 @@ export {
     startBooking,
     getBookingInfo,
     postBookingInfo,
+    deleteCookie,
     paymentBooking,
     checkTimeBooking,
     getBookingHistory,

@@ -46,6 +46,12 @@ export class PaymentService {
     private readonly minioService: MinioService,
   ) { }
 
+  async deleteCookie(res: Response){
+    res.clearCookie('bookingData', { path: '/' });
+    res.status(200).send('Cookie "bookingData" đã được xóa!');
+  }
+
+
   create(createPaymentDto: CreatePaymentDto) {
     return 'This action adds a new payment';
   }

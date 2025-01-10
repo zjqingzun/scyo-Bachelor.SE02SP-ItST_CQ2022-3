@@ -1,7 +1,11 @@
 import "./OrderDetail.scss";
-import { useEffect, useState } from "react";
-import { Space, Table, Descriptions, Spin, Modal } from "antd";
-import { useLocation } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+
+import { Space, Table, Button, Popconfirm, Input, Descriptions, Modal, Spin } from "antd";
+import { QuestionCircleOutlined, SearchOutlined } from "@ant-design/icons";
+import Highlighter from "react-highlight-words";
+
+import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const OrderDetail = () => {
@@ -114,7 +118,7 @@ const OrderDetail = () => {
                     }))}
                     scroll={{ x: "max-content" }}
                     tableLayout="auto"
-                    pagination={false}
+                    loading={loading}
                 />
 
                 <div className="order-detail__special-request bg-white p-3 mb-5">

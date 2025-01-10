@@ -11,7 +11,7 @@ export class DailyCheckService {
     }
 
     @Cron('0 0 * * *')
-    async updatePriceForHotel() {
+    async updateWeekendPriceForHotel() {
         const currenDate = new Date();
         if (currenDate.getDay() === 0 || currenDate.getDay() === 6) {
             await this.roomtypeService.applyWeekendPrice();

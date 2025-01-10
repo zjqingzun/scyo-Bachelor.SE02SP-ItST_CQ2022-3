@@ -142,8 +142,4 @@ export class RoomTypeService {
         SET price = "normalPrice"
     `);
   }
-
-  async handleUseFlexiblePrice() {
-    
-  }
 }

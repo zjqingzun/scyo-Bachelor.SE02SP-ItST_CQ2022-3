@@ -14,6 +14,6 @@ export class AppService {
   }
 
   async checkDailyTask() {
-    return await this.dailyCheckService.updatePriceForHotel();
+    return await this.dailyCheckService.updateWeekendPriceForHotel();
   }
 }

@@ -211,6 +211,22 @@ const createRoom = async (hotelId, data) => {
     return await axios.post(`/rooms/${hotelId}`, data);
 };
 
+// Room Type
+const getRoomType = async (hotelId) => {
+    return await axios.get(`/room_types/${hotelId}`);
+};
+
+const updatePrice = async (hotelId, type, data) => {
+    const price = {
+        price: data.price || 0,
+        weekendPrice: data.weekendPrice || 0,
+        flexiblePrice: data.flexiblePrice || 0,
+        useFlexiblePrice: data.useFlexiblePrice || false,
+    };
+
+    return await axios.post(`/room_types/price/${hotelId}/${type}`, price);
+};
+
 export {
     userLogin,
     getProfile,
@@ -235,4 +251,6 @@ export {
     getAllRooms,
     deleteRoom,
     createRoom,
+    getRoomType,
+    updatePrice,
 };

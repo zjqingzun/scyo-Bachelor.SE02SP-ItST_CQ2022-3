@@ -62,7 +62,10 @@ function Login() {
 
     return (
         <div className="d-flex justify-content-center align-items-center body">
-            <div className="login-container shadow-lg" style={{ backgroundColor: "#fff", padding: "40px", color: "#000", height: "100%" }}>
+            <div
+                className="login-container shadow-lg"
+                style={{ backgroundColor: "#fff", padding: "40px", color: "#000", height: "100%" }}
+            >
                 <h1 className="text-center login-title mb-3">LOGIN</h1>
                 <form onSubmit={handleSubmit} className="d-flex flex-column py-3">
                     {errorMessage && (
@@ -98,7 +101,7 @@ function Login() {
                             required
                         />
                     </div>
-                    <div className="d-flex justify-content-between align-items-center mb-3">
+                    {/* <div className="d-flex justify-content-between align-items-center mb-3">
                         <div className="d-flex align-items-center">
                             <input
                                 type="checkbox"
@@ -111,7 +114,7 @@ function Login() {
                         <a id="forgetPassword" href="/change-password">
                             Forget password?
                         </a>
-                    </div>
+                    </div> */}
                     <input type="submit" className="login mb-0 py-2 mt-3" value="OK" />
                 </form>
                 <p className="text-center mt-5 mb-0">

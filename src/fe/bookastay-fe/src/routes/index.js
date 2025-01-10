@@ -36,6 +36,7 @@ import ManageHotels from "../pages/Admin/manageHotels/manageHotels";
 import ManageRequests from "../pages/Admin/manageRequets/manageRequests";
 import AdminLogin from "../pages/Admin/login/login";
 import RequestDetails from "../pages/Admin/RequestDetails/requestDetails";
+import NotFound from "~/pages/NotFound/NotFound";
 
 const publicRoutes = [
     {
@@ -61,7 +62,7 @@ const publicRoutes = [
     {
         path: "/reserve",
         component: Reserve,
-        requiredRole: ["guest", "user"],
+        requiredRole: ["user"],
     },
     {
         path: "/login",
@@ -192,6 +193,11 @@ const publicRoutes = [
         layout: AdminLayout,
         component: ManageRequests,
         requiredRole: ["admin"],
+    },
+    {
+        path: "/not-found",
+        component: NotFound,
+        layout: NoneLayout,
     },
 ];
 

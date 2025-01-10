@@ -1,5 +1,5 @@
 import "./Guest.scss";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Space, Table, Tag, Button, Popconfirm, Input, Select, Modal } from "antd";
 import { QuestionCircleOutlined, SearchOutlined } from "@ant-design/icons";
@@ -11,128 +11,129 @@ import { useSelector } from "react-redux";
 import { updateStatus } from "~/services/apiService";
 import { formatDate } from "~/utils/datetime";
 
-const STATUS_OPTIONS = [
-    { label: "Completed", value: "COMPLETED" },
-    { label: "Confirmed", value: "CONFIRMED" },
-    { label: "Cancelled", value: "CANCELLED" },
-];
+import axios from "~/utils/axiosCustomize";
+
+// const STATUS_OPTIONS = [
+//     { label: "Completed", value: "COMPLETED" },
+//     { label: "Confirmed", value: "CONFIRMED" },
+//     { label: "Cancelled", value: "CANCELLED" },
+// ];
 
 const Guest = () => {
     const navigate = useNavigate();
     const [bookings, setBookings] = useState([]);
 
     const userInfo = useSelector((state) => state.account.userInfo);
-    const account = useSelector((state) => state.account);
 
-    const [searchText, setSearchText] = useState("");
-    const [searchedColumn, setSearchedColumn] = useState("");
-    const searchInput = useRef(null);
-    const handleSearch = (selectedKeys, confirm, dataIndex) => {
-        confirm();
-        setSearchText(selectedKeys[0]);
-        setSearchedColumn(dataIndex);
-    };
-    const handleReset = (clearFilters) => {
-        clearFilters();
-        setSearchText("");
-    };
+    // const [searchText, setSearchText] = useState("");
+    // const [searchedColumn, setSearchedColumn] = useState("");
+    // const searchInput = useRef(null);
+    // const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    //     confirm();
+    //     setSearchText(selectedKeys[0]);
+    //     setSearchedColumn(dataIndex);
+    // };
+    // const handleReset = (clearFilters) => {
+    //     clearFilters();
+    //     setSearchText("");
+    // };
 
-    const getColumnSearchProps = (dataIndex) => ({
-        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-            <div
-                style={{
-                    padding: 8,
-                }}
-                onKeyDown={(e) => e.stopPropagation()}
-            >
-                <Input
-                    ref={searchInput}
-                    placeholder={`Search ${dataIndex}`}
-                    value={selectedKeys[0]}
-                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-                    onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                    style={{
-                        marginBottom: 8,
-                        display: "block",
-                    }}
-                />
-                <Space>
-                    <Button
-                        type="primary"
-                        onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                        icon={<SearchOutlined />}
-                        size="small"
-                        style={{
-                            width: 90,
-                        }}
-                    >
-                        Search
-                    </Button>
-                    <Button
-                        onClick={() => clearFilters && handleReset(clearFilters)}
-                        size="small"
-                        style={{
-                            width: 90,
-                        }}
-                    >
-                        Reset
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
-                            confirm({
-                                closeDropdown: false,
-                            });
-                            setSearchText(selectedKeys[0]);
-                            setSearchedColumn(dataIndex);
-                        }}
-                    >
-                        Filter
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
-                            close();
-                        }}
-                    >
-                        close
-                    </Button>
-                </Space>
-            </div>
-        ),
-        filterIcon: (filtered) => (
-            <SearchOutlined
-                style={{
-                    color: filtered ? "#1677ff" : undefined,
-                }}
-            />
-        ),
-        onFilter: (value, record) =>
-            record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-        filterDropdownProps: {
-            onOpenChange(open) {
-                if (open) {
-                    setTimeout(() => searchInput.current?.select(), 100);
-                }
-            },
-        },
-        render: (text) =>
-            searchedColumn === dataIndex ? (
-                <Highlighter
-                    highlightStyle={{
-                        backgroundColor: "#ffc069",
-                        padding: 0,
-                    }}
-                    searchWords={[searchText]}
-                    autoEscape
-                    textToHighlight={text ? text.toString() : ""}
-                />
-            ) : (
-                text
-            ),
-    });
+    // const getColumnSearchProps = (dataIndex) => ({
+    //     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+    //         <div
+    //             style={{
+    //                 padding: 8,
+    //             }}
+    //             onKeyDown={(e) => e.stopPropagation()}
+    //         >
+    //             <Input
+    //                 ref={searchInput}
+    //                 placeholder={`Search ${dataIndex}`}
+    //                 value={selectedKeys[0]}
+    //                 onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+    //                 onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+    //                 style={{
+    //                     marginBottom: 8,
+    //                     display: "block",
+    //                 }}
+    //             />
+    //             <Space>
+    //                 <Button
+    //                     type="primary"
+    //                     onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+    //                     icon={<SearchOutlined />}
+    //                     size="small"
+    //                     style={{
+    //                         width: 90,
+    //                     }}
+    //                 >
+    //                     Search
+    //                 </Button>
+    //                 <Button
+    //                     onClick={() => clearFilters && handleReset(clearFilters)}
+    //                     size="small"
+    //                     style={{
+    //                         width: 90,
+    //                     }}
+    //                 >
+    //                     Reset
+    //                 </Button>
+    //                 <Button
+    //                     type="link"
+    //                     size="small"
+    //                     onClick={() => {
+    //                         confirm({
+    //                             closeDropdown: false,
+    //                         });
+    //                         setSearchText(selectedKeys[0]);
+    //                         setSearchedColumn(dataIndex);
+    //                     }}
+    //                 >
+    //                     Filter
+    //                 </Button>
+    //                 <Button
+    //                     type="link"
+    //                     size="small"
+    //                     onClick={() => {
+    //                         close();
+    //                     }}
+    //                 >
+    //                     close
+    //                 </Button>
+    //             </Space>
+    //         </div>
+    //     ),
+    //     filterIcon: (filtered) => (
+    //         <SearchOutlined
+    //             style={{
+    //                 color: filtered ? "#1677ff" : undefined,
+    //             }}
+    //         />
+    //     ),
+    //     onFilter: (value, record) =>
+    //         record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+    //     filterDropdownProps: {
+    //         onOpenChange(open) {
+    //             if (open) {
+    //                 setTimeout(() => searchInput.current?.select(), 100);
+    //             }
+    //         },
+    //     },
+    //     render: (text) =>
+    //         searchedColumn === dataIndex ? (
+    //             <Highlighter
+    //                 highlightStyle={{
+    //                     backgroundColor: "#ffc069",
+    //                     padding: 0,
+    //                 }}
+    //                 searchWords={[searchText]}
+    //                 autoEscape
+    //                 textToHighlight={text ? text.toString() : ""}
+    //             />
+    //         ) : (
+    //             text
+    //         ),
+    // });
 
     const handleStatusChange = async (recordKey, newStatus) => {
         try {
@@ -254,15 +255,10 @@ const Guest = () => {
     const fetchBookings = async () => {
         setLoading(true);
         try {
-            const response = await fetch(
-                `http://localhost:3001/api/booking/guest?userId=${userId}&page=${tableParams?.pagination?.current}&per_page=${tableParams?.pagination?.pageSize}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${account?.accessToken}`,
-                    },
-                }
+            const response = await axios.get(
+                `/booking/guest?userId=${userId}&page=${tableParams?.pagination?.current}&per_page=${tableParams?.pagination?.pageSize}`
             );
-            const result = await response.json();
+            const result = response;
             if (result.status_code === 200) {
                 const formattedData = result.data.bookings.map((booking) => ({
                     key: booking.id,

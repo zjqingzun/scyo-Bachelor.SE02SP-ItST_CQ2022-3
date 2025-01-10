@@ -262,6 +262,11 @@ const updateStatus = async (reservationId, status) => {
     );
 };
 
+// Admin
+const updateHotelRequestStatus = async (hotelId, status) => {
+    return await axios.get(`/hotels/updateHotelStatus/${hotelId}/${status}`);
+};
+
 export {
     userLogin,
     getProfile,
@@ -296,4 +301,5 @@ export {
     getTodayCheckIn,
     getTodayCheckOut,
     updateStatus,
+    updateHotelRequestStatus,
 };

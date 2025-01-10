@@ -84,9 +84,9 @@ const SearchBar = (props) => {
     const [numOfPeople, setNumOfPeople] = useState(() => {
         return (
             props?.searchData?.numOfPeople || {
-                roomType2: 1,
+                roomType2: 0,
                 children: 0,
-                roomType4: 1,
+                roomType4: 0,
             }
         );
     });

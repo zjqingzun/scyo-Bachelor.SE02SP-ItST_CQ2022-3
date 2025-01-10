@@ -145,6 +145,19 @@ const Reserve = () => {
                 toast.error(`Payment failed: ${message}`);
             }
         }
+
+        // clear cookie
+        return () => {
+            const clearCookie = async () => {
+                try {
+                    const res = await deleteCookie();
+                } catch (error) {
+                    console.error("Failed to delete cookie:", error);
+                }
+            };
+
+            clearCookie();
+        };
     }, [resultCode]);
 
     const intervalIdRef = useRef(null);
@@ -202,6 +215,16 @@ const Reserve = () => {
 
         return () => {
             clearInterval(intervalIdRef.current);
+
+            const clearCookie = async () => {
+                try {
+                    const res = await deleteCookie();
+                } catch (error) {
+                    console.error("Failed to delete cookie:", error);
+                }
+            };
+
+            clearCookie();
         };
     }, []);
 

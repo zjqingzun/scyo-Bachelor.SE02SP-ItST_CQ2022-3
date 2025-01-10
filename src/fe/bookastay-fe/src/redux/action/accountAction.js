@@ -96,7 +96,7 @@ export const doGetAccount = () => {
             const accessToken = localStorage.getItem("access_token");
             const refreshToken = localStorage.getItem("refresh_token");
 
-            if (response && response.email) {
+            if (response && response.email && refreshToken) {
                 const getAvatarUrlRes = await getAvatarUrl(response.email);
 
                 let avatar = getAvatarUrlRes?.url || "";

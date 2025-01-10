@@ -176,12 +176,6 @@ export class BookingService {
       // Kiểm tra cookie bookingData
       if (!bookingData) {
         const oldStateCookie = req.cookies['oldState'];
-
-        // Kiểm tra cookie oldState
-        if (!oldStateCookie) {
-          throw new HttpException('Old state cookie has expired or is not found', HttpStatus.NOT_FOUND);
-        }
-
         const oldState = JSON.parse(oldStateCookie);
         const { hotelId, availableRoom, canBooking } = oldState;
 
@@ -214,11 +208,12 @@ export class BookingService {
             })
             .execute();
         }
-
-        // Nếu không tìm thấy bookingData, trả về lỗi
-        throw new HttpException('Booking data not found in cookies', HttpStatus.NOT_FOUND);
+        // Trả về lỗi phù hợp
+        return res.status(HttpStatus.FORBIDDEN).json({
+          status_code: HttpStatus.FORBIDDEN,
+          message: 'Booking data has expired or not found',
+        });
       }
-
       // Nếu có bookingData, phân tích và trả về kết quả
       const parsedBookingData = JSON.parse(bookingData);
       return res.status(HttpStatus.OK).json({
@@ -229,12 +224,6 @@ export class BookingService {
 
     } catch (error) {
       console.error('Error checking booking:', error);
-
-      // Trả về lỗi phù hợp
-      return res.status(HttpStatus.FORBIDDEN).json({
-        status_code: HttpStatus.FORBIDDEN,
-        message: error.message || 'Booking data has expired or not found',
-      });
     }
   }
 
@@ -642,14 +631,14 @@ export class BookingService {
   async totalReservation(id: number) {
     try {
       const today = new Date();
-      const todayDate = today.toISOString().split('T')[0]; 
-  
+      const todayDate = today.toISOString().split('T')[0];
+
       const count = await this.bookingRepository
         .createQueryBuilder('booking')
-        .where('booking.hotelId = :hotelId', { hotelId: id})
+        .where('booking.hotelId = :hotelId', { hotelId: id })
         .andWhere('DATE(booking.checkinTime) <= :today', { today: todayDate })
         .andWhere('DATE(booking.checkoutTime) >= :today', { today: todayDate })
-        .getCount(); 
+        .getCount();
 
       return {
         status: 200,
@@ -664,13 +653,13 @@ export class BookingService {
   async totalcheckIn(id: number) {
     try {
       const today = new Date();
-      const todayDate = today.toISOString().split('T')[0]; 
-  
+      const todayDate = today.toISOString().split('T')[0];
+
       const count = await this.bookingRepository
         .createQueryBuilder('booking')
-        .where('booking.hotelId = :hotelId', { hotelId: id})
+        .where('booking.hotelId = :hotelId', { hotelId: id })
         .andWhere('DATE(booking.checkinTime) = :today', { today: todayDate })
-        .getCount(); 
+        .getCount();
 
       return {
         status: 200,
@@ -685,13 +674,13 @@ export class BookingService {
   async totalcheckOut(id: number) {
     try {
       const today = new Date();
-      const todayDate = today.toISOString().split('T')[0]; 
-  
+      const todayDate = today.toISOString().split('T')[0];
+
       const count = await this.bookingRepository
         .createQueryBuilder('booking')
-        .where('booking.hotelId = :hotelId', { hotelId: id})
+        .where('booking.hotelId = :hotelId', { hotelId: id })
         .andWhere('DATE(booking.checkoutTime) = :today', { today: todayDate })
-        .getCount(); 
+        .getCount();
 
       return {
         status: 200,
@@ -703,5 +692,5 @@ export class BookingService {
     }
   }
 
-  
+
 }

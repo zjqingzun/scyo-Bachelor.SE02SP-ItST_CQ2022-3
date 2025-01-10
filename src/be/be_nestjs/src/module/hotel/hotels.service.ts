@@ -57,7 +57,8 @@ export class HotelsService {
           'hotel.name',
           'u.name',
           'l.city'
-        ]);
+        ])
+        .where('hotel.status = :status', { status: 'approved' })
 
       queryBuilder.orderBy(`hotel.${sortBy}`, order === 'ASC' ? 'ASC' : 'DESC');
 

@@ -1,159 +1,202 @@
-import React, { useState } from 'react';
-import './fav.css';
+import React, { useCallback, useEffect, useState } from "react";
+import "./fav.css";
 import icons from "~/assets/icon";
 import HotelCard from "~/components/HotelCard/HotelCard";
+import { getAllFavorite } from "~/services/apiService";
+import { useSelector } from "react-redux";
+import { Button, Empty, Flex, Pagination, Spin } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const Favorite = () => {
-    const cardsData = [
-        {
-            name: 'Hotel ABC',
-            address: '123 Street, City, Country',
-            image: 'https://kinsley.bslthemes.com/wp-content/uploads/2021/08/img-banner-2-scaled-1-1920x1315.jpg',
-            price: 200,
-            rating: 9.5,
-            review: 100
-        },
-        {
-            name: 'Hotel XYZ',
-            address: '456 Street, City, Country',
-            image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-            price: 150,
-            rating: 8.5,
-            review: 50
-        },
-        {
-            name: 'Hotel LMN',
-            address: '789 Street, City, Country',
-            image: 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-            price: 300,
-            rating: 7.5,
-            review: 70
-        },
-        {
-            name: 'Hotel DEF',
-            address: '012 Street, City, Country',
-            image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-            price: 250,
-            rating: 6.5,
-            review: 80
-        },
-        {
-            name: 'Hotel GHI',
-            address: '345 Street, City, Country',
-            image: 'https://plus.unsplash.com/premium_photo-1675616563084-63d1f129623d?q=80&w=1769&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-            price: 180,
-            rating: 5.5,
-            review: 90
-        },
-        {
-            name: 'Hotel PQR',
-            address: '678 Street, City, Country',
-            image: 'https://cf.bstatic.com/xdata/images/hotel/square600/458830113.webp?k=ff0cb97b7983f09e099de3260a9553fa2a4d0582323e0a962b52cf67ffc2b38f&o=',
-            price: 400,
-            rating: 4.5,
-            review: 110
-        }
-    ];
+    const navigate = useNavigate();
 
-    const [searchTerm, setSearchTerm] = useState('');
+    const [isLoaded, setIsLoaded] = useState(false);
 
+    const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 6; // 6 items per page
-    // Pagination logic
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const filteredCards = cardsData.filter(card =>
-        card.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    const currentCards = filteredCards.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredCards.length / itemsPerPage);
+    const [totalItems, setTotalItems] = useState(0);
+    const [pageLimit, setPageLimit] = useState(6);
+
+    const userInfo = useSelector((state) => state.account.userInfo);
+
+    const [favoriteHotels, setFavoriteHotels] = useState([]);
+
+    const fetchFavoriteHotels = useCallback(async () => {
+        try {
+            setIsLoaded(true);
+            const response = await getAllFavorite({
+                userId: userInfo.id,
+                page: currentPage,
+                limit: pageLimit,
+            });
+
+            if (response && +response.status === 200) {
+                let hotels = response.data.hotels;
+
+                setFavoriteHotels(hotels);
+
+                console.log(">>> response.data", response);
+
+                // Set total items
+                setTotalItems(response.data.total);
+            }
+        } catch (error) {
+            console.log(">>> error", error);
+        } finally {
+            setIsLoaded(false);
+        }
+    }, [currentPage, pageLimit, userInfo.id]);
+
+    useEffect(() => {
+        fetchFavoriteHotels();
+    }, []);
+
+    useEffect(() => {
+        fetchFavoriteHotels();
+    }, [currentPage, pageLimit, userInfo.id]);
 
     // Change page
-    const handlePageChange = (pageNumber) => {
-        setCurrentPage(pageNumber);
+    const handlePaginationChange = (page, pageSize) => {
+        setCurrentPage(page);
+        setPageLimit(pageSize);
     };
 
-    return (
-        <div className="favorite-container">
-            {/* Header Section */}
-            <div className="favorite-header row my-5 py-5">
-                <div className="col-6 d-flex align-items-center ps-5 pt-5">
-                    <img src={icons.redHeartIcon} alt="Heart" className="heartIcon ms-5" />
-                    <h1 className="ms-5 pt-2">Favorite</h1>
-                </div>
-                <div className='col-6'>
-                    <div className="input-group pe-5 pt-5">
-                        <input
-                            type="text"
-                            className="form-control p-3 fs-3"
-                            placeholder="Search"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        <img src={icons.searchIcon} alt="search" className='btn btn-outline-primary searchIcon' />
-                    </div>
-                </div>
-            </div>
+    const handleDeleteFav = useCallback(
+        async (hotelId) => {
+            try {
+                // Cập nhật UI ngay lập tức bằng cách lọc ra hotel đã xóa
+                setFavoriteHotels((prev) => prev.filter((hotel) => hotel.id !== hotelId));
 
-            {/* Hotels Section */}
-            <div className="favorite-hotels row mx-5">
-                {cardsData.map((item, index) => (
-                    <div key={index} className="col-lg-4 col-md-6 col-sm-12 mb-4">
-                        <HotelCard
-                            name={item.name}
-                            address={item.address}
-                            image={item.image}
-                            price={item.price}
-                            rating={item.rating}
-                            review={item.review}
-                        />
-                    </div>
-                ))}
-            </div>
+                // Cập nhật tổng số items
+                setTotalItems((prev) => prev - 1);
 
-            {/* Pagination */}
-            <div className="d-flex justify-content-center my-5 pb-5 pt-3">
-                <nav>
-                    <ul className="pagination">
-                        {/* Nút "Trước" */}
-                        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                            <button
-                                className="page-link px-4 py-2 fs-2"
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                aria-label="Previous"
-                                disabled={currentPage === 1}
-                            >
-                                <span aria-hidden="true">&laquo;</span>
-                            </button>
-                        </li>
+                // Kiểm tra nếu page hiện tại không còn items nào
+                // và không phải là page đầu tiên thì chuyển về page trước đó
+                if (favoriteHotels.length === 1 && currentPage > 1) {
+                    setCurrentPage((prev) => prev - 1);
+                }
 
-                        {/* Các số trang */}
-                        {[...Array(totalPages).keys()].map((page) => (
-                            <li
-                                key={page}
-                                className={`page-item ${page + 1 === currentPage ? 'active' : ''}`}
-                                onClick={() => handlePageChange(page + 1)}
-                            >
-                                <button className="page-link px-4 py-2 fs-2">{page + 1}</button>
-                            </li>
-                        ))}
-
-                        {/* Nút "Sau" */}
-                        <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                            <button
-                                className="page-link px-4 py-2 fs-2"
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                aria-label="Next"
-                                disabled={currentPage === totalPages}
-                            >
-                                <span aria-hidden="true">&raquo;</span>
-                            </button>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
+                // Gọi API xóa favorite ở đây
+                // const response = await deleteFavorite(hotelId);
+            } catch (error) {
+                console.log(">>> error deleting favorite:", error);
+                // Nếu xóa thất bại thì fetch lại data
+                fetchFavoriteHotels();
+            }
+        },
+        [currentPage, favoriteHotels.length]
     );
-}
+
+    return (
+        <>
+            <div className="favorite-container">
+                {/* Header Section */}
+                <div className="favorite-header row my-5 py-5">
+                    <div className="col-6 d-flex align-items-center ps-5 pt-5">
+                        <img src={icons.redHeartIcon} alt="Heart" className="heartIcon ms-5" />
+                        <h1 className="ms-5 pt-2">Favorite</h1>
+                    </div>
+                    <div className="col-6">
+                        <div className="input-group pe-5 pt-5">
+                            <input
+                                type="text"
+                                className="form-control p-3 fs-3"
+                                placeholder="Search"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <img
+                                src={icons.searchIcon}
+                                alt="search"
+                                className="btn btn-outline-primary searchIcon"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Hotels Section */}
+                <div className="favorite-hotels row mx-5">
+                    {favoriteHotels.length === 0 && (
+                        <Empty
+                            image={Empty.PRESENTED_IMAGE_SIMPLE}
+                            description={<span className="fs-3">No favorite hotels found</span>}
+                        >
+                            <Button
+                                type="primary"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    navigate("/");
+                                }}
+                            >
+                                Homepage
+                            </Button>
+                        </Empty>
+                    )}
+                    {favoriteHotels.map((item, index) => (
+                        <div key={item.id} className="col-lg-4 col-md-6 col-sm-12 mb-4">
+                            <HotelCard
+                                {...item}
+                                maxHeight="450px"
+                                removeFavorite={handleDeleteFav}
+                                isFavorite={true}
+                                minRoomPrice={item.price}
+                            />
+                        </div>
+                    ))}
+                </div>
+
+                {/* Pagination */}
+                {favoriteHotels.length > 0 && (
+                    <div className="pagination mt-5 d-flex justify-content-center">
+                        <Pagination
+                            showQuickJumper
+                            defaultCurrent={currentPage}
+                            total={totalItems}
+                            defaultPageSize={pageLimit}
+                            pageSizeOptions={[6, 12, 18, 24]}
+                            onChange={(page, pageSize) => {
+                                handlePaginationChange(page, pageSize);
+                            }}
+                        />
+                    </div>
+                )}
+            </div>
+            {isLoaded && (
+                <Flex
+                    gap="middle"
+                    vertical
+                    align="center"
+                    justify="center"
+                    style={{
+                        height: "100%",
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: "rgba(0, 0, 0, 0.05)",
+                        zIndex: 9999,
+                    }}
+                >
+                    <Flex gap="middle">
+                        <Spin
+                            indicator={
+                                <LoadingOutlined
+                                    style={{
+                                        fontSize: 50,
+                                        fontWeight: "bold",
+                                    }}
+                                    spin
+                                />
+                            }
+                            size="large"
+                        ></Spin>
+                    </Flex>
+                </Flex>
+            )}
+        </>
+    );
+};
 
 export default Favorite;

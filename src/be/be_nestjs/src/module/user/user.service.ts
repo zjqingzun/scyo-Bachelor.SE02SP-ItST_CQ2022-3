@@ -81,25 +81,33 @@ export class UserService {
         WHERE "userId" = ${userId}
       )
     `);
-    const allPage = Math.ceil(parseInt(allFavHotel[0].count) / take);
+    const allPage = parseInt(allFavHotel[0].count);
 
     let allFavHotelPaging = await queryRunner.query(`
-      SELECT *
-      FROM hotel
-      WHERE id IN (
-        SELECT "hotelId"
-        FROM "user_favouriteHotel"
-        WHERE "userId" = ${userId}
-      )
+      SELECT 
+        h.*, 
+        MIN(rt.price) AS price,
+        json_agg(i.url) AS images
+      FROM hotel h
+      JOIN "user_favouriteHotel" uf ON uf."hotelId" = h.id
+      LEFT JOIN room_type rt ON rt."hotelId" = h.id
+      LEFT JOIN image i ON i."hotelId" = h.id
+      WHERE uf."userId" = $1
+      GROUP BY h.id
       ORDER BY ${sortBy} ${order}
-      LIMIT ${take} OFFSET ${skip}
-    `);
+      LIMIT $2 OFFSET $3
+    `, [userId, take, skip]);
     await queryRunner.release();
+    allFavHotelPaging = allFavHotelPaging.map(hotel => ({
+      ...hotel,
+      isFav: true
+    }));
     return {
       status: 200,
       message: 'Successfully',
       data: {
-        all_page: allPage,
+        all_page: Math.ceil(allPage / take),
+        total: allPage,
         hotels: allFavHotelPaging,
       },
     };
@@ -289,11 +297,12 @@ export class UserService {
 
   async setRole(userId: number, role: string) {
     const queryRunner = this.dataSource.createQueryRunner();
-    const roleObj = await queryRunner.manager.query(
-      `SELECT * FROM role WHERE name = '${role}'`,
+    const roleId = await queryRunner.manager.query(
+      `SELECT id FROM role WHERE name = '${role}'`,
     );
+
     await queryRunner.manager.query(
-      `INSERT INTO users_roles("userId", "roleId") VALUES(${userId}, ${roleObj[0].id})`,
+      `INSERT INTO users_roles("userId", "roleId") VALUES(${userId}, ${roleId[0].id})`,
     );
     await queryRunner.release();
   }

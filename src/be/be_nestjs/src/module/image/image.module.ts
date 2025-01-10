@@ -11,5 +11,6 @@ import { MinioService } from '@/minio/minio.service';
   ],
   controllers: [ImageController],
   providers: [ImageService, MinioService],
+  exports: [ImageService]
 })
 export class ImageModule {}

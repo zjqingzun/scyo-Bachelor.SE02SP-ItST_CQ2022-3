@@ -23,7 +23,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
-  app.setGlobalPrefix('api', { exclude: [''] });
+  app.setGlobalPrefix('api', { exclude: ['/callback'] });
   //app.use(logger); //use global middleware
   await app.listen(port);
 }

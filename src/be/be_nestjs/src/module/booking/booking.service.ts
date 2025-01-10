@@ -880,7 +880,7 @@ export class BookingService {
 
       // Kiểm tra cookie 'bookingData'
       const bookingDT = req.cookies['bookingData'];
-      let tempBooking = [];
+      let tempBooking = null;
 
       if (bookingDT) {
         const bookingData = JSON.parse(bookingDT);
@@ -897,7 +897,7 @@ export class BookingService {
         const status = 'Pending';
 
         tempBooking = {
-          hotelId: bookingData.hotelId,
+          hotelId: hotelId,
           totalCost: bookingData.sumPrice,
           createAt: bookingData.createAt,
           hotelName: hotel.name,

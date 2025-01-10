@@ -48,7 +48,6 @@ export class HotelsService {
     return 'This action adds a new hotel';
   }
 
-<<<<<<< HEAD
   async findOneByOwnerId(ownerId: number) {
     const queryRunner = this.dataSource.createQueryRunner();
     const res = await queryRunner.manager.query(`
@@ -60,8 +59,7 @@ export class HotelsService {
     return res[0];
   }
 
-  async findAll(req: { query: { page?: 1; limit?: 10; sortBy?: "id"; order?: "ASC"; searchTerm: any; }; }) {
-=======
+
   async findAll(req: {
     query: {
       page?: 1;
@@ -71,7 +69,6 @@ export class HotelsService {
       searchTerm: any;
     };
   }) {
->>>>>>> eb69ac652f3b5fe652086e5ce52ccc6addc3f114
     try {
       const {
         page = 1,

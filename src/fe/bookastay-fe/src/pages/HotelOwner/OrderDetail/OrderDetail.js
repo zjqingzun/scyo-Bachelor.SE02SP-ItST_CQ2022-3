@@ -8,29 +8,7 @@ import Highlighter from "react-highlight-words";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-const data = [
-    {
-        key: "1",
-        roomNumber: "#101",
-        roomType: "Double",
-        price: "1000",
-    },
-    {
-        key: "2",
-        roomNumber: "#102",
-        roomType: "Double",
-        price: "1000",
-    },
-    {
-        key: "3",
-        roomNumber: "#103",
-        roomType: "Double",
-        price: "1000",
-    },
-];
-
 const OrderDetail = () => {
-    const navigate = useNavigate();
     const userInfo = useSelector((state) => state.account.userInfo);
 
     const location = useLocation();
@@ -90,7 +68,7 @@ const OrderDetail = () => {
 
     if (loading) {
         return (
-            <div className="order-detail">
+            <div className="order-detail text-center p-5">
                 <Spin size="large" />
             </div>
         );
@@ -117,16 +95,27 @@ const OrderDetail = () => {
                 <h1>Order Detail</h1>
                 <div className="d-flex my-3 bg-white p-3">
                     <Descriptions title="Guest Information" column={2}>
-                        <Descriptions.Item span={2} label="Reservation Id">
-                            1
+                        <Descriptions.Item label="Reservation Id">
+                            {reservationID}
                         </Descriptions.Item>
-                        <Descriptions.Item label="UserName">Zhou Maomao</Descriptions.Item>
-                        <Descriptions.Item label="Telephone">1810000000</Descriptions.Item>
+                        <Descriptions.Item label="User Name">
+                            {orderData.user?.name || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Email">
+                            {orderData.user?.email || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Phone">
+                            {orderData.user?.phone || "N/A"}
+                        </Descriptions.Item>
                     </Descriptions>
                 </div>
+
                 <Table
                     columns={columns}
-                    dataSource={data}
+                    dataSource={orderData.bookingRooms.map((room, index) => ({
+                        key: index,
+                        ...room,
+                    }))}
                     scroll={{ x: "max-content" }}
                     tableLayout="auto"
                     loading={loading}
@@ -134,12 +123,7 @@ const OrderDetail = () => {
 
                 <div className="order-detail__special-request bg-white p-3 mb-5">
                     <h2>Special Request</h2>
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, elit
-                        eget fermentum faucibus, nunc odio tincidunt nunc, vel ultricies nisl ligula
-                        nec erat. Nullam auctor, elit eget fermentum faucibus, nunc odio tincidunt
-                        nunc, vel ultricies nisl ligula nec erat.
-                    </p>
+                    <p>{orderData.note || "No special requests"}</p>
                 </div>
             </div>
         </>

@@ -39,7 +39,7 @@ const HotelCard = ({
                 review,
                 star,
                 description,
-                isFav,
+                isFav: isFavorite,
                 checkInDate: checkInDate || formatDate(addDays(new Date(), 0), "yyyy-mm-dd"),
                 checkOutDate: checkOutDate || formatDate(addDays(new Date(), 2), "yyyy-mm-dd"),
             },

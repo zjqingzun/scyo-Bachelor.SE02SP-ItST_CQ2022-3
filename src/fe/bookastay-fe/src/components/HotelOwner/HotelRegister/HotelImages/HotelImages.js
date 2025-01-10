@@ -53,6 +53,8 @@ const HotelImages = ({
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef(null);
 
+    const [listFiles, setListFiles] = useState([]);
+
     const selectFiles = () => {
         fileInputRef.current.click();
     };
@@ -91,6 +93,8 @@ const HotelImages = ({
     const insertImages = (files) => {
         if (files && files.length === 0) return;
 
+        let newFiles = [];
+
         for (let i = 0; i < files.length; i++) {
             if (files[i].type.split("/")[0] !== "image") {
                 continue;
@@ -104,8 +108,12 @@ const HotelImages = ({
                 };
 
                 setImages((prev) => [...prev, image]);
+
+                newFiles.push(files[i]);
             }
         }
+
+        setListFiles((prev) => [...prev, ...newFiles]);
 
         fileInputRef.current.value = null;
     };
@@ -130,15 +138,15 @@ const HotelImages = ({
             return;
         }
 
-        updateData(images);
+        updateData(listFiles);
         handleNext();
     };
 
     useEffect(() => {
-        updateData(images);
+        updateData(listFiles);
 
         window.scrollTo(0, document.body.scrollHeight);
-    }, [images]);
+    }, [listFiles]);
 
     useEffect(() => {
         window.scrollTo(0, document.body.scrollHeight);

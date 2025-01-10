@@ -5,6 +5,7 @@ import { Space, Table, Tag, Button, Popconfirm, Input } from "antd";
 import { QuestionCircleOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const data = [
     {
@@ -31,6 +32,8 @@ const data = [
 ];
 
 const Room = () => {
+    const userInfo = useSelector((state) => state.account.userInfo);
+
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
     const searchInput = useRef(null);
@@ -259,23 +262,39 @@ const Room = () => {
     };
 
     return (
-        <div className="room">
-            <h1>Room</h1>
-            <div className="d-flex my-3">
-                <button className="btn btn-primary ms-auto fs-4" onClick={() => handleAddRoom()}>
-                    Add Room
-                </button>
+        <>
+            {userInfo && userInfo.hotel === undefined ? (
+                <Modal
+                    open={true}
+                    title="Notice"
+                    content="You have not registered any hotel yet. Please register your hotel first."
+                    closeable={false}
+                    onOk={() => navigate("/hotel-owner/register-hotel")}
+                >
+                    <p>You have not registered any hotel yet. Please register your hotel first.</p>
+                </Modal>
+            ) : null}
+            <div className="room">
+                <h1>Room</h1>
+                <div className="d-flex my-3">
+                    <button
+                        className="btn btn-primary ms-auto fs-4"
+                        onClick={() => handleAddRoom()}
+                    >
+                        Add Room
+                    </button>
+                </div>
+                <Table
+                    columns={columns}
+                    dataSource={data}
+                    scroll={{ x: "max-content" }}
+                    tableLayout="auto"
+                    loading={loading}
+                    pagination={tableParams.pagination}
+                    onChange={handleTableChange}
+                />
             </div>
-            <Table
-                columns={columns}
-                dataSource={data}
-                scroll={{ x: "max-content" }}
-                tableLayout="auto"
-                loading={loading}
-                pagination={tableParams.pagination}
-                onChange={handleTableChange}
-            />
-        </div>
+        </>
     );
 };
 

@@ -4,17 +4,20 @@ import React, { useRef, useMemo, useCallback } from "react";
 import "./hotelDetails.css";
 import icons from "~/assets/icon";
 import SearchBarNoLocation from "~/components/SearchBarNoLocation";
-import { getHotelDetail, startBooking } from "~/services/apiService";
+import { addFavorite, getHotelDetail, removeFavorite, startBooking } from "~/services/apiService";
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
 const HotelDetails = () => {
-    const { id } = useParams();
+    const { id, isFav } = useParams();
     const location = useLocation();
     const navigate = useNavigate();
 
-    const { checkInDate, checkOutDate, numOfPeople, isFav } = location.state || {};
+    const { checkInDate, checkOutDate, numOfPeople } = location.state || {};
+    const [isFavorite, setIsFavorite] = useState(isFav);
+    console.log("check in: ", checkInDate);
+    console.log("isFavorite: ", isFav);
 
     const currency = useSelector((state) => state.currency.currency);
     const exchangeRate = useSelector((state) => state.currency.exchangeRate);
@@ -93,13 +96,9 @@ const HotelDetails = () => {
         }
     }, []);
 
-    // const [roomPrice1, setRoomPrice1] = useState(0);
-    // const [roomPrice2, setRoomPrice2] = useState(0);
-
     const [hotelDetails, setHotelDetails] = useState(null);
     const [reviews, setReviews] = useState([]);
     const [isLoaded, setIsLoaded] = useState(false);
-    const [isHearted, setIsHearted] = useState(false);
     const [showAllImages, setShowAllImages] = useState(false);
 
     const [roomCounts, setRoomCounts] = useState({});
@@ -111,8 +110,19 @@ const HotelDetails = () => {
         return day === 6 || day === 0; // Thứ 7 hoặc Chủ nhật
     };
 
-    const handleToggleHeart = () => {
-        setIsHearted((prev) => !prev);
+    const handleToggleHeart = async () => {
+        try {
+            if (isHearted) {
+                await removeFavorite(userInfo.id, id);
+            } else {
+                await addFavorite(userInfo.id, id);
+            }
+
+            setIsHearted((prev) => !prev);
+        } catch (error) {
+            console.error(">>> Error: ", error);
+            toast.error("Error while toggling favorite");
+        }
     };
 
     const toggleImageView = () => {
@@ -142,7 +152,10 @@ const HotelDetails = () => {
             checkOutDate = "2025-01-02",
             roomType2 = 0,
             roomType4 = 0,
+            isFav,
         } = location.state || {};
+
+        setIsHearted(isFav);
 
         setIsWeekend(checkWeekend(checkInDate) || checkWeekend(checkOutDate));
 
@@ -234,10 +247,13 @@ const HotelDetails = () => {
             sumPrice: room_types.reduce((total, room) => {
                 const count = roomCounts[room.id] || 0;
                 const price = isWeekend ? room.weekend_price : room.price;
+
                 return total + count * price;
             }, 0),
             userId: +userInfo.id,
         };
+
+        console.log(">>> Start booking data: ", data);
 
         try {
             const res = await startBooking(data);
@@ -261,10 +277,12 @@ const HotelDetails = () => {
         }
     };
 
+    console.log(">>> location.state: ", location.state);
+
     return (
         <div className="mx-auto p-5">
             <div className="row px-5 py-2">
-                <div className="col-md-10 pb-3 d-flex flex-column">
+                <div className="col-md-11 pb-3 d-flex flex-column">
                     <h1 className="mt-5" style={{ fontWeight: "bold", fontSize: "40px" }}>
                         {name}
                     </h1>
@@ -277,14 +295,43 @@ const HotelDetails = () => {
                         <p className="pt-3 fs-3">{address}</p>
                     </div>
                 </div>
-                <div className="col-md-2 d-flex justify-content-end">
-                    <img
-                        src={isHearted ? icons.redHeartIcon : icons.heartIcon}
-                        alt="Heart"
-                        className="heart-icon me-3"
-                        onClick={handleToggleHeart}
-                        style={{ cursor: "pointer" }}
-                    />
+                <div className="col-md-1">
+                    <button
+                        onClick={() => {
+                            if (isFavorite) {
+                                removeFavorite(userInfo.id, id);
+                            } else {
+                                addFavorite(userInfo.id, id);
+                            }
+                            setIsFavorite(!isFavorite);
+                        }}
+                        className={`hotel-card_favorite ${userInfo.email ? "" : "d-none"}`}
+                    >
+                        {userInfo.email && (
+                            <>
+                                {!isFavorite ? (
+                                    <svg
+                                        className="hotel-card_favorite-icon"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 512 512"
+                                    >
+                                        <path d="M225.8 468.2l-2.5-2.3L48.1 303.2C17.4 274.7 0 234.7 0 192.8l0-3.3c0-70.4 50-130.8 119.2-144C158.6 37.9 198.9 47 231 69.6c9 6.4 17.4 13.8 25 22.3c4.2-4.8 8.7-9.2 13.5-13.3c3.7-3.2 7.5-6.2 11.5-9c0 0 0 0 0 0C313.1 47 353.4 37.9 392.8 45.4C462 58.6 512 119.1 512 189.5l0 3.3c0 41.9-17.4 81.9-48.1 110.4L288.7 465.9l-2.5 2.3c-8.2 7.6-19 11.9-30.2 11.9s-22-4.2-30.2-11.9zM239.1 145c-.4-.3-.7-.7-1-1.1l-17.8-20-.1-.1s0 0 0 0c-23.1-25.9-58-37.7-92-31.2C81.6 101.5 48 142.1 48 189.5l0 3.3c0 28.5 11.9 55.8 32.8 75.2L256 430.7 431.2 268c20.9-19.4 32.8-46.7 32.8-75.2l0-3.3c0-47.3-33.6-88-80.1-96.9c-34-6.5-69 5.4-92 31.2c0 0 0 0-.1 .1s0 0-.1 .1l-17.8 20c-.3 .4-.7 .7-1 1.1c-4.5 4.5-10.6 7-16.9 7s-12.4-2.5-16.9-7z" />
+                                    </svg>
+                                ) : (
+                                    <svg
+                                        className="hotel-card_favorite-icon"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 512 512"
+                                    >
+                                        <path
+                                            fill="red"
+                                            d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"
+                                        />
+                                    </svg>
+                                )}
+                            </>
+                        )}
+                    </button>
                 </div>
             </div>
             <div className="row px-5 py-2">

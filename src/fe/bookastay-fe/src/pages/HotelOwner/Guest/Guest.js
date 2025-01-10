@@ -7,6 +7,7 @@ import Highlighter from "react-highlight-words";
 
 import { useNavigate } from "react-router-dom";
 import StyledStatusSelect from "./StyledStatusSelect";
+import { useSelector } from "react-redux";
 
 const STATUS_OPTIONS = [
     { label: "Pending", value: "Pending" },
@@ -14,38 +15,12 @@ const STATUS_OPTIONS = [
     { label: "Cancelled", value: "Cancelled" },
 ];
 
-const data = [
-    {
-        key: "1",
-        reservationID: "1",
-        guestName: "John Doe",
-        checkInDate: "2021-09-01",
-        checkOutDate: "2021-09-02",
-        totalPrice: "1000",
-        status: ["Pending"],
-    },
-    {
-        key: "2",
-        reservationID: "2",
-        guestName: "Jane Doe",
-        checkInDate: "2021-09-01",
-        checkOutDate: "2021-09-02",
-        totalPrice: "1000",
-        status: ["Confirmed"],
-    },
-    {
-        key: "3",
-        reservationID: "3",
-        guestName: "John Doe",
-        checkInDate: "2021-09-01",
-        checkOutDate: "2021-09-02",
-        totalPrice: "1000",
-        status: ["Cancelled"],
-    },
-];
-
 const Guest = () => {
     const navigate = useNavigate();
+    const [bookings, setBookings] = useState([]);
+    const [totalBookings, setTotalBookings] = useState(0);
+
+    const userInfo = useSelector((state) => state.account.userInfo);
 
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
@@ -157,10 +132,22 @@ const Guest = () => {
             ),
     });
 
-    const handleStatusChange = (recordKey, newStatus) => {
-        // setData((prevData) =>
-        //     prevData.map((item) => (item.key === recordKey ? { ...item, status: newStatus } : item))
-        // );
+    const handleStatusChange = async (recordKey, newStatus) => {
+        try {
+            if (!recordKey) {
+                console.error("Invalid record key:", recordKey);
+                return;
+            }
+            const response = await fetch(
+                `http://localhost:3001/api/booking/guest/update-status?bookingId=${recordKey}&status=${newStatus}`,
+                { method: "PUT" }
+            );
+            const result = await response.json();
+        } catch {
+            console.log("Error when updating status");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const columns = [
@@ -217,7 +204,12 @@ const Guest = () => {
                         type="primary"
                         onClick={() => {
                             // Handle view action
-                            navigate("/hotel-owner/order-detail", { state: record });
+                            navigate(
+                                `/hotel-owner/order-detail/${userId}/${record.reservationID}`,
+                                {
+                                    state: { reservationID: record.reservationID, userId: userId },
+                                }
+                            );
                         }}
                     >
                         View
@@ -253,48 +245,79 @@ const Guest = () => {
         },
     });
 
+    const userId = localStorage.getItem("user_id");
+
     useEffect(() => {
-        setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
-        }, 1000);
-    }, [
-        tableParams.pagination?.current,
-        tableParams.pagination?.pageSize,
-        JSON.stringify(tableParams.filters),
-    ]);
+        const fetchBookings = async () => {
+            setLoading(true);
+            try {
+                const response = await fetch(
+                    `http://localhost:3001/api/booking/guest?userId=${userId}&page=${tableParams.pagination.current}&per_page=${tableParams.pagination.pageSize}`
+                );
+                const result = await response.json();
+                if (result.status_code === 200) {
+                    const formattedData = result.data.bookings.map((booking) => ({
+                        key: booking.id,
+                        reservationID: booking.id,
+                        guestName: booking.name,
+                        checkInDate: booking.checkInDate,
+                        checkOutDate: booking.checkOutDate,
+                        totalPrice: booking.totalPrice,
+                        status: [booking.status],
+                    }));
+                    setBookings(formattedData);
+                    setTotalBookings(result.data.total);
+                } else {
+                    console.error("Failed to fetch bookings:", result.message);
+                }
+            } catch (error) {
+                console.error("Error fetching bookings:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchBookings();
+    }, [tableParams.pagination.current, tableParams.pagination.pageSize]);
 
     const handleTableChange = (pagination, filters, sorter) => {
-        console.log(pagination, filters, sorter);
-
         setTableParams({
             pagination,
             filters,
         });
     };
 
-    // const handleAddRoom = () => {
-    //     navigate("/hotel-owner/room/add-room");
-    // };
-
     return (
-        <div className="guest">
-            <h1>Guest</h1>
-            <div className="d-flex my-3">
-                {/* <button className="btn btn-primary ms-auto fs-4" onClick={() => handleAddRoom()}>
-                    Add Room
-                </button> */}
+        <>
+            {userInfo && userInfo.hotel === undefined ? (
+                <Modal
+                    open={true}
+                    title="Notice"
+                    content="You have not registered any hotel yet. Please register your hotel first."
+                    closeable={false}
+                    onOk={() => navigate("/hotel-owner/register-hotel")}
+                >
+                    <p>You have not registered any hotel yet. Please register your hotel first.</p>
+                </Modal>
+            ) : null}
+            <div className="guest">
+                <h1>Guest</h1>
+                <div className="d-flex my-3">
+                    {/* <button className="btn btn-primary ms-auto fs-4" onClick={() => handleAddRoom()}>
+                        Add Room
+                    </button> */}
+                </div>
+                <Table
+                    columns={columns}
+                    dataSource={bookings}
+                    scroll={{ x: "max-content" }}
+                    tableLayout="auto"
+                    loading={loading}
+                    pagination={tableParams.pagination}
+                    onChange={handleTableChange}
+                />
             </div>
-            <Table
-                columns={columns}
-                dataSource={data}
-                scroll={{ x: "max-content" }}
-                tableLayout="auto"
-                loading={loading}
-                pagination={tableParams.pagination}
-                onChange={handleTableChange}
-            />
-        </div>
+        </>
     );
 };
 

@@ -41,7 +41,10 @@ export class HotelsController {
 
   @Post('add/basicInfo/:userId')
   @Public()
-  async addBasicInfo(@Param('userId') userId: string, @Body() createHotelDto : CreateHotelDto) {
+  async addBasicInfo(
+    @Param('userId') userId: string,
+    @Body() createHotelDto: CreateHotelDto,
+  ) {
     return await this.hotelsService.addBasicInfo(createHotelDto, userId);
   }
 
@@ -57,6 +60,7 @@ export class HotelsController {
     @UploadedFiles() files: Express.Multer.File[],
     @Param('hotelId') hotelId: string,
   ) {
+    console.log('>>> files', files);
     if (!files || files.length === 0) {
       throw new BadRequestException('At least one file is required');
     }
@@ -66,7 +70,7 @@ export class HotelsController {
 
   @Post('payment/add/:hotelId')
   @Public()
-  async addPaymentMethod(@Param('hotelId') hotelId : string, @Body() body) {
+  async addPaymentMethod(@Param('hotelId') hotelId: string, @Body() body) {
     return await this.hotelsService.addPaymentMethod(hotelId, body);
   }
 
@@ -90,8 +94,14 @@ export class HotelsController {
   // [GET]: /hotels?city=...&checkInDate=...&checkOutDate=...&roomType2=...&roomType4=...&minPrice=...&maxPrice=...&minRating=...&minStar=...&page=...&perPage=...
   @Get('search/:userId')
   @Public()
-  async findAvailableHotels(@Param('userId') userId: string, @Query() searchHotelDto: SearchHotelDto) {
-    return await this.hotelsService.findAvailableHotels(searchHotelDto, +userId);
+  async findAvailableHotels(
+    @Param('userId') userId: string,
+    @Query() searchHotelDto: SearchHotelDto,
+  ) {
+    return await this.hotelsService.findAvailableHotels(
+      searchHotelDto,
+      +userId,
+    );
   }
 
   // [GET]: /hotels/:id?checkInDate=...&checkOutDate=...&roomType2=...&roomType4=...
@@ -115,5 +125,4 @@ export class HotelsController {
   async getDashboardRequest() {
     return await this.hotelsService.getRequest();
   }
-
 }

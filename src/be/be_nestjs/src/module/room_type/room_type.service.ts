@@ -1,12 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { RoomType } from "./entites/room_type.entity";
-import { Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { CreateRoomTypeDto } from "./dto/create-room_type.dto";
+import { Hotel } from "../hotel/entities/hotel.entity";
 
 @Injectable()
 export class RoomTypeService {
   constructor(
+    private readonly dataSource: DataSource,
     @InjectRepository(RoomType)
     private readonly roomtypeRepository: Repository<RoomType>,
 
@@ -52,5 +54,16 @@ export class RoomTypeService {
             HttpStatus.INTERNAL_SERVER_ERROR,
         );
     }
+  }
+
+  async getRoomTypeByHotelId(hotelId: string) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    const roomtypes = await queryRunner.manager.query(`
+        SELECT *
+        FROM room_type
+        WHERE "hotelId" = $1    
+    `, [hotelId]);
+    queryRunner.release();  
+    return roomtypes;
   }
 }

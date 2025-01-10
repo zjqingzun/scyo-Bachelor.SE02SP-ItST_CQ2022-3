@@ -8,9 +8,10 @@ import { Public } from '@/helpers/decorator/public';
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
-  @Post()
-  create(@Body() createRoomDto: CreateRoomDto) {
-    return this.roomsService.create(createRoomDto);
+  @Post(':hotelId')
+  @Public()
+  create(@Param('hotelId') hotelId: string, @Body() createRoomDtos: CreateRoomDto[]) {
+    return this.roomsService.create(createRoomDtos, hotelId);
   }
 
   @Get()

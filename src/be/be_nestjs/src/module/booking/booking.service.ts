@@ -646,4 +646,27 @@ export class BookingService {
       throw new Error(`Error fetching total occupied rooms: ${error.message}`);
     }
   }
+
+  async totalcheckOut(id: number) {
+    try {
+      const today = new Date();
+      const todayDate = today.toISOString().split('T')[0]; 
+  
+      const count = await this.bookingRepository
+        .createQueryBuilder('booking')
+        .where('booking.hotelId = :hotelId', { hotelId: id})
+        .andWhere('DATE(booking.checkoutTime) = :today', { today: todayDate })
+        .getCount(); 
+
+      return {
+        status: 200,
+        hotelId: id,
+        total: count,
+      };
+    } catch (error) {
+      throw new Error(`Error fetching total occupied rooms: ${error.message}`);
+    }
+  }
+
+  
 }

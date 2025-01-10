@@ -111,5 +111,12 @@ export class BookingController {
     return await this.bookingService.totalcheckIn(id);
   }
 
+  // Room (checkout)
+  @Get('total/o/:id')
+  @Public()
+  async getTotalCheckOut(@Param('id') id: number) {
+    return await this.bookingService.totalcheckOut(id);
+  }
+
   
 }

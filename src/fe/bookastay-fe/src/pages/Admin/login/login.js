@@ -55,7 +55,7 @@ function Login() {
             const { accessToken, refreshToken } = res.DT;
             localStorage.setItem("accessToken", accessToken);
             localStorage.setItem("refreshToken", refreshToken);
-            
+
             toast.success("Login successfully!");
             navigate("/admin/dashboard");
         } else {
@@ -102,7 +102,7 @@ function Login() {
                             required
                         />
                     </div>
-                    <div className="d-flex justify-content-between align-items-center mb-3">
+                    {/* <div className="d-flex justify-content-between align-items-center mb-3">
                         <div className="d-flex align-items-center">
                             <input
                                 type="checkbox"
@@ -115,7 +115,7 @@ function Login() {
                         <a id="forgetPassword" href="/change-password" style={{ color: "#fff" }}>
                             Forget password?
                         </a>
-                    </div>
+                    </div> */}
                     <input type="submit" className="login mb-0 py-2 mt-3" value="OK" />
                 </form>
             </div>

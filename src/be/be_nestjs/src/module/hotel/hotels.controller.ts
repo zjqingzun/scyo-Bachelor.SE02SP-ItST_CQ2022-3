@@ -35,13 +35,13 @@ export class HotelsController {
   }
 
   @Get('getAll')
-  @Roles("admin")
+  @Roles('admin')
   findAll(@Req() req) {
     return this.hotelsService.findAll(req);
   }
 
   @Post('add/basicInfo/:userId')
-  @Roles("hotelier")
+  @Roles('hotelier')
   async addBasicInfo(
     @Param('userId') userId: string,
     @Body() createHotelDto: CreateHotelDto,
@@ -50,7 +50,7 @@ export class HotelsController {
   }
 
   @Post('images/upload/:hotelId')
-  @Roles("hotelier")
+  @Roles('hotelier')
   @UseInterceptors(
     FilesInterceptor('images', 15, {
       storage: memoryStorage(),
@@ -70,7 +70,7 @@ export class HotelsController {
   }
 
   @Post('payment/add/:hotelId')
-  @Roles("hotelier")
+  @Roles('hotelier')
   async addPaymentMethod(@Param('hotelId') hotelId: string, @Body() body) {
     return await this.hotelsService.addPaymentMethod(hotelId, body);
   }
@@ -81,14 +81,14 @@ export class HotelsController {
   }
 
   @Delete(':id')
-  @Roles("admin")
+  @Roles('admin')
   remove(@Param('id') id: string) {
     return this.hotelsService.remove(+id);
   }
 
   // [GET]: /hotels/recommended-hotel
   @Get('recommended-hotel/:userId')
-  @Roles("user")
+  @Public()
   async recommendedHotel(@Param('userId') userId: string) {
     return await this.hotelsService.getTopTenRatingHotel(+userId);
   }
@@ -117,20 +117,23 @@ export class HotelsController {
   }
 
   @Get('admin/dashboard/t/request')
-  @Roles("admin")
+  @Roles('admin')
   async totalDashboardRequest() {
     return await this.hotelsService.totalRequest();
   }
 
   @Get('admin/dashboard/ga/request')
-  @Roles("admin")
+  @Roles('admin')
   async getDashboardRequest() {
     return await this.hotelsService.getRequest();
   }
 
   @Get('updateHotelStatus/:hotelId/:status')
-  @Roles("admin")
-  async updateHotelStatus(@Param('hotelId') hotelId: number, @Param('status') status: string) {
+  @Roles('admin')
+  async updateHotelStatus(
+    @Param('hotelId') hotelId: number,
+    @Param('status') status: string,
+  ) {
     return await this.hotelsService.updateHotelStatus(hotelId, status);
   }
 }

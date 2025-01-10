@@ -216,6 +216,13 @@ const HotelDetails = () => {
     const displayedImages = showAllImages ? images : images.slice(0, 5);
 
     const handleReserve = async () => {
+        if (!userInfo.email) {
+            toast.error("Please login to reserve", {
+                position: "top-center",
+            });
+            return;
+        }
+
         const numberOfRoom2 =
             roomCounts[hotelDetails.room_types.find((room) => room.type === 2).id] || 0;
         const numberOfRoom4 =

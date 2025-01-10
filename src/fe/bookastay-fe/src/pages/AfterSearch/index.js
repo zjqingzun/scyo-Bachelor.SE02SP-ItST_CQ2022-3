@@ -24,6 +24,24 @@ const AfterSearch = () => {
     const [totalPage, setTotalPage] = useState(0);
     const [total, setTotal] = useState(0);
 
+    const [searchData, setSearchData] = useState({
+        destination: sessionStorage.getItem("searchData")
+            ? JSON.parse(sessionStorage.getItem("searchData")).destination
+            : location.state?.destination ?? "",
+        startDate: sessionStorage.getItem("searchData")
+            ? JSON.parse(sessionStorage.getItem("searchData")).startDate
+            : location.state?.startDate ?? "",
+        endDate: sessionStorage.getItem("searchData")
+            ? JSON.parse(sessionStorage.getItem("searchData")).endDate
+            : location.state?.endDate ?? "",
+        numOfPeople: sessionStorage.getItem("searchData")
+            ? JSON.parse(sessionStorage.getItem("searchData")).numOfPeople
+            : location.state?.numOfPeople ?? {
+                  roomType2: location.state?.numOfPeople?.roomType2 ?? 0,
+                  roomType4: location.state?.numOfPeople?.roomType4 ?? 0,
+              },
+    });
+
     const filteredHotels = useMemo(() => {
         if (!searchedHotel?.length) return [];
         return searchedHotel;
@@ -46,13 +64,15 @@ const AfterSearch = () => {
         setIsLoaded(true);
 
         try {
+            console.log("Search data:", searchData);
+
             const response = await getHotels(
                 {
-                    city: location.state.destination ?? "",
-                    checkInDate: location.state.startDate ?? "",
-                    checkOutDate: location.state.endDate ?? "",
-                    roomType2: location.state.numOfPeople?.roomType2 ?? 0,
-                    roomType4: location.state.numOfPeople?.roomType4 ?? 0,
+                    city: searchData.destination || location.state.destination || "",
+                    checkInDate: searchData.checkInDate || location.state.startDate || "",
+                    checkOutDate: searchData.checkOutDate || location.state.endDate || "",
+                    roomType2: searchData.roomType2 || location.state.numOfPeople?.roomType2 || 0,
+                    roomType4: searchData.roomType4 || location.state.numOfPeople?.roomType4 || 0,
                     page: currentPage,
                     minPrice: filterData.minPrice || 0,
                     maxPrice: filterData.maxPrice || 0,
@@ -83,14 +103,21 @@ const AfterSearch = () => {
                 isFirstMount.current = false;
             }
         }
-    }, [location.state, currentPage, filterData, pageSize]);
+    }, [location.state, currentPage, filterData, pageSize, searchData, userInfo.id]);
 
     useEffect(() => {
+        console.log("Location state:", location.state);
+
         if (isFirstMount.current) {
             window.scrollTo(0, 0); // Scroll to top
             fetchHotels();
             isFirstMount.current = false;
         }
+
+        return () => {
+            // cleanup session storage
+            sessionStorage.removeItem("searchData");
+        };
     }, []);
 
     useEffect(() => {
@@ -101,14 +128,23 @@ const AfterSearch = () => {
     }, [filterData, currentPage, pageSize]);
 
     const handleSearch = useCallback((searchData) => {
-        location.state = {
-            destination: searchData.destination,
-            startDate: searchData.startDate,
-            endDate: searchData.endDate,
-            numOfPeople: searchData.numOfPeople,
-        };
-        fetchHotels(); // Refetch when search data changes
+        // console.log("Search data:", searchData);
+
+        // save to session storage
+        sessionStorage.setItem("searchData", JSON.stringify(searchData));
+
+        setSearchData((prev) => ({
+            ...prev,
+            ...searchData,
+        }));
     }, []);
+
+    useEffect(() => {
+        if (searchData) {
+            window.scrollTo(0, 0);
+            fetchHotels();
+        }
+    }, [searchData]);
 
     const handlePaginationChange = useCallback((page, pageSize) => {
         setCurrentPage(page);
@@ -175,7 +211,7 @@ const AfterSearch = () => {
                     <SearchBar
                         handleSearch={handleSearch}
                         border-radius={12}
-                        searchData={location.state}
+                        searchData={searchData || location.state}
                     />
                 </div>
 
@@ -213,9 +249,17 @@ const AfterSearch = () => {
                                         <div key={hotel.id} className="col">
                                             <HotelCard
                                                 {...hotel}
-                                                checkInDate={location.state.startDate}
-                                                checkOutDate={location.state.endDate}
-                                                numOfPeople={location.state.numOfPeople}
+                                                checkInDate={
+                                                    searchData?.startDate ||
+                                                    location.state.startDate
+                                                }
+                                                checkOutDate={
+                                                    searchData?.endDate || location.state.endDate
+                                                }
+                                                numOfPeople={
+                                                    searchData?.numOfPeople ||
+                                                    location.state.numOfPeople
+                                                }
                                             />
                                         </div>
                                     ))

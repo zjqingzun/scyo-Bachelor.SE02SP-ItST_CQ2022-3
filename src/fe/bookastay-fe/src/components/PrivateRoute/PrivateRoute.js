@@ -41,10 +41,9 @@ const PrivateRoute = ({ requiredRole = [] }) => {
             if (userInfo.role === "hotelier") {
                 return <Navigate to="/hotel-owner/dashboard" />;
             }
-            // To do
-            // if (userInfo.role === "admin") {
-            //     return <Navigate to="/" />;
-            // }
+            if (userInfo.role === "admin") {
+                return <Navigate to="/admin/dashboard" />;
+            }
         }
 
         return <Navigate to="/unauthorized" />;

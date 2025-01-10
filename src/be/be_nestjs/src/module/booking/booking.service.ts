@@ -1,4 +1,9 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { Repository } from 'typeorm';
@@ -46,11 +51,25 @@ export class BookingService {
     private readonly minioService: MinioService,
   ) { }
 
-  async create(createBookingDto: CreateBookingDto, req: Request, res: Response) {
+  async create(
+    createBookingDto: CreateBookingDto,
+    req: Request,
+    res: Response,
+  ) {
     try {
-      const { hotelId, checkInDate, checkOutDate, roomType2, roomType4, type2Price, type4Price, sumPrice, userId } = createBookingDto;
+      const {
+        hotelId,
+        checkInDate,
+        checkOutDate,
+        roomType2,
+        roomType4,
+        type2Price,
+        type4Price,
+        sumPrice,
+        userId,
+      } = createBookingDto;
       // Tạm thời xử lý với phòng có trường là available trước
-      // Lấy ra danh sách phòng của khách sạn 
+      // Lấy ra danh sách phòng của khách sạn
       const availableRoomQuery = await this.roomRepository
         .createQueryBuilder('room')
         .leftJoin('room.hotel', 'hotel')
@@ -59,7 +78,7 @@ export class BookingService {
           'room.name AS name',
           'room.type AS type',
           'room.status AS status',
-          'room.hotelId AS hotelid'
+          'room.hotelId AS hotelid',
         ])
         .where('hotel.id = :hotelId', { hotelId })
         .andWhere('room.status = :status', { status: 'available' });
@@ -75,16 +94,16 @@ export class BookingService {
           '(booking.checkinTime >= :checkOutDate OR booking.checkoutTime <= :checkInDate)',
           {
             checkInDate,
-            checkOutDate
-          }
+            checkOutDate,
+          },
         )
         .select([
           'room.id AS id',
           'room.name AS name',
           'room.type AS type',
           'room.status AS status',
-          'room.hotelId AS hotelid'
-        ])
+          'room.hotelId AS hotelid',
+        ]);
 
       const canBooking = await canBookingQuery.getRawMany();
       // console.log('CAN BOOKING: ', canBooking);
@@ -92,8 +111,8 @@ export class BookingService {
       const rooms = [...availableRoom, ...canBooking];
       // console.log('ALL AVAILABLE ROOMS: ', rooms);
       // Lấy ra phòng loại 2 và 4
-      const roomsType2 = rooms.filter(room => room.type === 2);
-      const roomsType4 = rooms.filter(room => room.type === 4);
+      const roomsType2 = rooms.filter((room) => room.type === 2);
+      const roomsType4 = rooms.filter((room) => room.type === 4);
 
       const getRandomRooms = (roomsList: any[], count: number) => {
         const shuffled = roomsList.sort(() => 0.5 - Math.random());
@@ -106,7 +125,7 @@ export class BookingService {
       const selectedRooms = [...randomRoomsType2, ...randomRoomsType4];
       // console.log('SELECTED ROOMS: ', selectedRooms);
 
-      const roomIds = selectedRooms.map(room => room.id);
+      const roomIds = selectedRooms.map((room) => room.id);
       if (!roomIds || roomIds.length === 0) {
         throw new BadRequestException('No room IDs provided');
       }
@@ -142,19 +161,18 @@ export class BookingService {
       const oldState = {
         hotelId,
         availableRoom,
-        canBooking
-      }
+        canBooking,
+      };
       console.log('OLD STATE: ', oldState);
       res.cookie('oldState', JSON.stringify(oldState), {
         maxAge: 6 * 60 * 1000,
         httpOnly: true,
-      })
+      });
 
       return res.status(200).json({
         message: 'Booking data saved to cookie',
         bookingData,
       });
-
     } catch (error) {
       console.error('Error booking hotels:', error);
 
@@ -176,6 +194,7 @@ export class BookingService {
       // Kiểm tra cookie bookingData
       if (!bookingData) {
         const oldStateCookie = req.cookies['oldState'];
+
         const oldState = JSON.parse(oldStateCookie);
         const { hotelId, availableRoom, canBooking } = oldState;
 
@@ -208,6 +227,7 @@ export class BookingService {
             })
             .execute();
         }
+
         // Trả về lỗi phù hợp
         return res.status(HttpStatus.FORBIDDEN).json({
           status_code: HttpStatus.FORBIDDEN,
@@ -221,7 +241,6 @@ export class BookingService {
         message: 'Booking data is valid',
         bookingData: parsedBookingData,
       });
-
     } catch (error) {
       console.error('Error checking booking:', error);
     }
@@ -231,7 +250,10 @@ export class BookingService {
     try {
       const bookingDT = req.cookies['bookingData'];
       if (!bookingDT) {
-        throw new HttpException('Booking data not found in cookies', HttpStatus.NOT_FOUND);
+        throw new HttpException(
+          'Booking data not found in cookies',
+          HttpStatus.NOT_FOUND,
+        );
       }
       const bookingData = JSON.parse(bookingDT);
       console.log('BOOKING DATA: ', bookingData);
@@ -247,7 +269,7 @@ export class BookingService {
           'hotel.name AS name',
           'location.detailAddress AS address',
         ])
-        .where('hotel.id = :hotelId', { hotelId })
+        .where('hotel.id = :hotelId', { hotelId });
       const hotel = await hotelQuery.getRawOne();
       // console.log('HOTEL: ', hotel);
 
@@ -258,9 +280,9 @@ export class BookingService {
         .select([
           'user.name AS name',
           'user.email AS email',
-          'user.phone AS phone'
+          'user.phone AS phone',
         ])
-        .where('user.id = :userId', { userId })
+        .where('user.id = :userId', { userId });
       const user = await userQuery.getRawOne();
       // console.log('USER: ', user);
 
@@ -276,10 +298,10 @@ export class BookingService {
         user: user,
       };
 
-      return ({
+      return {
         message: 'Get information from cookie successfully',
         data,
-      });
+      };
     } catch (error) {
       console.error('Error booking hotels:', error);
 
@@ -302,7 +324,7 @@ export class BookingService {
 
       return res.status(HttpStatus.OK).json({
         message: 'Note added successfully to booking data',
-        note
+        note,
       });
     } catch (error) {
       console.error('Error booking hotels:', error);
@@ -324,7 +346,10 @@ export class BookingService {
       const bookingDT = req.cookies['bookingData'];
       const noteDT = req.cookies['note'];
       if (!bookingDT || !noteDT) {
-        throw new HttpException('Booking data not found in cookies', HttpStatus.NOT_FOUND);
+        throw new HttpException(
+          'Booking data not found in cookies',
+          HttpStatus.NOT_FOUND,
+        );
       }
       const bookingData = JSON.parse(bookingDT);
       const note = JSON.parse(noteDT);
@@ -336,7 +361,6 @@ export class BookingService {
         // console.log('VAO DUOC PAYMENT CASH');
         // console.log('BOOKING DATA TRUOC KHI VAO: ', bookingData);
         await this.saveDataIntoDatabase(bookingData, paymentStatus, bookingStatus, note, paymentMethod);
-
         return res.status(HttpStatus.OK).json({
           status_code: HttpStatus.OK,
           message: 'Cash successful, information saved to database.',
@@ -345,8 +369,13 @@ export class BookingService {
       else if (paymentMethod === 'momo') {
         const orderInfo = `Thanh toán đặt phòng khách sạn thông qua trang web đặt phòng BookAstay`;
 
-        const paymentUrl = await this.createMomoPayment(res, orderInfo, bookingData, note);
-        console.log("Payment URL:", paymentUrl);
+        const paymentUrl = await this.createMomoPayment(
+          res,
+          orderInfo,
+          bookingData,
+          note,
+        );
+        console.log('Payment URL:', paymentUrl);
         return res.status(HttpStatus.OK).json({
           status_code: HttpStatus.OK,
           message: 'Redirect to MoMo for payment.',
@@ -356,7 +385,6 @@ export class BookingService {
 
       // Trả về lỗi nếu phương thức thanh toán không hợp lệ
       throw new HttpException('Invalid payment method', HttpStatus.BAD_REQUEST);
-
     } catch (error) {
       console.error('Error processing payment:', error);
       throw new HttpException(
@@ -369,14 +397,19 @@ export class BookingService {
     }
   }
 
-  private async createMomoPayment(res: Response, orderInfo: string, bookingData, note) {
+  private async createMomoPayment(
+    res: Response,
+    orderInfo: string,
+    bookingData,
+    note,
+  ) {
     const accessKey = process.env.MOMO_ACCESS_KEY;
     const secretKey = process.env.MOMO_SECRET_KEY;
     var orderInfo = orderInfo;
     var partnerCode = 'MOMO';
     var redirectUrl = 'http://localhost:3000/reserve';
-    var ipnUrl = 'https://d886-2402-800-6315-309c-dc00-b07e-6724-3a00.ngrok-free.app/callback';
-    var requestType = "payWithMethod";
+    var ipnUrl = 'https://064c-42-118-113-230.ngrok-free.app/callback';
+    var requestType = 'payWithMethod';
     var amount = bookingData.sumPrice;
     var orderId = partnerCode + new Date().getTime();
     var requestId = orderId;
@@ -385,28 +418,49 @@ export class BookingService {
     var lang = 'vi';
 
     const extraData = Buffer.from(
-      JSON.stringify({ bookingData, note })
+      JSON.stringify({ bookingData, note }),
     ).toString('base64');
 
     //before sign HMAC SHA256 with format
     //accessKey=$accessKey&amount=$amount&extraData=$extraData&ipnUrl=$ipnUrl&orderId=$orderId&orderInfo=$orderInfo&partnerCode=$partnerCode&redirectUrl=$redirectUrl&requestId=$requestId&requestType=$requestType
-    var rawSignature = "accessKey=" + accessKey + "&amount=" + amount + "&extraData=" + extraData + "&ipnUrl=" + ipnUrl + "&orderId=" + orderId + "&orderInfo=" + orderInfo + "&partnerCode=" + partnerCode + "&redirectUrl=" + redirectUrl + "&requestId=" + requestId + "&requestType=" + requestType;
+    var rawSignature =
+      'accessKey=' +
+      accessKey +
+      '&amount=' +
+      amount +
+      '&extraData=' +
+      extraData +
+      '&ipnUrl=' +
+      ipnUrl +
+      '&orderId=' +
+      orderId +
+      '&orderInfo=' +
+      orderInfo +
+      '&partnerCode=' +
+      partnerCode +
+      '&redirectUrl=' +
+      redirectUrl +
+      '&requestId=' +
+      requestId +
+      '&requestType=' +
+      requestType;
     //puts raw signature
-    console.log("--------------------RAW SIGNATURE----------------")
-    console.log(rawSignature)
+    console.log('--------------------RAW SIGNATURE----------------');
+    console.log(rawSignature);
     //signature
     const crypto = require('crypto');
-    var signature = crypto.createHmac('sha256', secretKey)
+    var signature = crypto
+      .createHmac('sha256', secretKey)
       .update(rawSignature)
       .digest('hex');
-    console.log("--------------------SIGNATURE----------------")
-    console.log(signature)
+    console.log('--------------------SIGNATURE----------------');
+    console.log(signature);
 
     //json object send to MoMo endpoint
     const requestBody = JSON.stringify({
       partnerCode: partnerCode,
-      partnerName: "Test",
-      storeId: "MomoTestStore",
+      partnerName: 'Test',
+      storeId: 'MomoTestStore',
       requestId: requestId,
       amount: amount,
       orderId: orderId,
@@ -418,7 +472,7 @@ export class BookingService {
       autoCapture: autoCapture,
       extraData: extraData,
       orderGroupId: orderGroupId,
-      signature: signature
+      signature: signature,
     });
 
     // Option for axios
@@ -429,8 +483,8 @@ export class BookingService {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(requestBody),
       },
-      data: requestBody
-    }
+      data: requestBody,
+    };
 
     try {
       // Make HTTP request using axios
@@ -443,8 +497,14 @@ export class BookingService {
         throw new Error('Failed to get payment URL from MoMo.');
       }
     } catch (error) {
-      console.error('Error creating MoMo payment:', error.response?.data || error.message);
-      throw new HttpException('Error creating MoMo payment', HttpStatus.INTERNAL_SERVER_ERROR);
+      console.error(
+        'Error creating MoMo payment:',
+        error.response?.data || error.message,
+      );
+      throw new HttpException(
+        'Error creating MoMo payment',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -462,8 +522,7 @@ export class BookingService {
         message: 'Payment success, save data into database',
         data: { paymentStatus, bookingData },
       });
-    }
-    else {
+    } else {
       return res.status(HttpStatus.BAD_REQUEST).json({
         message: 'Payment failed, please try again.',
       });
@@ -492,7 +551,6 @@ export class BookingService {
         .execute();
 
       return bookingQuery.raw[0].id; // Trả về bookingId để sử dụng ở các bước tiếp theo
-
     } catch (error) {
       console.error('Error saving booking:', error);
       throw error;
@@ -534,12 +592,14 @@ export class BookingService {
         .createQueryBuilder()
         .insert()
         .into(BookingRoom)
-        .values(bookingData.rooms.map((room) => ({
-          booking: { id: bookingId },
-          type: room.type,
-          room_name: room.name,
-          room: { id: room.id },
-        })))
+        .values(
+          bookingData.rooms.map((room) => ({
+            booking: { id: bookingId },
+            type: room.type,
+            room_name: room.name,
+            room: { id: room.id },
+          })),
+        )
         .execute();
     } catch (error) {
       console.error('Error saving booking detail:', error);
@@ -547,7 +607,12 @@ export class BookingService {
     }
   }
 
-  private async createPayment(bookingId: number, bookingData: any, paymentMethod: string, status: string) {
+  private async createPayment(
+    bookingId: number,
+    bookingData: any,
+    paymentMethod: string,
+    status: string,
+  ) {
     try {
       const paymentQuery = await this.paymentRepository
         .createQueryBuilder()
@@ -557,7 +622,7 @@ export class BookingService {
           method: paymentMethod,
           status: status,
           booking: { id: bookingId },
-          totalCost: bookingData.sumPrice
+          totalCost: bookingData.sumPrice,
         })
         .execute();
     } catch (error) {
@@ -570,7 +635,7 @@ export class BookingService {
     try {
       const hotelId = bookingData.hotelId;
       const rooms = bookingData.rooms;
-      const roomIds = rooms.map(room => room.id);
+      const roomIds = rooms.map((room) => room.id);
       if (roomIds.length > 0) {
         // Cập nhật trạng thái "booked" cho các phòng đã được đặt thành công
         await this.roomRepository
@@ -867,6 +932,4 @@ export class BookingService {
       throw new Error(`Error fetching total occupied rooms: ${error.message}`);
     }
   }
-
-
 }

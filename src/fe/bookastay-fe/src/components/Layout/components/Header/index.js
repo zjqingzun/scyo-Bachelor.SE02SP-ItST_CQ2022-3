@@ -123,14 +123,33 @@ const Header = () => {
         },
         {
             key: "3",
-            label: "Billing",
-            extra: "⌘B",
+            label: (
+                <a
+                    href="#!"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        navigate("/history");
+                    }}
+                >
+                    History
+                </a>
+            ),
+            extra: "⌘H",
         },
         {
             key: "4",
-            label: "Settings",
-            icon: <SettingOutlined />,
-            extra: "⌘S",
+            label: (
+                <a
+                    href="#!"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        navigate("/favorite");
+                    }}
+                >
+                    Favorites
+                </a>
+            ),
+            extra: "⌘F",
         },
         {
             type: "divider",

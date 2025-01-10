@@ -1,4 +1,9 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { CreateHotelDto } from './dto/create-hotel.dto';
 import { UpdateHotelDto } from './dto/update-hotel.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,12 +23,10 @@ import { LocationsService } from '../location/locations.service';
 import { Location } from '../location/entities/location.entity';
 import { RoomTypeService } from '../room_type/room_type.service';
 
-
 @Injectable()
 export class HotelsService {
-
   constructor(
-    private dataSource : DataSource,
+    private dataSource: DataSource,
 
     @InjectRepository(Hotel)
     private readonly hotelRepository: Repository<Hotel>,
@@ -39,26 +42,36 @@ export class HotelsService {
     private readonly minioService: MinioService,
     private readonly locationService: LocationsService,
     private readonly roomtypeService: RoomTypeService,
-  ) { }
+  ) {}
 
   create(createHotelDto: CreateHotelDto) {
     return 'This action adds a new hotel';
   }
 
-  async findAll(req: { query: { page?: 1; limit?: 10; sortBy?: "id"; order?: "ASC"; searchTerm: any; }; }) {
+  async findAll(req: {
+    query: {
+      page?: 1;
+      limit?: 10;
+      sortBy?: 'id';
+      order?: 'ASC';
+      searchTerm: any;
+    };
+  }) {
     try {
-      const {page = 1, limit = 10, sortBy = 'id', order = 'ASC', searchTerm} = req.query;
-      const queryBuilder = this.hotelRepository.createQueryBuilder('hotel')
+      const {
+        page = 1,
+        limit = 10,
+        sortBy = 'id',
+        order = 'ASC',
+        searchTerm,
+      } = req.query;
+      const queryBuilder = this.hotelRepository
+        .createQueryBuilder('hotel')
         .leftJoinAndSelect('hotels_locations', 'hl', 'hl."hotelId" = hotel.id')
         .leftJoinAndSelect('user', 'u', 'u.id = hotel."ownerId"')
         .leftJoinAndSelect('location', 'l', 'l.id = hl."locationId"')
-        .select([
-          'hotel.id',
-          'hotel.name',
-          'u.name',
-          'l.city'
-        ])
-        .where('hotel.status = :status', { status: 'approved' })
+        .select(['hotel.id', 'hotel.name', 'u.name', 'l.city'])
+        .where('hotel.status = :status', { status: 'approved' });
 
       queryBuilder.orderBy(`hotel.${sortBy}`, order === 'ASC' ? 'ASC' : 'DESC');
 
@@ -67,11 +80,11 @@ export class HotelsService {
         .skip((+page - 1) * +limit)
         .getRawAndEntities();
 
-      const hotels = res.raw.map(entity => ({
+      const hotels = res.raw.map((entity) => ({
         id: entity.hotel_id,
         name: entity.hotel_name,
         hotelierName: entity.u_name,
-        location: entity.l_city
+        location: entity.l_city,
       }));
       const total = await this.hotelRepository.count();
 
@@ -80,7 +93,7 @@ export class HotelsService {
         per_page: limit,
         total,
         total_pages: Math.ceil(total / +limit),
-        hotels
+        hotels,
       };
     } catch (error) {
       console.error('Error fetching all hotels:', error);
@@ -102,9 +115,9 @@ export class HotelsService {
     try {
       const result = await this.hotelRepository.delete({ id: id });
       if (result.affected === 0) {
-        return { status: 404, message: "Hotel not found" };
+        return { status: 404, message: 'Hotel not found' };
       }
-      return { status: 200, message: "Delete hotel successfully" };
+      return { status: 200, message: 'Delete hotel successfully' };
     } catch (error) {
       console.error('Error delete hotels:', error);
       throw new HttpException(
@@ -141,7 +154,7 @@ export class HotelsService {
         .groupBy('hotel.id')
         .addGroupBy('location.id')
         .orderBy('COALESCE(AVG(review.rating), 0)', 'DESC')
-        .limit(10)
+        .limit(10);
 
       const hotels = await queryBuilder.getRawMany();
 
@@ -152,21 +165,25 @@ export class HotelsService {
             const queryRunner = this.dataSource.createQueryRunner();
             const res = await queryRunner.query(`
               SELECT *
-              FROM "user_favouriteHotel" where "hotelId" = ${hotel.id}
+              FROM "user_favouriteHotel" where "hotelId" = ${hotel.id} AND "userId" = ${userId}
             `);
             if (res.length > 0) {
+              console.log('>>> res: ', res);
               isFav = true;
             }
             await queryRunner.release();
           }
           const presignedImages = await Promise.all(
             hotel.images.map((url: string) => {
-              if (url.startsWith("https://cf.bstatic.com/xdata") || url.startsWith("http://88.222.212.40")) {
+              if (
+                url.startsWith('https://cf.bstatic.com/xdata') ||
+                url.startsWith('http://88.222.212.40')
+              ) {
                 return url;
               } else {
-                return this.minioService.getPresignedUrl("hotel_image/" + url);
+                return this.minioService.getPresignedUrl('hotel_image/' + url);
               }
-            })
+            }),
           );
 
           return {
@@ -178,7 +195,7 @@ export class HotelsService {
             images: presignedImages,
             averageRating: hotel.averagerating,
             totalReviews: Number(hotel.totalreviews) || 0,
-            minRoomPrice: hotel.minroomprice
+            minRoomPrice: hotel.minroomprice,
           };
         }),
       );
@@ -186,7 +203,7 @@ export class HotelsService {
       return {
         status_code: HttpStatus.OK,
         message: 'Top 10 hotels fetched successfully',
-        data: result
+        data: result,
       };
     } catch (error) {
       console.error('Error fetching top-rated hotels:', error);
@@ -201,9 +218,21 @@ export class HotelsService {
     }
   }
 
-  // SEARCH - SEARCH HOTEL 
-  async findAvailableHotels(searchHotelDto: SearchHotelDto, userId : number) {
-    const { city, checkInDate, checkOutDate, roomType2, roomType4, minRating, minStar, minPrice, maxPrice, page, per_page } = searchHotelDto;
+  // SEARCH - SEARCH HOTEL
+  async findAvailableHotels(searchHotelDto: SearchHotelDto, userId: number) {
+    const {
+      city,
+      checkInDate,
+      checkOutDate,
+      roomType2,
+      roomType4,
+      minRating,
+      minStar,
+      minPrice,
+      maxPrice,
+      page,
+      per_page,
+    } = searchHotelDto;
     // console.log('DTO: ', searchHotelDto);
 
     try {
@@ -242,69 +271,81 @@ export class HotelsService {
             WHERE b."hotelId" = hotel.id
             AND bd.type = 4
             AND (b."checkinTime" < :checkOutDate AND b."checkoutTime" > :checkInDate)
-          )) THEN room.id END) AS numberoftype4`
+          )) THEN room.id END) AS numberoftype4`,
         ])
         .where('hotel.status = :status', { status: 'approved' })
         .groupBy('hotel.id')
         .addGroupBy('location.id')
-        .setParameters({ checkInDate, checkOutDate })
+        .setParameters({ checkInDate, checkOutDate });
 
-      // Test trả về 
+      // Test trả về
       // "ARRAY_AGG(DISTINCT CASE WHEN room.status = 'available' THEN jsonb_build_object('id', room.id, 'name', room.name, 'type', room.type, 'hotelId', room.hotelId) END) AS availablerooms"
 
       // Nếu có city thì duyệt qua city
       if (city) {
         const normalizedCity = removeDiacritics(city);
-        queryBuilder.andWhere('LOWER(UNACCENT(location.city)) = :city', { city: normalizedCity });
+        queryBuilder.andWhere('LOWER(UNACCENT(location.city)) = :city', {
+          city: normalizedCity,
+        });
       }
 
       if (roomType2) {
-        queryBuilder.andWhere(subQuery => {
-          const sub = subQuery
-            .subQuery()
-            .select('COUNT(DISTINCT room.id)')
-            .from('Room', 'room')
-            .leftJoin('room.roomType', 'roomType')
-            .where('roomType.hotelId = hotel.id')
-            .andWhere('room.type = 2')
-            .andWhere(`(room.status = 'available' OR NOT EXISTS (
+        queryBuilder.andWhere(
+          (subQuery) => {
+            const sub = subQuery
+              .subQuery()
+              .select('COUNT(DISTINCT room.id)')
+              .from('Room', 'room')
+              .leftJoin('room.roomType', 'roomType')
+              .where('roomType.hotelId = hotel.id')
+              .andWhere('room.type = 2')
+              .andWhere(
+                `(room.status = 'available' OR NOT EXISTS (
               SELECT 1
               FROM booking b
               JOIN booking_detail bd ON b.id = bd."bookingId"
               WHERE b."hotelId" = hotel.id
               AND bd.type = 2
               AND (b."checkinTime" < :checkOutDate AND b."checkoutTime" > :checkInDate)
-            ))`)
-            .getQuery();
+            ))`,
+              )
+              .getQuery();
 
-          return `(${sub}) >= :roomType2`;
-        }, { roomType2 });
+            return `(${sub}) >= :roomType2`;
+          },
+          { roomType2 },
+        );
       }
 
       if (roomType4) {
-        queryBuilder.andWhere(subQuery => {
-          const sub = subQuery
-            .subQuery()
-            .select('COUNT(DISTINCT room.id)')
-            .from('Room', 'room')
-            .leftJoin('room.roomType', 'roomType')
-            .where('roomType.hotelId = hotel.id')
-            .andWhere('room.type = 4')
-            .andWhere(`(room.status = 'available' OR NOT EXISTS (
+        queryBuilder.andWhere(
+          (subQuery) => {
+            const sub = subQuery
+              .subQuery()
+              .select('COUNT(DISTINCT room.id)')
+              .from('Room', 'room')
+              .leftJoin('room.roomType', 'roomType')
+              .where('roomType.hotelId = hotel.id')
+              .andWhere('room.type = 4')
+              .andWhere(
+                `(room.status = 'available' OR NOT EXISTS (
               SELECT 1
               FROM booking b
               JOIN booking_detail bd ON b.id = bd."bookingId"
               WHERE b."hotelId" = hotel.id
               AND bd.type = 4
               AND (b."checkinTime" < :checkOutDate AND b."checkoutTime" > :checkInDate)
-            ))`)
-            .getQuery();
+            ))`,
+              )
+              .getQuery();
 
-          return `(${sub}) >= :roomType4`;
-        }, { roomType4 });
+            return `(${sub}) >= :roomType4`;
+          },
+          { roomType4 },
+        );
       }
 
-      // Lọc 
+      // Lọc
       // Lọc theo số sao của khách sạn
       if (minStar) {
         queryBuilder.andWhere('hotel.star >= :minStar', { minStar });
@@ -315,19 +356,24 @@ export class HotelsService {
       }
       // Lọc theo giá thấp nhất và lớn nhất
       if (minPrice && maxPrice) {
-        queryBuilder.having('MIN(roomType.price) >= :minPrice AND MIN(roomType.price) <= :maxPrice', { minPrice, maxPrice });
+        queryBuilder.having(
+          'MIN(roomType.price) >= :minPrice AND MIN(roomType.price) <= :maxPrice',
+          { minPrice, maxPrice },
+        );
       } else if (minPrice) {
         queryBuilder.having('MIN(roomType.price) >= :minPrice', { minPrice });
       } else if (maxPrice) {
         queryBuilder.having('MIN(roomType.price) <= :maxPrice', { maxPrice });
       }
 
-
       const offset = (page - 1) * per_page;
 
       // Áp dụng skip và take trước khi lấy kết quả
       queryBuilder.limit(per_page).offset(offset);
-      const [hotels, totalHotels] = await Promise.all([queryBuilder.getRawMany(), queryBuilder.getCount(),]);
+      const [hotels, totalHotels] = await Promise.all([
+        queryBuilder.getRawMany(),
+        queryBuilder.getCount(),
+      ]);
       const totalPages = Math.ceil(totalHotels / per_page);
 
       console.log({
@@ -338,7 +384,7 @@ export class HotelsService {
         totalHotels,
       });
 
-      // Xử lý hình ảnh và trả kết quả về 
+      // Xử lý hình ảnh và trả kết quả về
       // const hotels = await queryBuilder.getRawMany();
       const result = await Promise.all(
         hotels.map(async (hotel) => {
@@ -347,7 +393,7 @@ export class HotelsService {
             const queryRunner = this.dataSource.createQueryRunner();
             const res = await queryRunner.query(`
               SELECT *
-              FROM "user_favouriteHotel" where "hotelId" = ${hotel.id}
+              FROM "user_favouriteHotel" where "hotelId" = ${hotel.id} AND "userId" = ${userId}
             `);
             if (res.length > 0) {
               isFav = true;
@@ -356,12 +402,15 @@ export class HotelsService {
           }
           const presignedImages = await Promise.all(
             hotel.images.map((url: string) => {
-              if (url.startsWith("https://cf.bstatic.com/xdata") || url.startsWith("http://88.222.212.40")) {
+              if (
+                url.startsWith('https://cf.bstatic.com/xdata') ||
+                url.startsWith('http://88.222.212.40')
+              ) {
                 return url;
               } else {
-                return this.minioService.getPresignedUrl("hotel_image/" + url);
+                return this.minioService.getPresignedUrl('hotel_image/' + url);
               }
-            })
+            }),
           );
 
           return {
@@ -375,7 +424,7 @@ export class HotelsService {
             totalReviews: Number(hotel.totalreviews) || 0,
             minRoomPrice: hotel.minroomprice,
             numberOfType2: Number(hotel.numberoftype2) || 0,
-            numberOfType4: Number(hotel.numberoftype4) || 0
+            numberOfType4: Number(hotel.numberoftype4) || 0,
           };
         }),
       );
@@ -387,7 +436,7 @@ export class HotelsService {
         per_page,
         total: totalHotels,
         total_pages: totalPages,
-        data: result
+        data: result,
       };
     } catch (error) {
       console.error('Error searching hotels:', error);
@@ -442,7 +491,7 @@ export class HotelsService {
             WHERE b."hotelId" = hotel.id
             AND bd.type = 4
             AND (b."checkinTime" < :checkOutDate AND b."checkoutTime" > :checkInDate)
-          )) THEN room.id END) AS numberoftype4`
+          )) THEN room.id END) AS numberoftype4`,
         ])
         .where('hotel.id = :id', { id })
         .groupBy('hotel.id')
@@ -452,18 +501,18 @@ export class HotelsService {
 
       // Bắt lỗi không tìm thấy khách sạn
       if (!hotel) {
-        throw new NotFoundException('Hotel Not Found')
+        throw new NotFoundException('Hotel Not Found');
       }
 
       // Xử lý link hình ảnh Hotel
       const presignedImages = await Promise.all(
         hotel.images.map((url: string) => {
-          if (url.startsWith("https://cf.bstatic.com/xdata") || url.startsWith("http://88.222.212.40")) {
+          if (url.startsWith('https://cf.bstatic.com/xdata')) {
             return url;
           } else {
-            return this.minioService.getPresignedUrl("hotel_image/" + url);
+            return this.minioService.getPresignedUrl('hotel_image/' + url);
           }
-        })
+        }),
       );
 
       // Lấy ra loại phòng (Giá và số lượng)
@@ -480,7 +529,9 @@ export class HotelsService {
             'room_type.flexible_price AS flexible_price',
           ])
           .where('room.hotelId = :hotelId', { hotelId: id })
-          .groupBy('room_type.id, room_type.type, room_type.price, room_type.weekend_price, room_type.flexible_price')
+          .groupBy(
+            'room_type.id, room_type.type, room_type.price, room_type.weekend_price, room_type.flexible_price',
+          )
           .getRawMany();
       } catch (error) {
         console.error('Error fetching rooms:', error);
@@ -504,14 +555,14 @@ export class HotelsService {
           roomType4: roomType4,
           numberOfRoom2: Number(hotel.numberoftype2),
           numberOfRoom4: Number(hotel.numberoftype4),
-          room_types: roomTypes.map(room => ({
+          room_types: roomTypes.map((room) => ({
             id: room.id,
             type: room.type,
             price: room.price,
             weekend_price: room.weekend_price,
-            flexible_price: room.flexible_price
-          }))
-        }
+            flexible_price: room.flexible_price,
+          })),
+        },
       };
     } catch (error) {
       console.error('Error in findOne method:', error);
@@ -526,11 +577,11 @@ export class HotelsService {
     }
   }
 
-
   async totalRequest() {
-    const total = await this.hotelRepository.createQueryBuilder('hotel')
-        .where('hotel.status = :status', { status: 'pending'})
-        .getCount();
+    const total = await this.hotelRepository
+      .createQueryBuilder('hotel')
+      .where('hotel.status = :status', { status: 'pending' })
+      .getCount();
     return {
       status: 200,
       total: total,
@@ -546,30 +597,33 @@ export class HotelsService {
         'hotel.id',
         'hotel.email',
         'hotel.name',
+        'hotel.createdat',
         'hotel.status',
         'location.detailAddress',
       ])
-      .where('hotel.status = :status', {status: 'pending'})
+      .where('hotel.status = :status', { status: 'pending' })
+      .orderBy('hotel.id', 'ASC')
       .getRawMany();
   }
 
-  async addBasicInfo(createHotelDto : CreateHotelDto, userId : string) {
-    const hotel = {...createHotelDto, ownerId: userId, discount: 0};
+  async addBasicInfo(createHotelDto: CreateHotelDto, userId: string) {
+    const hotel = { ...createHotelDto, ownerId: userId, discount: 0 };
     const location = {
       name: hotel.ward,
       district: hotel.district,
       city: hotel.city,
-      detailAddress: hotel.detailAddress
+      detailAddress: hotel.detailAddress,
     };
     try {
-      const queryBuilder = await this.hotelRepository.createQueryBuilder()
+      const queryBuilder = await this.hotelRepository
+        .createQueryBuilder()
         .insert()
         .into('hotel')
         .values({
           name: hotel.name,
           description: hotel.description,
           discount: hotel.discount,
-          owner: {id: hotel.ownerId},
+          owner: { id: hotel.ownerId },
           phone: hotel.phone,
           email: hotel.email,
           star: hotel.star,
@@ -577,7 +631,9 @@ export class HotelsService {
         .execute();
 
       const hotelId = queryBuilder.raw[0].id;
-      const locationId = await (await this.locationService.add(location)).raw[0].id;
+      const locationId = await (
+        await this.locationService.add(location)
+      ).raw[0].id;
 
       const queryRunner = this.dataSource.createQueryRunner();
       await queryRunner.manager.query(`
@@ -586,12 +642,12 @@ export class HotelsService {
       `);
 
       queryRunner.release();
-      
+
       return {
         status: 200,
-        message: "Successfully",
-        hotel: hotelId
-      }
+        message: 'Successfully',
+        hotel: hotelId,
+      };
     } catch (error) {
       console.error('Error when add basic info for hotel:', error);
       throw new HttpException(
@@ -605,7 +661,7 @@ export class HotelsService {
     }
   }
 
-  async uploadImages(images : Express.Multer.File[], hotelId : string) {
+  async uploadImages(images: Express.Multer.File[], hotelId: string) {
     try {
       const hotel = await this.hotelRepository.findOneBy({ id: +hotelId });
       if (!hotel) {
@@ -614,9 +670,9 @@ export class HotelsService {
       const res = await this.imageService.uploadHotelImages(images, hotel);
       return {
         status: 200,
-        message: "Successfully",
-        images: res
-      }
+        message: 'Successfully',
+        images: res,
+      };
     } catch (error) {
       console.error('Error when upload hotel images:', error);
       throw new HttpException(
@@ -630,20 +686,21 @@ export class HotelsService {
     }
   }
 
-  async addPaymentMethod(hotelId : string, body: any) {
+  async addPaymentMethod(hotelId: string, body: any) {
     try {
-      const queryBuilder = await this.hotelRepository.createQueryBuilder()
+      const queryBuilder = await this.hotelRepository
+        .createQueryBuilder()
         .update()
         .set({
           onlineMethod: body.paymentAccount ? true : false,
-          paymentAccount: body.paymentAccount ? body.paymentAccount : ''
+          paymentAccount: body.paymentAccount ? body.paymentAccount : '',
         })
-        .where({id: +hotelId})
+        .where({ id: +hotelId })
         .execute();
 
       return {
         status: 200,
-        mesasge: "Successfully"
+        mesasge: 'Successfully',
       };
     } catch (error) {
       console.error('Error when set payment for hotel:', error);
@@ -657,7 +714,6 @@ export class HotelsService {
       );
     }
   }
-
 }
 
 function removeDiacritics(value: string): string {

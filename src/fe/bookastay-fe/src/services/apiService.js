@@ -252,6 +252,13 @@ const getTodayCheckOut = async (hotelId) => {
     return await axios.get(`/booking/total/o/${hotelId}`);
 };
 
+// Guest
+const updateStatus = async (reservationId, status) => {
+    return await axios.patch(
+        `/booking/guest/update-status?bookingId=${reservationId}&status=${status.toLowerCase()}`
+    );
+};
+
 export {
     userLogin,
     getProfile,
@@ -284,4 +291,5 @@ export {
     getTotalReservation,
     getTodayCheckIn,
     getTodayCheckOut,
+    updateStatus,
 };

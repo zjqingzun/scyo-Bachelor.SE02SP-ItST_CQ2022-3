@@ -88,7 +88,7 @@ const RoomType = () => {
     ]);
 
     const [tableParams, setTableParams] = useState({
-        pagination: { current: 1, pageSize: 10 },
+        pagination: { current: 1, pageSize: 10, position: ["bottomCenter"] },
     });
 
     const formik = useFormik({

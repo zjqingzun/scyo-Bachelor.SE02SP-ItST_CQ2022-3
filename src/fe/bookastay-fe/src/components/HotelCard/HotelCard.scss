@@ -36,6 +36,10 @@
     &__row {
         display: flex;
         align-items: center;
+
+        @include screen(md) {
+            flex-wrap: wrap;
+        }
     }
 
     &__name {
@@ -89,6 +93,12 @@
 
         &:hover {
             background-color: #1e9ab0;
+        }
+
+        @include screen(md) {
+            width: 100%;
+            margin-right: 0 !important;
+            margin-top: 10px;
         }
     }
 

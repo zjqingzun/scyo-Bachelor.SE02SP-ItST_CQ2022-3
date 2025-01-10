@@ -21,6 +21,7 @@ const HotelCard = ({
     isFav,
     checkInDate = null,
     checkOutDate = null,
+    ...rest
 }) => {
     const { t } = useTranslation();
 
@@ -96,7 +97,12 @@ const HotelCard = ({
     // }, [userInfo.email]);
 
     return (
-        <div className="hotel-card">
+        <div
+            className="hotel-card"
+            style={{
+                maxHeight: rest?.maxHeight || "auto",
+            }}
+        >
             <div className="hotel-card__image-wrap">
                 <a
                     href="#!"

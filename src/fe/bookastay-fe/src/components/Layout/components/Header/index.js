@@ -123,12 +123,32 @@ const Header = () => {
         },
         {
             key: "3",
-            label: "History",
+            label: (
+                <a
+                    href="#!"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        navigate("/history");
+                    }}
+                >
+                    History
+                </a>
+            ),
             extra: "⌘H",
         },
         {
             key: "4",
-            label: "Favorites",
+            label: (
+                <a
+                    href="#!"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        navigate("/favorite");
+                    }}
+                >
+                    Favorites
+                </a>
+            ),
             extra: "⌘F",
         },
         {

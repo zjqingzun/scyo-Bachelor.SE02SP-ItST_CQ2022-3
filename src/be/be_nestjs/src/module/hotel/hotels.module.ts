@@ -21,7 +21,7 @@ import { LocationsModule } from '../location/locations.module';
     ReviewModule,
     RoomTypeModule,
     ImageModule,
-    LocationsModule
+    LocationsModule,
   ],
   controllers: [HotelsController],
   providers: [HotelsService, MinioService],

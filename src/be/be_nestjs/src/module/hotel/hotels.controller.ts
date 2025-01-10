@@ -64,6 +64,12 @@ export class HotelsController {
     return await this.hotelsService.uploadImages(files, hotelId);
   }
 
+  @Post('payment/add/:hotelId')
+  @Public()
+  async addPaymentMethod(@Param('hotelId') hotelId : string, @Body() body) {
+    return await this.hotelsService.addPaymentMethod(hotelId, body);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateHotelDto: UpdateHotelDto) {
     return this.hotelsService.update(+id, updateHotelDto);

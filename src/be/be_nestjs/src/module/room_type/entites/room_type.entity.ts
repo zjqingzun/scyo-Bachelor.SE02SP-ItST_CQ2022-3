@@ -13,10 +13,10 @@ export class RoomType {
     @Column()
     price: number;
 
-    @Column()
+    @Column({name: 'weekend_price'})
     weekendPrice: number;
 
-    @Column()
+    @Column({name: 'flexible_price'})
     flexiblePrice: number;
 
     @ManyToOne(() => Hotel, (hotel) => hotel.roomTypes, { onDelete: 'CASCADE' })

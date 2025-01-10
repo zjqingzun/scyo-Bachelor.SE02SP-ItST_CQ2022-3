@@ -16,6 +16,7 @@ import { ConfigService } from '@nestjs/config';
 import { ImageService } from '../image/image.service';
 import { LocationsService } from '../location/locations.service';
 import { Location } from '../location/entities/location.entity';
+import { RoomTypeService } from '../room_type/room_type.service';
 
 
 @Injectable()
@@ -36,14 +37,15 @@ export class HotelsService {
     private readonly roomTypeRepository: Repository<RoomType>,
 
     private readonly minioService: MinioService,
-    private readonly locationService: LocationsService
+    private readonly locationService: LocationsService,
+    private readonly roomtypeService: RoomTypeService,
   ) { }
 
   create(createHotelDto: CreateHotelDto) {
     return 'This action adds a new hotel';
   }
 
-  async findAll(req) {
+  async findAll(req: { query: { page?: 1; limit?: 10; sortBy?: "id"; order?: "ASC"; searchTerm: any; }; }) {
     try {
       const {page = 1, limit = 10, sortBy = 'id', order = 'ASC', searchTerm} = req.query;
       const queryBuilder = this.hotelRepository.createQueryBuilder('hotel')
@@ -54,7 +56,7 @@ export class HotelsService {
           'hotel.id',
           'hotel.name',
           'u.name',
-          'l.detailAddress'
+          'l.city'
         ]);
 
       queryBuilder.orderBy(`hotel.${sortBy}`, order === 'ASC' ? 'ASC' : 'DESC');
@@ -68,7 +70,7 @@ export class HotelsService {
         id: entity.hotel_id,
         name: entity.hotel_name,
         hotelierName: entity.u_name,
-        location: entity.l_detailAddress
+        location: entity.l_city
       }));
       const total = await this.hotelRepository.count();
 
@@ -156,7 +158,7 @@ export class HotelsService {
             await queryRunner.release();
           }
           const presignedImages = await Promise.all(
-            hotel.images.map((url) => {
+            hotel.images.map((url: string) => {
               if (url.startsWith("https://cf.bstatic.com/xdata")) {
                 return url;
               } else {
@@ -350,7 +352,7 @@ export class HotelsService {
             await queryRunner.release();
           }
           const presignedImages = await Promise.all(
-            hotel.images.map((url) => {
+            hotel.images.map((url: string) => {
               if (url.startsWith("https://cf.bstatic.com/xdata")) {
                 return url;
               } else {
@@ -452,7 +454,7 @@ export class HotelsService {
 
       // Xử lý link hình ảnh Hotel
       const presignedImages = await Promise.all(
-        hotel.images.map((url) => {
+        hotel.images.map((url: string) => {
           if (url.startsWith("https://cf.bstatic.com/xdata")) {
             return url;
           } else {
@@ -597,6 +599,35 @@ export class HotelsService {
       );
     }
   }
+
+  async addPaymentMethod(hotelId : string, body: any) {
+    try {
+      const queryBuilder = await this.hotelRepository.createQueryBuilder()
+        .update()
+        .set({
+          onlineMethod: body.paymentAccount ? true : false,
+          paymentAccount: body.paymentAccount ? body.paymentAccount : ''
+        })
+        .where({id: +hotelId})
+        .execute();
+
+      return {
+        status: 200,
+        mesasge: "Successfully"
+      };
+    } catch (error) {
+      console.error('Error when set payment for hotel:', error);
+      throw new HttpException(
+        {
+          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error. Please try again later.',
+          error: error.message || 'Unknown error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
 }
 
 function removeDiacritics(value: string): string {

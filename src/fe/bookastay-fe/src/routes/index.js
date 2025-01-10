@@ -104,6 +104,7 @@ const publicRoutes = [
         path: "/hotel-owner/register-hotel",
         component: RegisterHotel,
         layout: HeaderOnly,
+        requiredRole: ["hotelier"],
     },
     {
         path: "/hotel-owner/dashboard",

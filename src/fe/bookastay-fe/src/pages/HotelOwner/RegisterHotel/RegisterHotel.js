@@ -11,6 +11,7 @@ import {
     FinalStep,
 } from "~/components/HotelOwner/HotelRegister";
 import "./RegisterHotel.scss";
+import { useNavigate } from "react-router-dom";
 
 const StyledStepLabel = styled.div`
     font-size: 2.8rem;
@@ -32,6 +33,8 @@ const formReducer = (state, action) => {
 };
 
 const RegisterHotel = () => {
+    const navigate = useNavigate();
+
     const stepsConfig = [
         {
             title: "Property details",
@@ -55,57 +58,66 @@ const RegisterHotel = () => {
 
     const persistData = async () => {
         // Persist data to the server
-        console.log(">>> Persist data", formData);
+        // console.log(">>> Persist data", formData);
         const userId = localStorage.getItem("user_id");
-        console.log(">>> User ID", userId);
+        // console.log(">>> User ID", userId);
         try {
             // // Gửi propertyDetails
             const propertyResponse = await axios.post(
-                // `http://localhost:3001/api/hotels/add/basicInfo/${userId}`,
-                // formData.propertyDetails
+                `http://localhost:3001/api/hotels/add/basicInfo/${userId}`,
+                formData.propertyDetails
             );
-            console.log("Property details response:", propertyResponse.data);
+            // console.log("Property details response:", propertyResponse.data);
 
             const hotelId = propertyResponse.data.hotel;
-            console.log("Hotel ID:", hotelId);
+            // console.log("Hotel ID:", hotelId);
 
-            // // Gửi images
-            // // Chuẩn bị FormData cho images
-            // const formData = new FormData();
-            // for (let i = 0; i < formData.images.length; i++) {
-            //     formData.append("images", formData.images[i]);
-            // }
-            // console.log("FormData:", formData);
-            // const imagesResponse = await axios.post(
-            //     `http://localhost:3001/api/hotels/images/upload/${hotelId}`,
-            //     formData.images
-            // );
+            // console.log(">>> formData", formData.images);
+            // Gửi images
+            // Chuẩn bị FormData cho images
+            const formDataFiles = new FormData();
+            formData.images.forEach((image) => {
+                formDataFiles.append("images", image);
+            });
+            console.log("FormData:", formDataFiles);
+            const imagesResponse = await axios.post(
+                `http://localhost:3001/api/hotels/images/upload/${hotelId}`,
+                formDataFiles,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
             // console.log("Images response:", imagesResponse.data);
 
-            // // Gửi payment
+            // Gửi payment
             const paymentResponse = await axios.post(
                 `http://localhost:3001/api/hotels/payment/add/${hotelId}`,
                 formData.payment.paymentAccount
             );
-            console.log("Payment response:", paymentResponse.data);
+            // console.log("Payment response:", paymentResponse.data);
 
             // // Gửi roomDetails
             const { doubleRoomPrice, quadRoomPrice } = formData.payment;
             const roomDetailsResponse = await axios.post(
                 `http://localhost:3001/api/room_types/add/${hotelId}`,
                 {
-                    doubleRoomPrice, quadRoomPrice
+                    doubleRoomPrice,
+                    quadRoomPrice,
                 }
             );
-            console.log("Room details response:", roomDetailsResponse.data);
-        }
-        catch {
+            // console.log("Room details response:", roomDetailsResponse.data);
+        } catch {
             console.log("Error when sending property details");
         }
     };
 
     useEffect(() => {
-        persistData();
+        if (isComplete) {
+            console.log(">>> formData", formData);
+            persistData();
+        }
     }, [formData]);
 
     const updateStepData = (stepKey, payload) => {
@@ -126,10 +138,9 @@ const RegisterHotel = () => {
         }
     };
 
-    const handleComplete = () => {
+    const handleComplete = async () => {
         setIsComplete(true);
         console.log(">>> Completed");
-        console.log(">>> persist data", formData);
     };
 
     return (
@@ -144,8 +155,7 @@ const RegisterHotel = () => {
                             type="primary"
                             key="console"
                             onClick={() => {
-                                setIsComplete(false);
-                                setCurrentStep(1);
+                                navigate("/hotel-owner/dashboard");
                             }}
                         >
                             Go to dashboard

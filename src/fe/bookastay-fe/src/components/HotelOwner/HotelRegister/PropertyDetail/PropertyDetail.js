@@ -8,7 +8,7 @@ import icons from "~/assets/icon";
 
 import "./PropertyDetail.scss";
 
-const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = () => { } }) => {
+const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () => {} }) => {
     const userId = localStorage.getItem("user_id");
     console.log(">>> User ID", userId);
     const formik = useFormik({
@@ -33,9 +33,7 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
             phone: Yup.string()
                 .matches(/^\d{10}$/, "Phone must be a valid 10-digit number")
                 .required("Phone is required"),
-            email: Yup.string()
-                .email("Invalid email address")
-                .required("Email is required"),
+            email: Yup.string().email("Invalid email address").required("Email is required"),
         }),
     });
 
@@ -66,7 +64,7 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
             address: formData.address || "",
             city: formData.city || "",
             district: formData.district || "",
-            ward: formData.ward || "",
+            ward: formData.ward || "unknown",
             star: formData.star || "N/A",
             description: formData.description || "",
             phone: formData.phone || "",
@@ -76,9 +74,7 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
 
     useEffect(() => {
         if (isSelectedProvince && formik.values.city) {
-            fetch(
-                `https://open.oapi.vn/location/districts/${formik.values.city}?page=0&size=1000`
-            )
+            fetch(`https://open.oapi.vn/location/districts/${formik.values.city}?page=0&size=1000`)
                 .then((res) => res.json())
                 .then((data) => {
                     setDistricts(data.data);
@@ -92,9 +88,7 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
 
     useEffect(() => {
         if (isSelectedDistrict && formik.values.district) {
-            fetch(
-                `https://open.oapi.vn/location/wards/${formik.values.district}?page=0&size=1000`
-            )
+            fetch(`https://open.oapi.vn/location/wards/${formik.values.district}?page=0&size=1000`)
                 .then((res) => res.json())
                 .then((data) => {
                     setWards(data.data);
@@ -145,13 +139,17 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
             );
             const selectedWard = wards.find((ward) => ward.id === formik.values.ward);
 
-            const detailAddress = `${formik.values.address}, ${selectedWard.name}, ${selectedDistrict.name}, ${selectedProvince.name}`;
+            const detailAddress = `${formik.values?.address} ${
+                selectedWard?.name ? "," + selectedWard.name : ""
+            } ${selectedDistrict?.name ? "," + selectedDistrict.name : ""} ${
+                selectedProvince?.name ? "," + selectedProvince.name : ""
+            }`;
 
             updateData({
                 name: formik.values.name,
-                district: selectedDistrict.name,
-                ward: selectedWard.name,
-                city: selectedProvince.name,
+                district: selectedDistrict?.name,
+                ward: selectedWard?.name || "unknown",
+                city: selectedProvince?.name,
                 detailAddress,
                 description: formik.values.description,
                 phone: formik.values.phone,
@@ -173,10 +171,9 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
                             </label>
                             <input
                                 type="text"
-                                className={`form-control form-control-lg fs-4 ${formik.touched.name && formik.errors.name
-                                    ? "is-invalid"
-                                    : ""
-                                    }`}
+                                className={`form-control form-control-lg fs-4 ${
+                                    formik.touched.name && formik.errors.name ? "is-invalid" : ""
+                                }`}
                                 value={formik.values.name}
                                 onChange={formik.handleChange}
                                 id="name"
@@ -191,10 +188,11 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
                                 value={formik.values.address}
                                 onChange={formik.handleChange}
                                 type="text"
-                                className={`form-control form-control-lg fs-4 ${formik.touched.address && formik.errors.address
-                                    ? "is-invalid"
-                                    : ""
-                                    }`}
+                                className={`form-control form-control-lg fs-4 ${
+                                    formik.touched.address && formik.errors.address
+                                        ? "is-invalid"
+                                        : ""
+                                }`}
                                 id="address"
                             />
                             <div className="invalid-feedback">{formik.errors.address}</div>
@@ -205,10 +203,11 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
                                     City <span className="red-dot">*</span>
                                 </label>
                                 <select
-                                    className={`form-select form-select-lg fs-4 ${formik.touched.city && formik.errors.city
-                                        ? "is-invalid"
-                                        : ""
-                                        }`}
+                                    className={`form-select form-select-lg fs-4 ${
+                                        formik.touched.city && formik.errors.city
+                                            ? "is-invalid"
+                                            : ""
+                                    }`}
                                     name="city"
                                     id="city"
                                     value={formik.values.city}
@@ -232,10 +231,11 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
                                 </label>
                                 <select
                                     disabled={!isSelectedProvince || districts.length === 0}
-                                    className={`form-select form-select-lg fs-4 ${formik.touched.district && formik.errors.district
-                                        ? "is-invalid"
-                                        : ""
-                                        }`}
+                                    className={`form-select form-select-lg fs-4 ${
+                                        formik.touched.district && formik.errors.district
+                                            ? "is-invalid"
+                                            : ""
+                                    }`}
                                     id="district"
                                     name="district"
                                     value={formik.values.district}
@@ -250,9 +250,7 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
                                         </option>
                                     ))}
                                 </select>
-                                <div className="invalid-feedback">
-                                    {formik.errors.district}
-                                </div>
+                                <div className="invalid-feedback">{formik.errors.district}</div>
                             </div>
                             <div className="col">
                                 <label htmlFor="ward" className="form-label">
@@ -262,14 +260,13 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
                                     disabled={!isSelectedDistrict || wards.length === 0}
                                     id="ward"
                                     name="ward"
-                                    className={`form-select form-select-lg fs-4 ${formik.touched.ward && formik.errors.ward
-                                        ? "is-invalid"
-                                        : ""
-                                        }`}
+                                    className={`form-select form-select-lg fs-4 ${
+                                        formik.touched.ward && formik.errors.ward
+                                            ? "is-invalid"
+                                            : ""
+                                    }`}
                                     value={formik.values.ward}
-                                    onChange={(e) =>
-                                        formik.setFieldValue("ward", e.target.value)
-                                    }
+                                    onChange={(e) => formik.setFieldValue("ward", e.target.value)}
                                 >
                                     <option value="">Select ward</option>
                                     {wards.map((ward) => (
@@ -286,8 +283,11 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
                                 Description
                             </label>
                             <textarea
-                                className={`form-control form-control-lg fs-4 ${formik.touched.description && formik.errors.description ? "is-invalid" : ""
-                                    }`}
+                                className={`form-control form-control-lg fs-4 ${
+                                    formik.touched.description && formik.errors.description
+                                        ? "is-invalid"
+                                        : ""
+                                }`}
                                 id="description"
                                 name="description"
                                 value={formik.values.description}
@@ -298,7 +298,6 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
                                 <div className="invalid-feedback">{formik.errors.description}</div>
                             )}
                         </div>
-
                     </div>
                     <div className="col">
                         <div className="mb-3">
@@ -307,8 +306,9 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
                             </label>
                             <input
                                 type="text"
-                                className={`form-control form-control-lg fs-4 ${formik.touched.phone && formik.errors.phone ? "is-invalid" : ""
-                                    }`}
+                                className={`form-control form-control-lg fs-4 ${
+                                    formik.touched.phone && formik.errors.phone ? "is-invalid" : ""
+                                }`}
                                 id="phone"
                                 value={formik.values.phone}
                                 onChange={formik.handleChange}
@@ -322,8 +322,9 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
                             </label>
                             <input
                                 type="email"
-                                className={`form-control form-control-lg fs-4 ${formik.touched.email && formik.errors.email ? "is-invalid" : ""
-                                    }`}
+                                className={`form-control form-control-lg fs-4 ${
+                                    formik.touched.email && formik.errors.email ? "is-invalid" : ""
+                                }`}
                                 id="email"
                                 value={formik.values.email}
                                 onChange={formik.handleChange}
@@ -506,8 +507,8 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
                         Next
                     </button>
                 </div>
-            </form >
-        </div >
+            </form>
+        </div>
     );
 };
 

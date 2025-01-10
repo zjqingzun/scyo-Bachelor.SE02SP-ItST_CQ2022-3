@@ -47,7 +47,6 @@ export class HotelsService {
   create(createHotelDto: CreateHotelDto) {
     return 'This action adds a new hotel';
   }
-  
   async findOneByOwnerId(ownerId: number) {
     const queryRunner = this.dataSource.createQueryRunner();
     const res = await queryRunner.manager.query(`

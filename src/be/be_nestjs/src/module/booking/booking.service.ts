@@ -360,7 +360,7 @@ export class BookingService {
         const bookingStatus = 'confirmed'
         // console.log('VAO DUOC PAYMENT CASH');
         // console.log('BOOKING DATA TRUOC KHI VAO: ', bookingData);
-        await this.saveDataIntoDatabase(bookingData, paymentStatus, bookingStatus, note, paymentMethod);
+        await this.saveDataIntoDatabase(res, bookingData, paymentStatus, bookingStatus, note, paymentMethod);
         return res.status(HttpStatus.OK).json({
           status_code: HttpStatus.OK,
           message: 'Cash successful, information saved to database.',
@@ -517,7 +517,7 @@ export class BookingService {
     if (resultCode === 0) {
       const paymentStatus = 'paid';
       const bookingStatus = 'confirmed';
-      this.saveDataIntoDatabase(bookingData, paymentStatus, bookingStatus, note, 'momo');
+      this.saveDataIntoDatabase(res, bookingData, paymentStatus, bookingStatus, note, 'momo');
       return res.status(HttpStatus.OK).json({
         message: 'Payment success, save data into database',
         data: { paymentStatus, bookingData },
@@ -654,7 +654,7 @@ export class BookingService {
     }
   }
 
-  private async saveDataIntoDatabase(bookingData: any, paymentStatus: string, bookingStatus: string, note: string, paymentMethod: string) {
+  private async saveDataIntoDatabase(res: Response, bookingData: any, paymentStatus: string, bookingStatus: string, note: string, paymentMethod: string) {
     try {
       const bookingId = await this.saveBooking(bookingData, bookingStatus, note);
       // console.log('BOOKING ID: ', bookingId);
@@ -662,6 +662,7 @@ export class BookingService {
       await this.saveBookingRoom(bookingId, bookingData);
       await this.setStatusRoom(bookingData);
       await this.createPayment(bookingId, bookingData, paymentMethod, paymentStatus);
+      res.clearCookie('bookingData');
     } catch (error) {
       console.error('Error saving data into database:', error);
       throw new HttpException(
@@ -778,7 +779,6 @@ export class BookingService {
         .where('booking.id = :bookingId', { bookingId })
 
       const offset = (page - 1) * per_page;
-      // Áp dụng skip và take trước khi lấy kết quả
       bookingRoomQuery.limit(per_page).offset(offset);
 
       const [bookingRooms, totalBookingRooms] = await Promise.all([bookingRoomQuery.getRawMany(), bookingRoomQuery.getCount(),]);
@@ -851,6 +851,74 @@ export class BookingService {
         {
           status_code: HttpStatus.INTERNAL_SERVER_ERROR,
           message: 'Internal server error while saving all data.',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async getAllHistoryBooking(req: Request, getAllHistoryBooking) {
+    try {
+      const { userId, page, per_page } = getAllHistoryBooking;
+      const bookingQuery = await this.bookingRepository
+        .createQueryBuilder('booking')
+        .leftJoin('booking.hotel', 'hotel')
+        .leftJoin('booking.payment', 'payment')
+        .select([
+          'booking.id AS id',
+          'booking.createdAt AS created',  // Thêm dấu ngoặc kép
+          'hotel.name AS name',
+          'payment.totalCost AS totalcost',  // Thêm dấu ngoặc kép
+          'booking.status AS status'
+        ])
+        .where('booking.userId = :userId', { userId: userId });
+
+      const offset = (page - 1) * per_page;
+      bookingQuery.limit(per_page).offset(offset);
+
+      const [bookings, totalBookings] = await Promise.all([bookingQuery.getRawMany(), bookingQuery.getCount(),]);
+      const totalPages = Math.ceil(totalBookings / per_page);
+
+      // Kiểm tra cookie 'bookingData'
+      const bookingDT = req.cookies['bookingData'];
+      let tempBooking = null;
+
+      if (bookingDT) {
+        const bookingData = JSON.parse(bookingDT);
+
+        const hotelId = bookingData.hotelId;
+        const hotelQuery = await this.hotelRepository
+          .createQueryBuilder('hotel')
+          .select(['hotel.name AS name'])
+          .where('hotel.id = :hotelId', { hotelId });
+        const hotel = await hotelQuery.getRawOne();
+
+        tempBooking = {
+          hotelId: hotelId,
+          totalCost: bookingData.sumPrice,
+          createAt: bookingData.createAt,
+          hotelName: hotel.name,
+          status: 'Pending',
+        };
+      }
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Successfully fetched booking history.',
+        data: {
+          tempBooking,
+          total: totalBookings,
+          page: page,
+          total_page: totalPages,
+          bookings,
+        },
+      };
+    } catch (error) {
+      console.error('Error get history:', error);
+      throw new HttpException(
+        {
+          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error while get data.',
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );

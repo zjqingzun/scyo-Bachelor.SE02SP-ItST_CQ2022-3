@@ -14,11 +14,11 @@ export class CreateBookingDto {
     @IsDateString()
     checkOutDate?: string;
 
-    @Transform(({ value }) => (value ? parseInt(value, 10) : undefined))
+    @Transform(({ value }) => (value !== undefined && value !== null ? parseInt(value, 10) : value))
     @IsInt()
     roomType2?: number;
 
-    @Transform(({ value }) => (value ? parseInt(value, 10) : undefined))
+    @Transform(({ value }) => (value !== undefined && value !== null ? parseInt(value, 10) : value))
     @IsInt()
     roomType4?: number;
 

@@ -110,21 +110,6 @@ const HotelDetails = () => {
         return day === 6 || day === 0; // Thứ 7 hoặc Chủ nhật
     };
 
-    const handleToggleHeart = async () => {
-        try {
-            if (isHearted) {
-                await removeFavorite(userInfo.id, id);
-            } else {
-                await addFavorite(userInfo.id, id);
-            }
-
-            setIsHearted((prev) => !prev);
-        } catch (error) {
-            console.error(">>> Error: ", error);
-            toast.error("Error while toggling favorite");
-        }
-    };
-
     const toggleImageView = () => {
         setShowAllImages((prev) => !prev);
     };
@@ -155,7 +140,7 @@ const HotelDetails = () => {
             isFav,
         } = location.state || {};
 
-        setIsHearted(isFav);
+        setIsFavorite(isFav);
 
         setIsWeekend(checkWeekend(checkInDate) || checkWeekend(checkOutDate));
 

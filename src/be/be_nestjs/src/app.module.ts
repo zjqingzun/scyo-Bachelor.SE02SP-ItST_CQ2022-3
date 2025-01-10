@@ -30,6 +30,8 @@ import { MinioService } from './minio/minio.service';
 import { RoomTypeModule } from './module/room_type/room_type.module';
 import { BookingDetailModule } from './module/booking_detail/booking_detail.module';
 import { BookingRoomModule } from './module/booking_room/booking_room.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { DailyCheckService } from './helpers/DailyCheckService';
 
 @Module({
   imports: [
@@ -99,7 +101,8 @@ import { BookingRoomModule } from './module/booking_room/booking_room.module';
     ImageModule,
     RoomTypeModule,
     BookingDetailModule,
-    BookingRoomModule
+    BookingRoomModule,
+    ScheduleModule.forRoot()
   ],
   controllers: [AppController],
   providers: [
@@ -108,7 +111,8 @@ import { BookingRoomModule } from './module/booking_room/booking_room.module';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
-    MinioService
+    MinioService,
+    DailyCheckService
   ],
 })
 export class AppModule implements NestModule {

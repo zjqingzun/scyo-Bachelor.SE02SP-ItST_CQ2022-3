@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./RoomType.scss";
-import { Space, Table, Checkbox, Button, Popconfirm } from "antd";
+import { Space, Table, Checkbox, Button, Popconfirm, Modal as AModal } from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 
 import { useNavigate } from "react-router-dom";
@@ -189,7 +189,7 @@ const RoomType = () => {
     return (
         <>
             {userInfo && userInfo.hotel === undefined ? (
-                <Modal
+                <AModal
                     open={true}
                     title="Notice"
                     content="You have not registered any hotel yet. Please register your hotel first."
@@ -197,7 +197,7 @@ const RoomType = () => {
                     onOk={() => navigate("/hotel-owner/register-hotel")}
                 >
                     <p>You have not registered any hotel yet. Please register your hotel first.</p>
-                </Modal>
+                </AModal>
             ) : null}
             <div className="room">
                 <h1 className="mb-4">Room Type</h1>

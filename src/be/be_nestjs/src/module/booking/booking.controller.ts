@@ -104,4 +104,12 @@ export class BookingController {
     return await this.bookingService.totalReservation(id);
   }
 
+  // Room (checkin)
+  @Get('total/i/:id')
+  @Public()
+  async getTotalCheckIn(@Param('id') id: number) {
+    return await this.bookingService.totalcheckIn(id);
+  }
+
+  
 }

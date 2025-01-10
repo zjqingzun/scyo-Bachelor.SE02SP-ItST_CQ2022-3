@@ -1,11 +1,11 @@
 import "./OrderDetail.scss";
 import { useEffect, useRef, useState } from "react";
 
-import { Space, Table, Button, Popconfirm, Input, Descriptions, Modal } from "antd";
+import { Space, Table, Button, Popconfirm, Input, Descriptions, Modal, Spin } from "antd";
 import { QuestionCircleOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const data = [
@@ -130,8 +130,6 @@ const OrderDetail = () => {
                     scroll={{ x: "max-content" }}
                     tableLayout="auto"
                     loading={loading}
-                    pagination={tableParams.pagination}
-                    onChange={handleTableChange}
                 />
 
                 <div className="order-detail__special-request bg-white p-3 mb-5">

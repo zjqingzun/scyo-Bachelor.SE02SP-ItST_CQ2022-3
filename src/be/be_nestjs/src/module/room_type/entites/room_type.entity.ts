@@ -19,6 +19,12 @@ export class RoomType {
     @Column({name: 'flexible_price'})
     flexiblePrice: number;
 
+    @Column({name: 'useFlexiblePrice'})
+    useFlexiblePrice: boolean;
+
+    @Column({name: 'normalPrice'})
+    normalPrice: number;
+
     @ManyToOne(() => Hotel, (hotel) => hotel.roomTypes, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'hotelId' })
     hotel: Hotel;

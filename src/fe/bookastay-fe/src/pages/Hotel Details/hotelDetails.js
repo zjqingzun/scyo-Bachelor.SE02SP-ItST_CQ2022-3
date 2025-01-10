@@ -7,6 +7,7 @@ import SearchBarNoLocation from "~/components/SearchBarNoLocation";
 import { getHotelDetail, startBooking } from "~/services/apiService";
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const HotelDetails = () => {
     const { id } = useParams();

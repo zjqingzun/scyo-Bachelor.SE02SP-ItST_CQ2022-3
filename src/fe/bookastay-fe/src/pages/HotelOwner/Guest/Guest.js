@@ -8,19 +8,21 @@ import Highlighter from "react-highlight-words";
 import { useNavigate } from "react-router-dom";
 import StyledStatusSelect from "./StyledStatusSelect";
 import { useSelector } from "react-redux";
+import { updateStatus } from "~/services/apiService";
+import { formatDate } from "~/utils/datetime";
 
 const STATUS_OPTIONS = [
-    { label: "Pending", value: "Pending" },
-    { label: "Confirmed", value: "Confirmed" },
-    { label: "Cancelled", value: "Cancelled" },
+    { label: "Completed", value: "COMPLETED" },
+    { label: "Confirmed", value: "CONFIRMED" },
+    { label: "Cancelled", value: "CANCELLED" },
 ];
 
 const Guest = () => {
     const navigate = useNavigate();
     const [bookings, setBookings] = useState([]);
-    const [totalBookings, setTotalBookings] = useState(0);
 
     const userInfo = useSelector((state) => state.account.userInfo);
+    const account = useSelector((state) => state.account);
 
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
@@ -138,11 +140,14 @@ const Guest = () => {
                 console.error("Invalid record key:", recordKey);
                 return;
             }
-            const response = await fetch(
-                `http://localhost:3001/api/booking/guest/update-status?bookingId=${recordKey}&status=${newStatus}`,
-                { method: "PUT" }
-            );
-            const result = await response.json();
+
+            setLoading(true);
+
+            const res = await updateStatus(recordKey, newStatus);
+
+            if (res && +res.status_code === 200) {
+                fetchBookings();
+            }
         } catch {
             console.log("Error when updating status");
         } finally {
@@ -162,7 +167,7 @@ const Guest = () => {
             dataIndex: "guestName",
             key: "guestName",
             fixed: "left",
-            ...getColumnSearchProps("guestName"),
+            // ...getColumnSearchProps("guestName"),
         },
         {
             title: "Check-in Date",
@@ -183,7 +188,7 @@ const Guest = () => {
             title: "Status",
             key: "status",
             dataIndex: "status",
-            filters: STATUS_OPTIONS,
+            // filters: STATUS_OPTIONS,
             render: (status, record) => (
                 <>
                     <StyledStatusSelect
@@ -214,8 +219,7 @@ const Guest = () => {
                     >
                         View
                     </Button>
-
-                    <Popconfirm
+                    {/* <Popconfirm
                         onConfirm={() => {
                             // Handle delete action
                             console.log("Delete record", record);
@@ -231,7 +235,7 @@ const Guest = () => {
                         }
                     >
                         <Button danger>Delete</Button>
-                    </Popconfirm>
+                    </Popconfirm> */}
                 </Space>
             ),
         },
@@ -242,41 +246,55 @@ const Guest = () => {
         pagination: {
             current: 1,
             pageSize: 10,
+            position: ["bottomCenter"],
         },
     });
 
     const userId = localStorage.getItem("user_id");
+    const fetchBookings = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch(
+                `http://localhost:3001/api/booking/guest?userId=${userId}&page=${tableParams?.pagination?.current}&per_page=${tableParams?.pagination?.pageSize}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${account?.accessToken}`,
+                    },
+                }
+            );
+            const result = await response.json();
+            if (result.status_code === 200) {
+                const formattedData = result.data.bookings.map((booking) => ({
+                    key: booking.id,
+                    reservationID: booking.id,
+                    guestName: booking.name,
+                    checkInDate: formatDate(booking.checkInDate),
+                    checkOutDate: formatDate(booking.checkOutDate),
+                    totalPrice: booking.totalPrice,
+                    status: [booking.status],
+                }));
+
+                setBookings(formattedData);
+
+                setTableParams({
+                    pagination: {
+                        ...tableParams.pagination,
+                        current: result.data.page,
+                        pageSize: result.data.per_page,
+                        total: result.data.total,
+                    },
+                });
+            } else {
+                console.error("Failed to fetch bookings:", result.message);
+            }
+        } catch (error) {
+            console.error("Error fetching bookings:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchBookings = async () => {
-            setLoading(true);
-            try {
-                const response = await fetch(
-                    `http://localhost:3001/api/booking/guest?userId=${userId}&page=${tableParams.pagination.current}&per_page=${tableParams.pagination.pageSize}`
-                );
-                const result = await response.json();
-                if (result.status_code === 200) {
-                    const formattedData = result.data.bookings.map((booking) => ({
-                        key: booking.id,
-                        reservationID: booking.id,
-                        guestName: booking.name,
-                        checkInDate: booking.checkInDate,
-                        checkOutDate: booking.checkOutDate,
-                        totalPrice: booking.totalPrice,
-                        status: [booking.status],
-                    }));
-                    setBookings(formattedData);
-                    setTotalBookings(result.data.total);
-                } else {
-                    console.error("Failed to fetch bookings:", result.message);
-                }
-            } catch (error) {
-                console.error("Error fetching bookings:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchBookings();
     }, [tableParams.pagination.current, tableParams.pagination.pageSize]);
 

@@ -245,12 +245,13 @@ const AccountSetting = () => {
                     </div>
                 </div>
 
-                <button
+                {/* <button
                     className="btn btn-danger my-5 fs-2"
                     style={{ padding: "8px 20px", borderRadius: "10px" }}
+                    onClick={() => handleDeleteAccount()}
                 >
                     Delete account permanently
-                </button>
+                </button> */}
 
                 {/* Modal */}
                 {isModalOpen && (

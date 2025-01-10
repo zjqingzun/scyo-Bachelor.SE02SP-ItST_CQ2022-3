@@ -12,6 +12,8 @@ import {
 } from "~/components/HotelOwner/HotelRegister";
 import "./RegisterHotel.scss";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { doGetAccount } from "~/redux/action/accountAction";
 
 const StyledStepLabel = styled.div`
     font-size: 2.8rem;
@@ -33,6 +35,7 @@ const formReducer = (state, action) => {
 };
 
 const RegisterHotel = () => {
+    const reduxDispatch = useDispatch();
     const navigate = useNavigate();
 
     const stepsConfig = [
@@ -107,6 +110,9 @@ const RegisterHotel = () => {
                     quadRoomPrice,
                 }
             );
+
+            reduxDispatch(doGetAccount());
+
             // console.log("Room details response:", roomDetailsResponse.data);
         } catch {
             console.log("Error when sending property details");

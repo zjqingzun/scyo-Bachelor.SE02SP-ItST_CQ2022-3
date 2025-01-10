@@ -234,10 +234,13 @@ const HotelDetails = () => {
             sumPrice: room_types.reduce((total, room) => {
                 const count = roomCounts[room.id] || 0;
                 const price = isWeekend ? room.weekend_price : room.price;
+
                 return total + count * price;
             }, 0),
             userId: +userInfo.id,
         };
+
+        console.log(">>> Start booking data: ", data);
 
         try {
             const res = await startBooking(data);

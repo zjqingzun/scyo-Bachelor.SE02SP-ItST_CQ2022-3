@@ -7,6 +7,7 @@ import Highlighter from "react-highlight-words";
 
 import { useNavigate } from "react-router-dom";
 import StyledStatusSelect from "./StyledStatusSelect";
+import { useSelector } from "react-redux";
 
 const STATUS_OPTIONS = [
     { label: "Pending", value: "Pending" },
@@ -46,6 +47,8 @@ const data = [
 
 const Guest = () => {
     const navigate = useNavigate();
+
+    const userInfo = useSelector((state) => state.account.userInfo);
 
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
@@ -278,23 +281,36 @@ const Guest = () => {
     // };
 
     return (
-        <div className="guest">
-            <h1>Guest</h1>
-            <div className="d-flex my-3">
-                {/* <button className="btn btn-primary ms-auto fs-4" onClick={() => handleAddRoom()}>
-                    Add Room
-                </button> */}
+        <>
+            {userInfo && userInfo.hotel === undefined ? (
+                <Modal
+                    open={true}
+                    title="Notice"
+                    content="You have not registered any hotel yet. Please register your hotel first."
+                    closeable={false}
+                    onOk={() => navigate("/hotel-owner/register-hotel")}
+                >
+                    <p>You have not registered any hotel yet. Please register your hotel first.</p>
+                </Modal>
+            ) : null}
+            <div className="guest">
+                <h1>Guest</h1>
+                <div className="d-flex my-3">
+                    {/* <button className="btn btn-primary ms-auto fs-4" onClick={() => handleAddRoom()}>
+                        Add Room
+                    </button> */}
+                </div>
+                <Table
+                    columns={columns}
+                    dataSource={data}
+                    scroll={{ x: "max-content" }}
+                    tableLayout="auto"
+                    loading={loading}
+                    pagination={tableParams.pagination}
+                    onChange={handleTableChange}
+                />
             </div>
-            <Table
-                columns={columns}
-                dataSource={data}
-                scroll={{ x: "max-content" }}
-                tableLayout="auto"
-                loading={loading}
-                pagination={tableParams.pagination}
-                onChange={handleTableChange}
-            />
-        </div>
+        </>
     );
 };
 

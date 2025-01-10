@@ -10,7 +10,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private configService: ConfigService,
     private usersService: UserService,
-    private hotelService: HotelsService
+    private hotelService: HotelsService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -25,6 +25,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const hotel = await this.hotelService.findOneByOwnerId(user.id);
 
     const { password, accountType, codeId, codeExpired, ...userInfo } = user;
-    return {...userInfo, role, hotel};
+    return { ...userInfo, role, hotel };
   }
 }

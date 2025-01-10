@@ -6,6 +6,7 @@ import { QuestionCircleOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const data = [
     {
@@ -29,6 +30,10 @@ const data = [
 ];
 
 const OrderDetail = () => {
+    const navigate = useNavigate();
+
+    const userInfo = useSelector((state) => state.account.userInfo);
+
     const columns = [
         {
             title: "Room Number",
@@ -80,37 +85,50 @@ const OrderDetail = () => {
     // };
 
     return (
-        <div className="order-detail">
-            <h1>Order Detail</h1>
-            <div className="d-flex my-3 bg-white p-3">
-                <Descriptions title="Guest Information" column={2}>
-                    <Descriptions.Item span={2} label="Reservation Id">
-                        1
-                    </Descriptions.Item>
-                    <Descriptions.Item label="UserName">Zhou Maomao</Descriptions.Item>
-                    <Descriptions.Item label="Telephone">1810000000</Descriptions.Item>
-                </Descriptions>
-            </div>
-            <Table
-                columns={columns}
-                dataSource={data}
-                scroll={{ x: "max-content" }}
-                tableLayout="auto"
-                loading={loading}
-                pagination={tableParams.pagination}
-                onChange={handleTableChange}
-            />
+        <>
+            {userInfo && userInfo.hotel === undefined ? (
+                <Modal
+                    open={true}
+                    title="Notice"
+                    content="You have not registered any hotel yet. Please register your hotel first."
+                    closeable={false}
+                    onOk={() => navigate("/hotel-owner/register-hotel")}
+                >
+                    <p>You have not registered any hotel yet. Please register your hotel first.</p>
+                </Modal>
+            ) : null}
+            <div className="order-detail">
+                <h1>Order Detail</h1>
+                <div className="d-flex my-3 bg-white p-3">
+                    <Descriptions title="Guest Information" column={2}>
+                        <Descriptions.Item span={2} label="Reservation Id">
+                            1
+                        </Descriptions.Item>
+                        <Descriptions.Item label="UserName">Zhou Maomao</Descriptions.Item>
+                        <Descriptions.Item label="Telephone">1810000000</Descriptions.Item>
+                    </Descriptions>
+                </div>
+                <Table
+                    columns={columns}
+                    dataSource={data}
+                    scroll={{ x: "max-content" }}
+                    tableLayout="auto"
+                    loading={loading}
+                    pagination={tableParams.pagination}
+                    onChange={handleTableChange}
+                />
 
-            <div className="order-detail__special-request bg-white p-3 mb-5">
-                <h2>Special Request</h2>
-                <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, elit
-                    eget fermentum faucibus, nunc odio tincidunt nunc, vel ultricies nisl ligula nec
-                    erat. Nullam auctor, elit eget fermentum faucibus, nunc odio tincidunt nunc, vel
-                    ultricies nisl ligula nec erat.
-                </p>
+                <div className="order-detail__special-request bg-white p-3 mb-5">
+                    <h2>Special Request</h2>
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, elit
+                        eget fermentum faucibus, nunc odio tincidunt nunc, vel ultricies nisl ligula
+                        nec erat. Nullam auctor, elit eget fermentum faucibus, nunc odio tincidunt
+                        nunc, vel ultricies nisl ligula nec erat.
+                    </p>
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 

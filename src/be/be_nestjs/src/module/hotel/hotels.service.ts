@@ -161,7 +161,7 @@ export class HotelsService {
           }
           const presignedImages = await Promise.all(
             hotel.images.map((url: string) => {
-              if (url.startsWith("https://cf.bstatic.com/xdata")) {
+              if (url.startsWith("https://cf.bstatic.com/xdata") || url.startsWith("http://88.222.212.40")) {
                 return url;
               } else {
                 return this.minioService.getPresignedUrl("hotel_image/" + url);
@@ -356,7 +356,7 @@ export class HotelsService {
           }
           const presignedImages = await Promise.all(
             hotel.images.map((url: string) => {
-              if (url.startsWith("https://cf.bstatic.com/xdata")) {
+              if (url.startsWith("https://cf.bstatic.com/xdata") || url.startsWith("http://88.222.212.40")) {
                 return url;
               } else {
                 return this.minioService.getPresignedUrl("hotel_image/" + url);
@@ -458,7 +458,7 @@ export class HotelsService {
       // Xử lý link hình ảnh Hotel
       const presignedImages = await Promise.all(
         hotel.images.map((url: string) => {
-          if (url.startsWith("https://cf.bstatic.com/xdata")) {
+          if (url.startsWith("https://cf.bstatic.com/xdata") || url.startsWith("http://88.222.212.40")) {
             return url;
           } else {
             return this.minioService.getPresignedUrl("hotel_image/" + url);

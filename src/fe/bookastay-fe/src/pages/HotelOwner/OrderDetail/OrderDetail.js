@@ -1,16 +1,15 @@
 import "./OrderDetail.scss";
 
-import { useEffect, useRef, useState } from "react";
-import { Space, Table, Button, Popconfirm, Input, Descriptions, Modal, Spin } from "antd";
-import { QuestionCircleOutlined, SearchOutlined } from "@ant-design/icons";
-import Highlighter from "react-highlight-words";
+import { useEffect, useState } from "react";
+import { Table, Descriptions, Modal, Spin } from "antd";
 
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
+import axios from "~/utils/axiosCustomize";
+
 const OrderDetail = () => {
     const userInfo = useSelector((state) => state.account.userInfo);
-    const account = useSelector((state) => state.account);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -29,13 +28,8 @@ const OrderDetail = () => {
     const fetchOrderDetails = async () => {
         setLoading(true);
         try {
-            const response = await fetch(
-                `http://localhost:3001/api/booking/guest/detail?userId=${userId}&bookingId=${reservationID}&page=${tableParams?.pagination?.current}&per_page=${tableParams?.pagination?.pageSize}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${account?.accessToken}`,
-                    },
-                }
+            const response = await axios.get(
+                `/booking/guest/detail?userId=${userId}&bookingId=${reservationID}&page=${tableParams?.pagination?.current}&per_page=${tableParams?.pagination?.pageSize}`
             );
             const data = await response.json();
             if (data.status_code === 200) {

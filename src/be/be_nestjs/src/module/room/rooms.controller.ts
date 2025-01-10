@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
+import { Public } from '@/helpers/decorator/public';
 
 @Controller('rooms')
 export class RoomsController {
@@ -30,5 +31,19 @@ export class RoomsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.roomsService.remove(+id);
+  }
+
+  // Room (booked)
+  @Get('total/b/:id')
+  @Public()
+  async getTotalOccupiedRooms(@Param('id') id: number) {
+    return await this.roomsService.totalOccupied(id);
+  }
+
+  // Room (available)
+  @Get('total/a/:id')
+  @Public()
+  async getTotalAvailableRooms(@Param('id') id: number) {
+    return await this.roomsService.totalAvailable(id);
   }
 }

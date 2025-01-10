@@ -84,4 +84,27 @@ export class BookingController {
   async bookRoom(createBookingDto: CreateBookingDto) {
 
   }
+
+  // Room (Reservation)
+  @Get('total/r/:id')
+  @Public()
+  async getTotalResservation(@Param('id') id: number) {
+    return await this.bookingService.totalReservation(id);
+  }
+
+  // Room (checkin)
+  @Get('total/i/:id')
+  @Public()
+  async getTotalCheckIn(@Param('id') id: number) {
+    return await this.bookingService.totalcheckIn(id);
+  }
+
+  // Room (checkout)
+  @Get('total/o/:id')
+  @Public()
+  async getTotalCheckOut(@Param('id') id: number) {
+    return await this.bookingService.totalcheckOut(id);
+  }
+
+  
 }

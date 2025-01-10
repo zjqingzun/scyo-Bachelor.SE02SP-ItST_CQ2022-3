@@ -886,15 +886,11 @@ export class BookingService {
         const bookingData = JSON.parse(bookingDT);
 
         const hotelId = bookingData.hotelId;
-        const totalCost = bookingData.sumPrice;
-        const createAt = bookingData.createAt;
         const hotelQuery = await this.hotelRepository
           .createQueryBuilder('hotel')
           .select(['hotel.name AS name'])
           .where('hotel.id = :hotelId', { hotelId });
         const hotel = await hotelQuery.getRawOne();
-        const hotelName = hotel.name;
-        const status = 'Pending';
 
         tempBooking = {
           hotelId: hotelId,

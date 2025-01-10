@@ -96,4 +96,12 @@ export class BookingController {
   async bookRoom(createBookingDto: CreateBookingDto) {
 
   }
+
+  // Room (Reservation)
+  @Get('total/r/:id')
+  @Public()
+  async getTotalResservation(@Param('id') id: number) {
+    return await this.bookingService.totalReservation(id);
+  }
+
 }

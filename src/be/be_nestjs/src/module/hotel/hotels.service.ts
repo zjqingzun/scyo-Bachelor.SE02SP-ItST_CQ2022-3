@@ -513,6 +513,19 @@ export class HotelsService {
       );
     }
   }
+
+
+  async totalRequest() {
+    const total = await this.hotelRepository.createQueryBuilder('hotel')
+        .where('hotel.status = :status', { status: 'pending'})
+        .getCount();
+    return {
+      status: 200,
+      total: total,
+    };
+  }
+
+
 }
 
 function removeDiacritics(value: string): string {

@@ -67,4 +67,12 @@ export class HotelsController {
   ) {
     return await this.hotelsService.findOne(id, detailHotelDto);
   }
+
+  @Get('admin/dashboard/t/request')
+  @Public()
+  async totalDashboardRequest() {
+    return await this.hotelsService.totalRequest();
+  }
+
+
 }

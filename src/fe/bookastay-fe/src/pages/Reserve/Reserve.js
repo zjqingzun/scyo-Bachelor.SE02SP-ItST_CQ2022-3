@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import {
     checkTimeBooking,
+    deleteCookie,
     getBookingInfo,
     getHotelDetail,
     paymentBooking,
@@ -72,8 +73,9 @@ const Reserve = () => {
                 toast.error("Failed to get booking information");
             }
         };
-
-        fetchBookingInfo();
+        if (location.state && location.state.isReturn) {
+            fetchBookingInfo();
+        }
     }, []);
 
     const searchParams = new URLSearchParams(location.search);
@@ -121,6 +123,16 @@ const Reserve = () => {
                     transId,
                     message,
                 });
+
+                const clearCookie = async () => {
+                    try {
+                        const res = await deleteCookie();
+                    } catch (error) {
+                        console.error("Failed to delete cookie:", error);
+                    }
+                };
+
+                clearCookie();
 
                 // Hiển thị thông báo thành công
                 toast.success("Payment successful!");

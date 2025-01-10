@@ -24,7 +24,4 @@ export class Bill {
     @ManyToOne(() => User, (user) => user.bills)
     @JoinColumn({name: "userId"})
     user: User;
-
-    @OneToOne(() => Payment, (payment) => payment.bill)
-    payment: Payment;
 }

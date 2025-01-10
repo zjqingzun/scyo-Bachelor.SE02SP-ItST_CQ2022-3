@@ -9,8 +9,8 @@ import { PaymentCallbackDto } from './dto/payment-callback.dto';
 export class BookingController {
   constructor(private readonly bookingService: BookingService) { }
 
-  // [GET]: /booking --> Kiểm tra booking còn hạn không
-  @Get()
+  // [GET]: /booking/check-booking --> Kiểm tra booking còn hạn không
+  @Get('check-booking')
   @Public()
   async check(
     @Req() req,
@@ -63,6 +63,7 @@ export class BookingController {
 
   // [POST]: 
   @Post('callback')
+  @Public()
   async handlePaymentCallback(
     @Body() detailPay: PaymentCallbackDto,
     @Req() req,

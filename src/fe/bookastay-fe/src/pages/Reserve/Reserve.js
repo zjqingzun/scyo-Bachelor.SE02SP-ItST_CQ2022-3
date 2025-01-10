@@ -24,7 +24,7 @@ import {
     postBookingInfo,
 } from "~/services/apiService";
 import { useLocation, useNavigate } from "react-router-dom";
-import { formatCheckInOutDate } from "~/utils/datetime";
+import { formatCheckInOutDate, formatDate } from "~/utils/datetime";
 
 const StyledStepLabel = styled.div`
     font-size: 2.8rem;
@@ -74,6 +74,8 @@ const Reserve = () => {
     const extraData = searchParams.get("extraData");
     const signature = searchParams.get("signature");
 
+    const [isFinishCashPayment, setIsFinishCashPayment] = useState(false);
+
     // Xử lý logic sau khi nhận kết quả thanh toán
     useEffect(() => {
         if (resultCode) {
@@ -93,6 +95,8 @@ const Reserve = () => {
             });
 
             if (resultCode === "0") {
+                clearInterval(intervalIdRef.current);
+
                 console.log("Payment successful:", {
                     partnerCode,
                     orderId,
@@ -114,24 +118,61 @@ const Reserve = () => {
         }
     }, [resultCode]);
 
+    const intervalIdRef = useRef(null);
+
     useEffect(() => {
         const fetchAvailability = async () => {
+            if (resultCode === "0" || isFinishCashPayment) {
+                return false;
+            }
             try {
                 const response = await checkTimeBooking(); // Gọi API
                 console.log(">>> response", response);
+
+                if (
+                    response &&
+                    +response.status_code === 403 &&
+                    resultCode !== "0" &&
+                    !isFinishCashPayment
+                ) {
+                    toast.error("Booking time is expired");
+                    navigate(`/hotel/${hotelId}`, {
+                        state: {
+                            checkInDate: formatDate(checkInDate, "yyyy-mm-dd"),
+                            checkOutDate: formatDate(checkOutDate, "yyyy-mm-dd"),
+                            roomType2,
+                            roomType4,
+                            rooms,
+                            sumPrice,
+                            type2Price,
+                            type4Price,
+                            userId,
+                            numberOfRoom2,
+                            numberOfRoom4,
+                        },
+                    });
+
+                    return true;
+                }
             } catch (error) {
                 toast.error("Failed to check availability");
+
+                return false;
             }
         };
 
         fetchAvailability();
 
-        const intervalId = setInterval(() => {
-            fetchAvailability();
+        intervalIdRef.current = setInterval(async () => {
+            const res = await fetchAvailability();
+
+            if (res === false) {
+                clearInterval(intervalIdRef.current);
+            }
         }, 1000 * 30); // Gọi API mỗi 30 giây
 
         return () => {
-            clearInterval(intervalId);
+            clearInterval(intervalIdRef.current);
         };
     }, []);
 
@@ -238,6 +279,11 @@ const Reserve = () => {
                     // open in current tab
                     window.open(res.paymentUrl, "_self");
                 } else {
+                    if (+res.status_code === 200) {
+                        clearInterval(intervalIdRef.current);
+                        toast.success("Payment successful!");
+                        setIsFinishCashPayment(true);
+                    }
                 }
             } catch (error) {
                 console.log(">>> error", error);
@@ -276,12 +322,12 @@ const Reserve = () => {
             roomsInfoRef.current.className === "collapse" ? "collapse show" : "collapse";
     };
 
-    if (resultCode && resultCode === "0") {
+    if ((resultCode && resultCode === "0") || isFinishCashPayment) {
         return (
             <Result
                 status="success"
                 title="Successfully Purchased!"
-                subTitle={`Order number: ${orderId}`}
+                subTitle={paymentMethod === "momo" ? "Order number: " + orderId : ""}
                 extra={[
                     <Button
                         type="primary"
@@ -292,7 +338,7 @@ const Reserve = () => {
                     >
                         Go Homepage
                     </Button>,
-                    <Button key="buy">Buy Again</Button>,
+                    // <Button key="buy">Buy Again</Button>,
                 ]}
             />
         );
@@ -306,7 +352,7 @@ const Reserve = () => {
                     <Button type="primary" key="console" onClick={() => navigate("/")}>
                         Go Homepage
                     </Button>,
-                    <Button key="buy">Buy Again</Button>,
+                    // <Button key="buy">Buy Again</Button>,
                 ]}
             />
         );

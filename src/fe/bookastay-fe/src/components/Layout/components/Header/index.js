@@ -123,14 +123,13 @@ const Header = () => {
         },
         {
             key: "3",
-            label: "Billing",
-            extra: "⌘B",
+            label: "History",
+            extra: "⌘H",
         },
         {
             key: "4",
-            label: "Settings",
-            icon: <SettingOutlined />,
-            extra: "⌘S",
+            label: "Favorites",
+            extra: "⌘F",
         },
         {
             type: "divider",

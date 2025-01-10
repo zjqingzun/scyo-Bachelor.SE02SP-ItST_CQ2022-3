@@ -154,7 +154,7 @@ export class BookingService {
 
       // Lưu vào cookie với thời gian hết hạn là 5 phút
       res.cookie('bookingData', JSON.stringify(bookingData), {
-        maxAge: 5 * 60 * 1000,
+        maxAge: 1 * 60 * 1000,
         httpOnly: true,
       });
 
@@ -165,7 +165,7 @@ export class BookingService {
       };
       console.log('OLD STATE: ', oldState);
       res.cookie('oldState', JSON.stringify(oldState), {
-        maxAge: 6 * 60 * 1000,
+        maxAge: 2 * 60 * 1000,
         httpOnly: true,
       });
 
@@ -318,7 +318,7 @@ export class BookingService {
   async addNote(res: Response, note: string) {
     try {
       res.cookie('note', JSON.stringify(note), {
-        maxAge: 5 * 60 * 1000,
+        maxAge: 1 * 60 * 1000,
         httpOnly: true,
       });
 
@@ -766,9 +766,4 @@ export class BookingService {
       throw new Error(`Error fetching total occupied rooms: ${error.message}`);
     }
   }
-<<<<<<< HEAD
-=======
-
-
->>>>>>> main
 }

@@ -45,32 +45,6 @@ const OrderDetail = () => {
             key: "price",
             dataIndex: "price",
         },
-        {
-            title: "Action",
-            key: "action",
-            fixed: "right",
-            render: (_, record) => (
-                <Space size="middle">
-                    <Popconfirm
-                        onConfirm={() => {
-                            // Handle delete action
-                            console.log("Delete record", record);
-                        }}
-                        title="Delete the guest?"
-                        description="Are you sure to delete this guest?"
-                        icon={
-                            <QuestionCircleOutlined
-                                style={{
-                                    color: "red",
-                                }}
-                            />
-                        }
-                    >
-                        <Button danger>Delete</Button>
-                    </Popconfirm>
-                </Space>
-            ),
-        },
     ];
 
     const [loading, setLoading] = useState(false);
@@ -115,9 +89,6 @@ const OrderDetail = () => {
                     </Descriptions.Item>
                     <Descriptions.Item label="UserName">Zhou Maomao</Descriptions.Item>
                     <Descriptions.Item label="Telephone">1810000000</Descriptions.Item>
-                    <Descriptions.Item label="Address">
-                        No. 18, Wantang Road, Xihu District, Hangzhou, Zhejiang, China
-                    </Descriptions.Item>
                 </Descriptions>
             </div>
             <Table

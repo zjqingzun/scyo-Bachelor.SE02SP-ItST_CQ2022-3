@@ -152,6 +152,25 @@ const paymentBooking = async (data) => {
     });
 };
 
+// Booking History
+const getBookingHistory = async (
+    query = {
+        userId: "",
+        page: 1,
+        per_page: 6,
+    }
+) => {
+    const { userId, page, per_page } = query;
+
+    const params = new URLSearchParams({
+        userId: userId,
+        page: page || 1,
+        per_page: per_page || 6,
+    });
+
+    return await axios.get(`/booking/history?${params.toString()}`);
+};
+
 export {
     userLogin,
     getProfile,
@@ -171,4 +190,5 @@ export {
     postBookingInfo,
     paymentBooking,
     checkTimeBooking,
+    getBookingHistory,
 };

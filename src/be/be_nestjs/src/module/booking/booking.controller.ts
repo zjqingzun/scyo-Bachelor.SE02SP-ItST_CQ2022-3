@@ -3,7 +3,6 @@ import { BookingService } from './booking.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { Public } from '@/helpers/decorator/public';
-import { PaymentCallbackDto } from './dto/payment-callback.dto';
 
 @Controller('booking')
 export class BookingController {
@@ -59,17 +58,6 @@ export class BookingController {
   ) {
     const paymentMethod = body.paymentMethod;
     return this.bookingService.processPayment(req, res, paymentMethod);
-  }
-
-  // [POST]: 
-  @Post('callback')
-  @Public()
-  async handlePaymentCallback(
-    @Body() detailPay: PaymentCallbackDto,
-    @Req() req,
-    @Res() res,
-  ) {
-    return this.bookingService.updatePaymentStatus(req, res, detailPay);
   }
 
   @Get()

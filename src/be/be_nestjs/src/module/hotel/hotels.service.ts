@@ -127,6 +127,7 @@ export class HotelsService {
           'COUNT(DISTINCT review.id) AS totalreviews',
           'MIN(roomType.price) AS minroomprice',
         ])
+        .where('hotel.status = :status', { status: 'approved' })
         .groupBy('hotel.id')
         .addGroupBy('location.id')
         .orderBy('COALESCE(AVG(review.rating), 0)', 'DESC')
@@ -233,6 +234,7 @@ export class HotelsService {
             AND (b."checkinTime" < :checkOutDate AND b."checkoutTime" > :checkInDate)
           )) THEN room.id END) AS numberoftype4`
         ])
+        .where('hotel.status = :status', { status: 'approved' })
         .groupBy('hotel.id')
         .addGroupBy('location.id')
         .setParameters({ checkInDate, checkOutDate })

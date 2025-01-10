@@ -4,6 +4,7 @@ import icons from "~/assets/icon";
 import HistoryCard from "~/components/HotelCard/HistoryCard";
 import { getBookingHistory } from "~/services/apiService";
 import { useSelector } from "react-redux";
+import { Pagination } from "antd";
 
 const History = () => {
     const userInfo = useSelector((state) => state.account.userInfo);
@@ -147,47 +148,73 @@ const History = () => {
         },
     ];
 
+    const [bookingHistory, setBookingHistory] = useState([]);
+
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 8; // 8 items per page
+    const [totalItems, setTotalItems] = useState(0);
+    const [pageSizes, setPageSizes] = useState(6);
+    const [pendingBooking, setPendingBooking] = useState(null);
 
     const [selectedCard, setSelectedCard] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
 
-    // Pagination logic
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const filteredCards = cardsData.filter((card) =>
-        card.hotelName.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    const currentCards = filteredCards.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredCards.length / itemsPerPage);
-
     // Change page
-    const handlePageChange = (pageNumber) => {
-        setCurrentPage(pageNumber);
-    };
 
-    const handleCardClick = (card) => {
-        setSelectedCard(card);
-    };
+    const handleCardClick = (card) => {};
 
     const closeModal = () => {
         setSelectedCard(null);
     };
 
-    useEffect(() => {
-        const fetchHistory = async () => {
-            try {
-                const res = await getBookingHistory({
-                    userId: userInfo.id,
+    const fetchHistory = async () => {
+        try {
+            const res = await getBookingHistory({
+                userId: userInfo.id,
+                page: currentPage,
+                per_page: pageSizes,
+            });
+
+            if (res && +res.statusCode === 200) {
+                let bookings = res.data.bookings;
+
+                bookings = bookings.map((booking) => {
+                    let date = new Date(booking.created);
+                    let day = date.getDate();
+                    let time = date.toLocaleTimeString();
+
+                    return {
+                        ...booking,
+                        date: `${day < 10 ? "0" + day : day}/${(date.getMonth() + 1)
+                            .toString()
+                            .padStart(2, "0")}/${date.getFullYear()}`,
+                        time: time,
+                    };
                 });
 
-                console.log(">>> History data", res);
-            } catch (error) {}
-        };
+                setBookingHistory(bookings);
+                setTotalItems(res.data.total);
 
+                if (res.data.tempBooking) {
+                    setPendingBooking(res.data.tempBooking);
+                }
+            }
+
+            console.log(">>> History data", res);
+        } catch (error) {}
+    };
+
+    useEffect(() => {
         fetchHistory();
     }, []);
+
+    useEffect(() => {
+        fetchHistory();
+    }, [currentPage, pageSizes]);
+
+    const handlePaginationChange = (page, pageSize) => {
+        setCurrentPage(page);
+        setPageSizes(pageSize);
+    };
 
     return (
         <div>
@@ -200,35 +227,32 @@ const History = () => {
                     />
                     <h1 className="ms-5 pt-2">History</h1>
                 </div>
-                <div className="col-6">
-                    <div className="input-group pe-5 pt-5">
-                        <input
-                            type="text"
-                            className="form-control p-3 fs-3"
-                            placeholder="Search"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        <img
-                            src={icons.searchIcon}
-                            alt="search"
-                            className="btn btn-outline-primary searchIcon"
-                        />
-                    </div>
-                </div>
             </div>
 
-            <div className="row">
-                {currentCards.map((card, index) => (
+            {/* Hiển thị thông báo nếu có booking đang chờ xác nhận */}
+            {pendingBooking && (
+                <div>
                     <HistoryCard
-                        key={index}
+                        key={pendingBooking.hotelId}
+                        status={pendingBooking.status}
+                        id={pendingBooking.hotelId}
+                        hotelName={pendingBooking.hotelName}
+                        money={pendingBooking.totalCost}
+                        onClick={() => handleCardClick(card)} // Set trực tiếp
+                    />
+                </div>
+            )}
+
+            <div className="row">
+                {bookingHistory.map((card, index) => (
+                    <HistoryCard
+                        key={card.id}
                         date={card.date}
                         time={card.time}
                         status={card.status}
                         id={card.id}
-                        hotelName={card.hotelName}
-                        money={card.money}
-                        onClick={() => handleCardClick(card)} // Set trực tiếp
+                        hotelName={card.name}
+                        money={card.totalcost}
                     />
                 ))}
             </div>
@@ -319,46 +343,20 @@ const History = () => {
             )}
 
             {/* Pagination */}
-            <div className="d-flex justify-content-center my-5 pb-5 pt-3">
-                <nav>
-                    <ul className="pagination">
-                        {/* Nút "Trước" */}
-                        <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                            <button
-                                className="page-link px-4 py-2 fs-2"
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                aria-label="Previous"
-                                disabled={currentPage === 1}
-                            >
-                                <span aria-hidden="true">&laquo;</span>
-                            </button>
-                        </li>
-
-                        {/* Các số trang */}
-                        {[...Array(totalPages).keys()].map((page) => (
-                            <li
-                                key={page}
-                                className={`page-item ${page + 1 === currentPage ? "active" : ""}`}
-                                onClick={() => handlePageChange(page + 1)}
-                            >
-                                <button className="page-link px-4 py-2 fs-2">{page + 1}</button>
-                            </li>
-                        ))}
-
-                        {/* Nút "Sau" */}
-                        <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                            <button
-                                className="page-link px-4 py-2 fs-2"
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                aria-label="Next"
-                                disabled={currentPage === totalPages}
-                            >
-                                <span aria-hidden="true">&raquo;</span>
-                            </button>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+            {bookingHistory.length > 0 && (
+                <div className="pagination mt-5 d-flex justify-content-center">
+                    <Pagination
+                        showQuickJumper
+                        defaultCurrent={currentPage}
+                        total={totalItems}
+                        defaultPageSize={pageSizes}
+                        pageSizeOptions={[6, 12, 18, 24]}
+                        onChange={(page, pageSize) => {
+                            handlePaginationChange(page, pageSize);
+                        }}
+                    />
+                </div>
+            )}
         </div>
     );
 };

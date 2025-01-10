@@ -171,6 +171,17 @@ const getBookingHistory = async (
     return await axios.get(`/booking/history?${params.toString()}`);
 };
 
+// Review
+const postReview = async (review) => {
+    const data = {
+        comment: review.comment || "",
+        rating: review.rating || 0,
+        hotelId: review.hotelId || "",
+        userId: review.userId || "",
+    };
+    return await axios.post("/review/create", data);
+};
+
 export {
     userLogin,
     getProfile,
@@ -191,4 +202,5 @@ export {
     paymentBooking,
     checkTimeBooking,
     getBookingHistory,
+    postReview,
 };

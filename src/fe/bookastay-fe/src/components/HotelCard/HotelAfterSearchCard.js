@@ -33,7 +33,6 @@ const HotelAfterSearchCard = ({
 
     const navigate = useNavigate();
     const handleBookNow = () => {
-        
         navigate(`/hotel/${id}`, {
             state: {
                 id,
@@ -42,6 +41,7 @@ const HotelAfterSearchCard = ({
                 images,
                 price,
                 rating,
+                isFav: isFavorite,
                 review,
                 star,
                 checkInDate: location.state?.startDate, // Truyền từ location.state
@@ -137,7 +137,14 @@ const HotelAfterSearchCard = ({
                 </Modal.Body>
             </Modal>
             <div className="hotel-card__image-wrap">
-                <a href="#!" style={{ display: "block", height: "100%" }}>
+                <a
+                    href="#!"
+                    style={{ display: "block", height: "100%" }}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        handleBookNow();
+                    }}
+                >
                     <img src={images[0]} alt={name} className="hotel-card__image" />
                 </a>
 

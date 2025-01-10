@@ -59,6 +59,23 @@ const Reserve = () => {
     const [hotelDetail, setHotelDetail] = useState(null);
     const [bookingInfo, setBookingInfo] = useState(null);
 
+    useEffect(() => {
+        const fetchBookingInfo = async () => {
+            try {
+                const response = await getBookingInfo();
+                console.log(">>> response", response);
+
+                if (response) {
+                    setBookingInfo(response.data);
+                }
+            } catch (error) {
+                toast.error("Failed to get booking information");
+            }
+        };
+
+        fetchBookingInfo();
+    }, []);
+
     const searchParams = new URLSearchParams(location.search);
 
     const partnerCode = searchParams.get("partnerCode");
@@ -688,21 +705,28 @@ const Reserve = () => {
                                                     {t("reserve.hotel")}
                                                 </span>
                                                 <div className="d-flex gap-1">
-                                                    {[...Array(hotelDetail?.star ?? 0)].map(
-                                                        (_, index) => (
-                                                            <img
-                                                                style={{ width: 20 }}
-                                                                key={index}
-                                                                src={icons.yellowStarIcon}
-                                                                alt="star"
-                                                                className="hotel-card__star-icon"
-                                                            />
-                                                        )
-                                                    )}
+                                                    {[
+                                                        ...Array(
+                                                            hotelDetail?.star ||
+                                                                bookingInfo?.hotel?.star ||
+                                                                0
+                                                        ),
+                                                    ].map((_, index) => (
+                                                        <img
+                                                            style={{ width: 20 }}
+                                                            key={index}
+                                                            src={icons.yellowStarIcon}
+                                                            alt="star"
+                                                            className="hotel-card__star-icon"
+                                                        />
+                                                    ))}
                                                 </div>
                                             </div>
-                                            <h2>{hotelDetail?.name}</h2>
-                                            <p className="fw-light mt-3">{hotelDetail?.address}</p>
+                                            <h2>{hotelDetail?.name || bookingInfo?.hotel?.name}</h2>
+                                            <p className="fw-light mt-3">
+                                                {hotelDetail?.address ||
+                                                    bookingInfo?.hotel?.address}
+                                            </p>
                                         </div>
                                         {/* Detail */}
                                         <div>
@@ -711,7 +735,9 @@ const Reserve = () => {
                                                     <span>Check-in</span>
                                                     <h4 className="mt-2 fs-3 fw-bold">
                                                         {formatCheckInOutDate(
-                                                            checkInDate ?? tempInfo?.checkInDate,
+                                                            checkInDate ||
+                                                                tempInfo?.checkInDate ||
+                                                                bookingInfo?.checkInDate,
                                                             localStorage.getItem("i18nextLng")
                                                         )}
                                                     </h4>
@@ -723,7 +749,9 @@ const Reserve = () => {
                                                     <span>Check-out</span>
                                                     <h4 className="mt-2 fs-3 fw-bold">
                                                         {formatCheckInOutDate(
-                                                            checkOutDate ?? tempInfo?.checkOutDate,
+                                                            checkOutDate ||
+                                                                tempInfo?.checkOutDate ||
+                                                                bookingInfo?.checkOutDate,
                                                             localStorage.getItem("i18nextLng")
                                                         )}
                                                     </h4>

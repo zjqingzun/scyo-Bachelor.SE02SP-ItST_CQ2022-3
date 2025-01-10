@@ -6,6 +6,7 @@ import { GetBookingDto } from './dto/get-booking.dto';
 import { ViewDetailBookingDto } from './dto/view-detail-booking.dto';
 import { ChangeStatusBookingDto } from './dto/change-status-booking.dto';
 import { Public } from '@/helpers/decorator/public';
+import { GetHistoryBookingDto } from './dto/get-history-booking.dto';
 
 @Controller('booking')
 export class BookingController {
@@ -93,7 +94,14 @@ export class BookingController {
   }
 
   // HISTORY
-
+  @Get('history')
+  @Public()
+  async getAllHistory(
+    @Query() getHistoryBookingDto: GetHistoryBookingDto,
+    @Req() req,
+  ){
+    return await this.bookingService.getAllHistoryBooking(req, getHistoryBookingDto);
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {

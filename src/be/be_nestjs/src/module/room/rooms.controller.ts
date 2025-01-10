@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
@@ -14,9 +14,10 @@ export class RoomsController {
     return this.roomsService.create(createRoomDtos, hotelId);
   }
 
-  @Get()
-  findAll() {
-    return this.roomsService.findAll();
+  @Get(':hotelId')
+  @Public()
+  async findAll(@Param('hotelId') hotelId: string, @Query() query) {
+    return await this.roomsService.findAll(+hotelId, query);
   }
 
   @Get(':id')

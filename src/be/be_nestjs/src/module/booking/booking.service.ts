@@ -222,6 +222,7 @@ export class BookingService {
       // Nếu có bookingData, phân tích và trả về kết quả
       const parsedBookingData = JSON.parse(bookingData);
       return res.status(HttpStatus.OK).json({
+        status_code: HttpStatus.OK,
         message: 'Booking data is valid',
         bookingData: parsedBookingData,
       });
@@ -231,6 +232,7 @@ export class BookingService {
 
       // Trả về lỗi phù hợp
       return res.status(HttpStatus.FORBIDDEN).json({
+        status_code: HttpStatus.FORBIDDEN,
         message: error.message || 'Booking data has expired or not found',
       });
     }
@@ -347,6 +349,7 @@ export class BookingService {
         await this.saveDataIntoDatabase(bookingData, status, note, paymentMethod);
 
         return res.status(HttpStatus.OK).json({
+          status_code: HttpStatus.OK,
           message: 'Cash successful, information saved to database.',
         });
       }
@@ -358,6 +361,7 @@ export class BookingService {
         const paymentUrl = await this.createMomoPayment(res, orderInfo, bookingData, note);
         console.log("Payment URL:", paymentUrl);
         return res.status(HttpStatus.OK).json({
+          status_code: HttpStatus.OK,
           message: 'Redirect to MoMo for payment.',
           paymentUrl,
         });
@@ -383,7 +387,7 @@ export class BookingService {
     const secretKey = process.env.MOMO_SECRET_KEY;
     var orderInfo = orderInfo;
     var partnerCode = 'MOMO';
-    var redirectUrl = 'http://localhost:3000';
+    var redirectUrl = 'http://localhost:3000/reserve';
     var ipnUrl = 'https://d886-2402-800-6315-309c-dc00-b07e-6724-3a00.ngrok-free.app/callback';
     var requestType = "payWithMethod";
     var amount = bookingData.sumPrice;

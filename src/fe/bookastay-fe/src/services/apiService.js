@@ -132,6 +132,26 @@ const startBooking = async (data) => {
     return await axios.post("/booking/start", data);
 };
 
+const getBookingInfo = async () => {
+    return await axios.get("/booking/information");
+};
+
+const postBookingInfo = async (note) => {
+    return await axios.post("/booking/information", {
+        note,
+    });
+};
+
+const checkTimeBooking = async () => {
+    return await axios.get("/booking/check-booking");
+};
+
+const paymentBooking = async (data) => {
+    return await axios.post("/booking/finish", {
+        paymentMethod: data,
+    });
+};
+
 export {
     userLogin,
     getProfile,
@@ -147,4 +167,8 @@ export {
     getAvatarUrl,
     updateProfile,
     startBooking,
+    getBookingInfo,
+    postBookingInfo,
+    paymentBooking,
+    checkTimeBooking,
 };

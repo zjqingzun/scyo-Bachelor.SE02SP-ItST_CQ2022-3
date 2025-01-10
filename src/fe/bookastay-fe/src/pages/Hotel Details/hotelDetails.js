@@ -27,6 +27,9 @@ const HotelDetails = () => {
     const [roomPrice1Now, setRoomPrice1Now] = useState(0);
     const [roomPrice2Now, setRoomPrice2Now] = useState(0);
 
+    const [maxRoom2, setMaxRoom2] = useState(0);
+    const [maxRoom4, setMaxRoom4] = useState(0);
+
     const convertPrice = useCallback(
         (price, fromCurrency, toCurrency) => {
             if (toCurrency === "VND") return price;
@@ -173,6 +176,9 @@ const HotelDetails = () => {
                         [room1.id]: roomType2 || 1,
                         [room2.id]: roomType4 || 1,
                     });
+
+                    setMaxRoom2(data.data.numberOfRoom2);
+                    setMaxRoom4(data.data.numberOfRoom4);
 
                     setHotelDetails(data.data);
                 } else {
@@ -379,7 +385,9 @@ const HotelDetails = () => {
                                                             handleRoomCountChange(
                                                                 room.id,
                                                                 -1,
-                                                                room.numberOfRoom2
+                                                                room.type === 2
+                                                                    ? maxRoom2
+                                                                    : maxRoom4
                                                             )
                                                         }
                                                         className="btn btn-outline-secondary"
@@ -395,13 +403,15 @@ const HotelDetails = () => {
                                                             handleRoomCountChange(
                                                                 room.id,
                                                                 1,
-                                                                room.numberOfRoom2
+                                                                room.type === 2
+                                                                    ? maxRoom2
+                                                                    : maxRoom4
                                                             )
                                                         }
                                                         className="btn btn-outline-secondary"
                                                         disabled={
                                                             (roomCounts[room.id] || 0) >=
-                                                            room.numberOfRoom2
+                                                            (room.type === 2 ? maxRoom2 : maxRoom4)
                                                         }
                                                     >
                                                         +
@@ -429,6 +439,12 @@ const HotelDetails = () => {
                                     className="btn btn-success"
                                     style={{ fontSize: "20px", padding: "5px 15px" }}
                                     onClick={() => handleReserve()}
+                                    disabled={
+                                        Object.values(roomCounts).reduce(
+                                            (total, count) => total + count,
+                                            0
+                                        ) === 0
+                                    }
                                 >
                                     Reserve
                                 </button>

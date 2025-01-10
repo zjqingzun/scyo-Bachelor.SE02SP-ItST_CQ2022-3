@@ -88,7 +88,7 @@ export class HotelsController {
 
   // [GET]: /hotels/recommended-hotel
   @Get('recommended-hotel/:userId')
-  @Roles("user")
+  @Public()
   async recommendedHotel(@Param('userId') userId: string) {
     return await this.hotelsService.getTopTenRatingHotel(+userId);
   }

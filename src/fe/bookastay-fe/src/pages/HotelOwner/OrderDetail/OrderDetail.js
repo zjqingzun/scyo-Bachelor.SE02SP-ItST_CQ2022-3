@@ -31,19 +31,55 @@ const data = [
 
 const OrderDetail = () => {
     const navigate = useNavigate();
-
     const userInfo = useSelector((state) => state.account.userInfo);
+
+    const location = useLocation();
+    const { userId, reservationID } = location.state; // Lấy userId và reservationID từ state
+    const [loading, setLoading] = useState(false);
+    const [orderData, setOrderData] = useState(null);
+
+    const fetchOrderDetails = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch(
+                `http://localhost:3001/api/booking/guest/detail?userId=${userId}&bookingId=${reservationID}&page=1&per_page=5`
+            );
+            const data = await response.json();
+            if (data.status_code === 200) {
+                setOrderData(data.data); // Cập nhật dữ liệu đặt phòng
+            } else {
+                console.error("Failed to fetch order details", data.message);
+            }
+        } catch (error) {
+            console.error("Error fetching order details:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchOrderDetails();
+    }, [userId, reservationID]);
 
     const columns = [
         {
-            title: "Room Number",
-            dataIndex: "roomNumber",
-            key: "roomNumber",
+            title: "Room Name",
+            dataIndex: "name",
+            key: "name",
         },
         {
             title: "Room Type",
-            key: "roomType",
-            dataIndex: "roomType",
+            key: "type",
+            dataIndex: "type",
+            render: (type) => {
+                const roomTypes = {
+                    1: "Single",
+                    2: "Double",
+                    3: "Suite",
+                    4: "Family",
+                };
+                return roomTypes[type] || "Unknown";
+            },
         },
         {
             title: "Price",
@@ -52,37 +88,17 @@ const OrderDetail = () => {
         },
     ];
 
-    const [loading, setLoading] = useState(false);
-    const [tableParams, setTableParams] = useState({
-        pagination: {
-            current: 1,
-            pageSize: 10,
-        },
-    });
+    if (loading) {
+        return (
+            <div className="order-detail">
+                <Spin size="large" />
+            </div>
+        );
+    }
 
-    useEffect(() => {
-        setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
-        }, 1000);
-    }, [
-        tableParams.pagination?.current,
-        tableParams.pagination?.pageSize,
-        JSON.stringify(tableParams.filters),
-    ]);
-
-    const handleTableChange = (pagination, filters, sorter) => {
-        console.log(pagination, filters, sorter);
-
-        setTableParams({
-            pagination,
-            filters,
-        });
-    };
-
-    // const handleAddRoom = () => {
-    //     navigate("/hotel-owner/room/add-room");
-    // };
+    if (!orderData) {
+        return <p>No order details available</p>;
+    }
 
     return (
         <>

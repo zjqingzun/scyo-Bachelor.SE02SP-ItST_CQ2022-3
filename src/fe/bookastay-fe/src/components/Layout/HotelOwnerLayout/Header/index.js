@@ -80,14 +80,24 @@ const Header = ({ toggle = () => {} }) => {
         },
         {
             key: "2",
-            label: "Profile",
+            label: (
+                <a
+                    href="#!"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        navigate("/account-setting");
+                    }}
+                >
+                    Profile
+                </a>
+            ),
             extra: "⌘P",
         },
-        {
-            key: "3",
-            label: "Delete Hotel",
-            extra: "⌘D",
-        },
+        // {
+        //     key: "3",
+        //     label: "Delete Hotel",
+        //     extra: "⌘D",
+        // },
         {
             type: "divider",
         },
@@ -95,7 +105,8 @@ const Header = ({ toggle = () => {} }) => {
             key: "4",
             icon: <LoginOutlined />,
             label: (
-                <span
+                <a
+                    href="#!"
                     onClick={(e) => {
                         e.preventDefault();
                         dispatch(doLogout());
@@ -103,7 +114,7 @@ const Header = ({ toggle = () => {} }) => {
                     style={{ color: "#f5222d" }}
                 >
                     Logout
-                </span>
+                </a>
             ),
             extra: "⌘L",
         },

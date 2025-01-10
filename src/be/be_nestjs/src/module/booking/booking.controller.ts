@@ -7,6 +7,7 @@ import { ViewDetailBookingDto } from './dto/view-detail-booking.dto';
 import { ChangeStatusBookingDto } from './dto/change-status-booking.dto';
 import { Public } from '@/helpers/decorator/public';
 import { GetHistoryBookingDto } from './dto/get-history-booking.dto';
+import { Roles } from '@/helpers/decorator/roles';
 
 @Controller('booking')
 export class BookingController {
@@ -15,7 +16,7 @@ export class BookingController {
   // BOOKING
   // [GET]: /booking/check-booking --> Kiểm tra booking còn hạn không
   @Get('check-booking')
-  @Public()
+  @Roles("user")
   async check(
     @Req() req,
     @Res() res
@@ -36,7 +37,7 @@ export class BookingController {
 
   // [GET]: /booking/information
   @Get('information')
-  @Public()
+  @Roles("user")
   async getInformation(
     @Req() req
   ) {
@@ -45,7 +46,7 @@ export class BookingController {
 
   // [POST]: /booking/information
   @Post('information')
-  @Public()
+  @Roles("user")
   async addInformation(
     @Res() res,
     @Body() note: string
@@ -55,7 +56,7 @@ export class BookingController {
 
   // [POST]: /booking/finish
   @Post('finish')
-  @Public()
+  @Roles("user")
   async finishBooking(
     @Body() body: { paymentMethod: string },
     @Req() req,
@@ -69,7 +70,7 @@ export class BookingController {
   // HOTEL - CONTROL 
   // [GET]: /booking/guest?userId=...&page=...&per_page=...
   @Get('guest')
-  @Public()
+  @Roles("hotelier")
   async getAllBooking(
     @Query() getBookingDto: GetBookingDto
   ){
@@ -78,7 +79,7 @@ export class BookingController {
 
   // [GET]: /booking/guest/detail?userId=...&bookingId=...&page=...&per_page=...
   @Get('guest/detail')
-  @Public()
+  @Roles("hotelier", "user")
   async getDetailBooking(
     @Query() viewDetailBookingDto: ViewDetailBookingDto
   ){
@@ -87,7 +88,7 @@ export class BookingController {
 
   // [PATCH]: /booking/guest/update-status?bookingId=...?status='confirmed' || 'canceled' || 'completed'
   @Patch('guest/update-status')
-  @Public()
+  @Roles("hotelier", "user")
   async updateStatus(@Query() changeStatusBookingDto: ChangeStatusBookingDto
   ){
     return await this.bookingService.updateStatusBooking(changeStatusBookingDto);
@@ -95,7 +96,7 @@ export class BookingController {
 
   // HISTORY
   @Get('history')
-  @Public()
+  @Roles("user", "hotelier")
   async getAllHistory(
     @Query() getHistoryBookingDto: GetHistoryBookingDto,
     @Req() req,
@@ -125,21 +126,21 @@ export class BookingController {
 
   // Room (Reservation)
   @Get('total/r/:id')
-  @Public()
+  @Roles("hotelier")
   async getTotalResservation(@Param('id') id: number) {
     return await this.bookingService.totalReservation(id);
   }
 
   // Room (checkin)
   @Get('total/i/:id')
-  @Public()
+  @Roles("hotelier")
   async getTotalCheckIn(@Param('id') id: number) {
     return await this.bookingService.totalcheckIn(id);
   }
 
   // Room (checkout)
   @Get('total/o/:id')
-  @Public()
+  @Roles("hotelier")
   async getTotalCheckOut(@Param('id') id: number) {
     return await this.bookingService.totalcheckOut(id);
   }

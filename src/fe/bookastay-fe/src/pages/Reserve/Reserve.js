@@ -56,32 +56,59 @@ const Reserve = () => {
     const [hotelDetail, setHotelDetail] = useState(null);
     const [bookingInfo, setBookingInfo] = useState(null);
 
+    const searchParams = new URLSearchParams(location.search);
+
+    const partnerCode = searchParams.get("partnerCode");
+    const orderId = searchParams.get("orderId");
+    const requestId = searchParams.get("requestId");
+    const amount = searchParams.get("amount");
+    const orderInfo = searchParams.get("orderInfo");
+    const transId = searchParams.get("transId");
+    const resultCode = searchParams.get("resultCode");
+    const message = searchParams.get("message");
+    const payType = searchParams.get("payType");
+    const responseTime = searchParams.get("responseTime");
+    const extraData = searchParams.get("extraData");
+    const signature = searchParams.get("signature");
+
+    // Xử lý logic sau khi nhận kết quả thanh toán
     useEffect(() => {
-        const fetchBookingInfo = async () => {
-            try {
-                console.log(hotelId, checkInDate, checkOutDate, numberOfRoom2, numberOfRoom4);
+        if (resultCode) {
+            console.log("Payment result:", {
+                partnerCode,
+                orderId,
+                requestId,
+                amount,
+                orderInfo,
+                transId,
+                resultCode,
+                message,
+                payType,
+                responseTime,
+                extraData,
+                signature,
+            });
 
-                console.log(tempInfo);
-
-                const id = hotelId || tempInfo?.hotelId;
-
-                const res = await getBookingInfo();
-
-                // console.log(response.data);
-
-                const { hotel, ...booking } = res.data;
-
-                console.log(hotel, booking);
-
-                setHotelDetail(hotel);
-                setBookingInfo(booking);
-            } catch (error) {
-                toast.error("Failed to get booking info");
+            if (resultCode === "0") {
+                console.log("Payment successful:", {
+                    partnerCode,
+                    orderId,
+                    amount,
+                    transId,
+                    message,
+                });
+                // Hiển thị thông báo thành công
+                toast.success("Payment successful!");
+            } else {
+                console.error("Payment failed:", {
+                    resultCode,
+                    message,
+                });
+                // Hiển thị thông báo lỗi
+                toast.error(`Payment failed: ${message}`);
             }
-        };
-
-        fetchBookingInfo();
-    }, [location.state]);
+        }
+    }, [resultCode]);
 
     const formik = useFormik({
         initialValues: {

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./Room.scss";
 
 import { Space, Table, Tag, Button, Popconfirm, Input, Modal } from "antd";
@@ -6,6 +6,8 @@ import { QuestionCircleOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { deleteRoom, getAllRooms } from "~/services/apiService";
+import { toast } from "react-toastify";
 
 const data = [
     {
@@ -33,6 +35,8 @@ const data = [
 
 const Room = () => {
     const userInfo = useSelector((state) => state.account.userInfo);
+
+    const [rooms, setRooms] = useState([]);
 
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
@@ -150,7 +154,7 @@ const Room = () => {
             dataIndex: "roomNumber",
             key: "roomNumber",
             render: (text) => <a>{text}</a>,
-            ...getColumnSearchProps("roomNumber"),
+            // ...getColumnSearchProps("roomNumber"),
         },
         {
             title: "Room Type",
@@ -161,33 +165,37 @@ const Room = () => {
             title: "Room Price",
             dataIndex: "roomPrice",
             key: "roomPrice",
-            sorter: true,
+            // sorter: true,
         },
         {
             title: "Status",
             key: "status",
             dataIndex: "status",
-            filters: [
-                {
-                    text: "Available",
-                    value: "Available",
-                },
-                {
-                    text: "Booked",
-                    value: "Booked",
-                },
-            ],
+            // filters: [
+            //     {
+            //         text: "Available",
+            //         value: "AVAILABLE",
+            //     },
+            //     {
+            //         text: "Booked",
+            //         value: "BOOKED",
+            //     },
+            //     {
+            //         text: "Pending",
+            //         value: "PENDING",
+            //     },
+            // ],
             render: (status) => (
                 <>
                     {status.map((tag) => {
                         let color = tag.length > 5 ? "geekblue" : "green";
-                        if (tag === "Booked") {
+                        if (tag === "BOOKED") {
                             color = "volcano";
                         }
-                        if (tag === "Cleaning") {
+                        if (tag === "PENDING") {
                             color = "red";
                         }
-                        if (tag === "Available") {
+                        if (tag === "AVAILABLE") {
                             color = "green";
                         }
                         return (
@@ -204,11 +212,18 @@ const Room = () => {
             key: "action",
             render: (_, record) => (
                 <Space size="middle">
-                    <a>Edit</a>
                     <Popconfirm
-                        onConfirm={() => {
+                        onConfirm={async () => {
                             // Handle delete action
                             console.log("Delete record", record);
+                            const res = await deleteRoom(record.key);
+
+                            if (res && +res.status === 200) {
+                                toast.success("Room deleted successfully");
+                                fetchRooms();
+                            } else {
+                                toast.error("Failed to delete room");
+                            }
                         }}
                         title="Delete the room type?"
                         description="Are you sure to delete this room type?"
@@ -220,7 +235,15 @@ const Room = () => {
                             />
                         }
                     >
-                        <Button danger>Delete</Button>
+                        <Button
+                            danger
+                            onClick={() => {
+                                // Handle delete action
+                                console.log("Delete record", record);
+                            }}
+                        >
+                            Delete
+                        </Button>
                     </Popconfirm>
                 </Space>
             ),
@@ -233,20 +256,50 @@ const Room = () => {
     const [tableParams, setTableParams] = useState({
         pagination: {
             current: 1,
-            pageSize: 10,
+            pageSize: 5,
+            position: ["bottomCenter"],
         },
     });
 
-    useEffect(() => {
-        setLoading(true);
-        setTimeout(() => {
+    const fetchRooms = useCallback(async () => {
+        try {
+            setLoading(true);
+            const res = await getAllRooms({
+                hotelId: userInfo.hotel.id,
+                page: tableParams.pagination?.current,
+                limit: tableParams.pagination?.pageSize,
+            });
+
+            if (res && +res.status === 200) {
+                let rooms = res.data.rooms.map((room) => ({
+                    key: room.id,
+                    roomNumber: room.name,
+                    roomType: +room.type === 2 ? "Double Room" : "Quad Room",
+                    roomPrice: room.price,
+                    status: [room.status.toUpperCase()],
+                }));
+
+                setRooms(rooms);
+                setTableParams({
+                    ...tableParams,
+                    pagination: {
+                        ...tableParams.pagination,
+                        total: res.data.total,
+                    },
+                });
+            }
+        } catch (error) {
+            console.log(">>> error", error);
+        } finally {
             setLoading(false);
-        }, 1000);
-    }, [
-        tableParams.pagination?.current,
-        tableParams.pagination?.pageSize,
-        JSON.stringify(tableParams.filters),
-    ]);
+        }
+    }, [tableParams.pagination?.current, tableParams.pagination?.pageSize, userInfo.hotel.id]);
+
+    useEffect(() => {
+        if (userInfo.hotel?.id) {
+            fetchRooms();
+        }
+    }, [fetchRooms]);
 
     const handleTableChange = (pagination, filters, sorter) => {
         console.log(pagination, filters, sorter);
@@ -286,7 +339,7 @@ const Room = () => {
                 </div>
                 <Table
                     columns={columns}
-                    dataSource={data}
+                    dataSource={rooms}
                     scroll={{ x: "max-content" }}
                     tableLayout="auto"
                     loading={loading}

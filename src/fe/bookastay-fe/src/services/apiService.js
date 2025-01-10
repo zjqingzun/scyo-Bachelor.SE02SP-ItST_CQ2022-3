@@ -182,6 +182,51 @@ const postReview = async (review) => {
     return await axios.post("/review/create", data);
 };
 
+// Room
+const getAllRooms = async (
+    query = {
+        hotelId: "",
+        page: 1,
+        limit: 6,
+        sortBy: "",
+        order: "",
+    }
+) => {
+    const { hotelId, page, limit, sortBy, order } = query;
+    const params = new URLSearchParams({
+        page: page || 1,
+        limit: limit || 6,
+        sortBy: sortBy || "",
+        order: order || "",
+    });
+
+    return await axios.get(`/rooms/${hotelId}?${params.toString()}`);
+};
+
+const deleteRoom = async (roomId) => {
+    return await axios.delete(`/rooms/${roomId}`);
+};
+
+const createRoom = async (hotelId, data) => {
+    return await axios.post(`/rooms/${hotelId}`, data);
+};
+
+// Room Type
+const getRoomType = async (hotelId) => {
+    return await axios.get(`/room_types/${hotelId}`);
+};
+
+const updatePrice = async (hotelId, type, data) => {
+    const price = {
+        price: data.price || 0,
+        weekendPrice: data.weekendPrice || 0,
+        flexiblePrice: data.flexiblePrice || 0,
+        useFlexiblePrice: data.useFlexiblePrice || false,
+    };
+
+    return await axios.post(`/room_types/price/${hotelId}/${type}`, price);
+};
+
 export {
     userLogin,
     getProfile,
@@ -203,4 +248,9 @@ export {
     checkTimeBooking,
     getBookingHistory,
     postReview,
+    getAllRooms,
+    deleteRoom,
+    createRoom,
+    getRoomType,
+    updatePrice,
 };

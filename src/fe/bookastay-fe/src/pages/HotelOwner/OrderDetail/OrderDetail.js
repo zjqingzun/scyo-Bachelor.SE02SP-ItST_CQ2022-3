@@ -1,6 +1,6 @@
 import "./OrderDetail.scss";
-import { useEffect, useRef, useState } from "react";
 
+import { useEffect, useRef, useState } from "react";
 import { Space, Table, Button, Popconfirm, Input, Descriptions, Modal, Spin } from "antd";
 import { QuestionCircleOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 const OrderDetail = () => {
     const userInfo = useSelector((state) => state.account.userInfo);
 
+    const navigate = useNavigate();
     const location = useLocation();
     const { userId, reservationID } = location.state; // Lấy userId và reservationID từ state
     const [loading, setLoading] = useState(false);

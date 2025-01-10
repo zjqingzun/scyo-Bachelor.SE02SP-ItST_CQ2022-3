@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "./RoomType.scss";
 import { Space, Table, Checkbox, Button, Popconfirm, Modal as AModal } from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
@@ -9,6 +9,7 @@ import { Button as BButton } from "react-bootstrap";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useSelector } from "react-redux";
+import { getRoomType } from "~/services/apiService";
 
 const INITIAL_FORM_VALUES = {
     roomType: "",
@@ -66,6 +67,32 @@ const RoomType = () => {
             isFlexiblePriceEnabled: true,
         },
     ]);
+
+    const [roomTypes, setRoomTypes] = useState([]);
+
+    const fetchRoomTypes = useCallback(async () => {
+        try {
+            setLoading(true);
+
+            const res = await getRoomType(userInfo.hotel.id);
+
+            if (res && res.length > 0) {
+                const roomTypes = res.map((roomType) => ({
+                    key: roomType.id,
+                    roomType: +roomType.type === 2 ? "Double Room" : "Quad Room",
+                    roomPrice: roomType.price,
+                    roomWeekendPrice: roomType.weekend_price,
+                    roomFlexiblePrice: roomType.flexible_price,
+                    numberOfRooms: roomType.number_of_rooms,
+                    isFlexiblePriceEnabled: roomType.useFlexiblePrice,
+                }));
+
+                setRoomTypes(res);
+            }
+        } catch (error) {}
+    }, []);
+
+    useEffect(() => {}, []);
 
     const [tableParams, setTableParams] = useState({
         pagination: { current: 1, pageSize: 10 },
@@ -128,6 +155,11 @@ const RoomType = () => {
                     />
                 </Space>
             ),
+        },
+        {
+            title: "Number of Rooms",
+            dataIndex: "numberOfRooms",
+            key: "numberOfRooms",
         },
         {
             title: "Action",

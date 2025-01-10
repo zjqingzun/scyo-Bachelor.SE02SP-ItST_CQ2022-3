@@ -9,6 +9,7 @@ import "./Room.scss";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { createRoom } from "~/services/apiService";
 
 const ROOM_TYPE = [
     { label: "Double", value: 2 },
@@ -179,13 +180,26 @@ const AddRoom = () => {
         setOpenEditModal(false);
     };
 
-    const handleSave = () => {
-        const data = {
-            roomType,
-            rooms: rooms.map((room) => room.roomNumber),
-        };
+    const handleSave = async () => {
+        const data = rooms.map((room) => {
+            return {
+                type: roomType,
+                name: room.roomNumber,
+            };
+        });
 
-        console.log(data);
+        try {
+            const res = await createRoom(userInfo.hotel.id, data);
+
+            if (res && +res.status === 200) {
+                toast.success("Room added successfully");
+                navigate("/hotel-owner/room");
+            } else {
+                toast.error("Failed to add room");
+            }
+        } catch (error) {
+            toast.error("Failed to add room");
+        }
     };
 
     return (

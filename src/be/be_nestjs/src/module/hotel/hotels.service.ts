@@ -527,6 +527,22 @@ export class HotelsService {
     };
   }
 
+  async getRequest() {
+    return this.hotelRepository
+      .createQueryBuilder('hotel')
+      .leftJoinAndSelect('hotels_locations', 'hl', 'hotel.id = hl.hotelId')
+      .leftJoinAndSelect('location', 'location', 'location.id = hl.locationId')
+      .select([
+        'hotel.id',
+        'hotel.email',
+        'hotel.name',
+        'hotel.status',
+        'location.detailAddress',
+      ])
+      .where('hotel.status = :status', {status: 'pending'})
+      .getRawMany();
+  }
+
 
 }
 

@@ -74,5 +74,10 @@ export class HotelsController {
     return await this.hotelsService.totalRequest();
   }
 
+  @Get('admin/dashboard/ga/request')
+  @Public()
+  async getDashboardRequest() {
+    return await this.hotelsService.getRequest();
+  }
 
 }

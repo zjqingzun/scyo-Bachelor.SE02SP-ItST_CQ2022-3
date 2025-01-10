@@ -32,6 +32,15 @@ export class Hotel {
     @Column()
     star: number;
 
+    @Column({default: 'pending'})
+    status: string;
+
+    @Column({default: false})
+    onlineMethod: boolean;
+
+    @Column({default: ''})
+    paymentAccount: string;
+
     @ManyToOne(() => User, (user) => user.hotels)
     @JoinColumn({ name: "ownerId" })
     owner: User;

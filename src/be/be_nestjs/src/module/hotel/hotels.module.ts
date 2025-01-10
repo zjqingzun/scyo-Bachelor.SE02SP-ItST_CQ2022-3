@@ -25,5 +25,6 @@ import { LocationsModule } from '../location/locations.module';
   ],
   controllers: [HotelsController],
   providers: [HotelsService, MinioService],
+  exports: [HotelsService]
 })
 export class HotelsModule {}

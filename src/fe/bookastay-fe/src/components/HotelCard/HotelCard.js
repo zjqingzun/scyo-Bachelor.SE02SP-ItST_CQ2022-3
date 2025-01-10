@@ -118,6 +118,10 @@ const HotelCard = ({
                     onClick={() => {
                         if (isFavorite) {
                             removeFavorite(userInfo.id, id);
+
+                            if (rest.removeFavorite) {
+                                rest.removeFavorite(id);
+                            }
                         } else {
                             addFavorite(userInfo.id, id);
                         }

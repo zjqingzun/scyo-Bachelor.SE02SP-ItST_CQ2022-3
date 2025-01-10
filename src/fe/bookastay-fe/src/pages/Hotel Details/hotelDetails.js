@@ -140,7 +140,7 @@ const HotelDetails = () => {
             isFav,
         } = location.state || {};
 
-        setIsHearted(isFav);
+        setIsFavorite(isFav);
 
         setIsWeekend(checkWeekend(checkInDate) || checkWeekend(checkOutDate));
 

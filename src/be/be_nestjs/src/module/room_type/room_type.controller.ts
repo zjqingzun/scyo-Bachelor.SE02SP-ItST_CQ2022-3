@@ -19,5 +19,11 @@ export class RoomTypeController {
     async getRoomType(@Param('hotelId') hotelId: string) {
         return await this.roomtypeService.getRoomTypeByHotelId(hotelId);
     }
+
+    @Post('price/:hotelId')
+    @Public()
+    async updatePrice(@Param('hotelId') hotelId: string) {
+        //return await this.roomtypeService.updatePrice(hotelId, )
+    }
 }
  

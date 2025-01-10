@@ -59,7 +59,6 @@ export class HotelsService {
     return res[0];
   }
 
-
   async findAll(req: {
     query: {
       page?: 1;

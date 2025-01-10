@@ -26,11 +26,20 @@ export class RoomsService {
         hotelId: hotelId,
         roomType: {id: roomtypeIds[(room.type / 2) - 1]}
       }));
+      const doubleRooms = rooms.filter(room => room.type === 2);
+      const quadRooms = rooms.filter(room => room.type === 4);
+      console.log(doubleRooms.length, quadRooms.length);
       const queryBuilder = await this.roomRepository.createQueryBuilder()
         .insert()
         .into('room')
         .values(rooms)
         .execute();
+      if (doubleRooms.length > 0) {
+        await this.roomtypeService.updateNumOfRoomType(doubleRooms.length, 2, +hotelId);
+      }
+      if (quadRooms.length > 0) {
+        await this.roomtypeService.updateNumOfRoomType(quadRooms.length, 4, +hotelId);
+      }
       return {
         status: 200,
         message: "Successfully",
@@ -48,8 +57,45 @@ export class RoomsService {
     }
   }
 
-  findAll() {
-    return `This action returns all rooms`;
+  async findAll(hotelId: number, query: any) {
+    try {
+      const {page = 1, limit = 5, sortBy = 'id', order = 'ASC', searchTerm} = query;
+      const take = limit;
+
+      const [rooms, total] = await this.roomRepository.createQueryBuilder('room')
+        .leftJoinAndSelect('room.hotel', 'hotel') 
+        .leftJoinAndSelect('room.roomType', 'roomType') 
+        .select(['room', 'roomType.price'])
+        .where('room.hotelId = :hotelId', { hotelId })
+        .take(limit)
+        .skip((+page - 1) * +limit)
+        .getManyAndCount();
+      const res = rooms.map(room => ({
+        id: room.id,
+        name: room.name,
+        type: room.type,
+        price: room.roomType.price,
+        status: room.status
+      }));
+      return {
+        status: 200,
+        message: "Successfully",
+        data: {
+          all_page: Math.ceil(total / +limit),
+          total,
+          rooms: res
+        }
+      };
+    } catch (error) {
+      console.error('Error getting room by hotelid:', error);
+      throw new HttpException(
+        {
+          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   findOne(id: number) {

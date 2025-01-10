@@ -56,6 +56,29 @@ export class RoomTypeService {
     }
   }
 
+  async updateNumOfRoomType(num: number, type: number, hotelId: number) {
+    try {
+        const queryRunner = this.dataSource.createQueryRunner();
+        const res = await queryRunner.manager.query(`
+            UPDATE room_type
+            SET nums = nums + $1
+            WHERE "hotelId" = $2 AND type = $3
+        `, [num, hotelId, type]);
+        queryRunner.release();
+        return res;
+    } catch (error) {
+        console.error('Error when set price for rooms:', error);
+        throw new HttpException(
+            {
+                status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+                message: 'Internal server error. Please try again later.',
+                error: error.message || 'Unknown error',
+            },
+            HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+    }
+  }
+
   async getRoomTypeByHotelId(hotelId: string) {
     const queryRunner = this.dataSource.createQueryRunner();
     const roomtypes = await queryRunner.manager.query(`

@@ -11,6 +11,7 @@ import { JwtStrategy } from './passport/jwt.strategy';
 import { MailService } from '@/mail/mail.service';
 import { MailModule } from '@/mail/mail.module';
 import { GoogleStrategy } from './passport/google.strategy';
+import { HotelsModule } from '@/module/hotel/hotels.module';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { GoogleStrategy } from './passport/google.strategy';
       inject: [ConfigService],
     }),
     PassportModule,
-    MailModule
+    MailModule,
+    HotelsModule
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy],

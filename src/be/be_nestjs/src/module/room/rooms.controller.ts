@@ -32,4 +32,18 @@ export class RoomsController {
   remove(@Param('id') id: string) {
     return this.roomsService.remove(+id);
   }
+
+  // Room (booked)
+  @Get('total/b/:id')
+  @Public()
+  async getTotalOccupiedRooms(@Param('id') id: number) {
+    return await this.roomsService.totalOccupied(id);
+  }
+
+  // Room (available)
+  @Get('total/a/:id')
+  @Public()
+  async getTotalAvailableRooms(@Param('id') id: number) {
+    return await this.roomsService.totalAvailable(id);
+  }
 }

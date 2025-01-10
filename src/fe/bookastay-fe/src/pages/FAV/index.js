@@ -34,13 +34,6 @@ const Favorite = () => {
             if (response && +response.status === 200) {
                 let hotels = response.data.hotels;
 
-                hotels = hotels.map((hotel) => {
-                    return {
-                        ...hotel,
-                        isFav: true,
-                    };
-                });
-
                 setFavoriteHotels(hotels);
 
                 console.log(">>> response.data", response);
@@ -71,9 +64,28 @@ const Favorite = () => {
 
     const handleDeleteFav = useCallback(
         async (hotelId) => {
-            await fetchFavoriteHotels();
+            try {
+                // Cập nhật UI ngay lập tức bằng cách lọc ra hotel đã xóa
+                setFavoriteHotels((prev) => prev.filter((hotel) => hotel.id !== hotelId));
+
+                // Cập nhật tổng số items
+                setTotalItems((prev) => prev - 1);
+
+                // Kiểm tra nếu page hiện tại không còn items nào
+                // và không phải là page đầu tiên thì chuyển về page trước đó
+                if (favoriteHotels.length === 1 && currentPage > 1) {
+                    setCurrentPage((prev) => prev - 1);
+                }
+
+                // Gọi API xóa favorite ở đây
+                // const response = await deleteFavorite(hotelId);
+            } catch (error) {
+                console.log(">>> error deleting favorite:", error);
+                // Nếu xóa thất bại thì fetch lại data
+                fetchFavoriteHotels();
+            }
         },
-        [favoriteHotels]
+        [currentPage, favoriteHotels.length]
     );
 
     return (
@@ -122,11 +134,13 @@ const Favorite = () => {
                         </Empty>
                     )}
                     {favoriteHotels.map((item, index) => (
-                        <div key={index} className="col-lg-4 col-md-6 col-sm-12 mb-4">
+                        <div key={item.id} className="col-lg-4 col-md-6 col-sm-12 mb-4">
                             <HotelCard
                                 {...item}
                                 maxHeight="450px"
                                 removeFavorite={handleDeleteFav}
+                                isFavorite={true}
+                                minRoomPrice={item.price}
                             />
                         </div>
                     ))}

@@ -2,13 +2,52 @@ import { useSelector } from "react-redux";
 import { Descriptions, Modal } from "antd";
 import "./Dashboard.scss";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import {
+    getAvailableRoom,
+    getOccupiedRoom,
+    getTodayCheckIn,
+    getTodayCheckOut,
+    getTotalReservation,
+} from "~/services/apiService";
 
 const Dashboard = () => {
     const navigate = useNavigate();
 
     const userInfo = useSelector((state) => state.account.userInfo);
 
-    console.log(">>> userInfo", userInfo.hotel);
+    const [availableRoom, setAvailableRoom] = useState(0);
+    const [occupiedRoom, setOccupiedRoom] = useState(0);
+    const [totalReservation, setTotalReservation] = useState(0);
+    const [todayCheckIn, setTodayCheckIn] = useState(0);
+    const [todayCheckOut, setTodayCheckOut] = useState(0);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!userInfo || !userInfo.hotel) return;
+
+            try {
+                const availableRoom = await getAvailableRoom(userInfo.hotel.id);
+                setAvailableRoom(availableRoom.total);
+
+                const occupiedRoom = await getOccupiedRoom(userInfo.hotel.id);
+                setOccupiedRoom(occupiedRoom.total);
+
+                const totalReservation = await getTotalReservation(userInfo.hotel.id);
+                setTotalReservation(totalReservation.total);
+
+                const totalCheckIn = await getTodayCheckIn(userInfo.hotel.id);
+                setTodayCheckIn(totalCheckIn.total);
+
+                const totalCheckOut = await getTodayCheckOut(userInfo.hotel.id);
+                setTodayCheckOut(totalCheckOut.total);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     return (
         <>
@@ -56,7 +95,9 @@ const Dashboard = () => {
                                 <span className="dashboard-card__label">Today's</span>
                                 <div className="dashboard-card__info">
                                     <span className="h2 dashboard-card__desc">Check-in</span>
-                                    <span className="dashboard-card__value ms-2">10</span>
+                                    <span className="dashboard-card__value ms-2">
+                                        {todayCheckIn}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -65,7 +106,9 @@ const Dashboard = () => {
                                 <span className="dashboard-card__label">Today's</span>
                                 <div className="dashboard-card__info">
                                     <span className="h2 dashboard-card__desc">Check-out</span>
-                                    <span className="dashboard-card__value ms-2">10</span>
+                                    <span className="dashboard-card__value ms-2">
+                                        {todayCheckOut}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -74,7 +117,9 @@ const Dashboard = () => {
                                 <span className="dashboard-card__label">Today's</span>
                                 <div className="dashboard-card__info">
                                     <span className="h2 dashboard-card__desc">Reservation</span>
-                                    <span className="dashboard-card__value ms-2">10</span>
+                                    <span className="dashboard-card__value ms-2">
+                                        {totalReservation}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -83,7 +128,9 @@ const Dashboard = () => {
                                 <span className="dashboard-card__label">Total</span>
                                 <div className="dashboard-card__info">
                                     <span className="h2 dashboard-card__desc">Available room</span>
-                                    <span className="dashboard-card__value ms-2">10</span>
+                                    <span className="dashboard-card__value ms-2">
+                                        {availableRoom}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -92,7 +139,9 @@ const Dashboard = () => {
                                 <span className="dashboard-card__label">Total</span>
                                 <div className="dashboard-card__info">
                                     <span className="h2 dashboard-card__desc">Occupied room</span>
-                                    <span className="dashboard-card__value ms-2">10</span>
+                                    <span className="dashboard-card__value ms-2">
+                                        {occupiedRoom}
+                                    </span>
                                 </div>
                             </div>
                         </div>

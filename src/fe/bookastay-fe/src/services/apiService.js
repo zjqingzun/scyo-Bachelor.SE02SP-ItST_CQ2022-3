@@ -231,6 +231,27 @@ const updatePrice = async (hotelId, type, data) => {
     return await axios.post(`/room_types/price/${hotelId}/${type}`, price);
 };
 
+// Dashboard
+const getAvailableRoom = async (hotelId) => {
+    return await axios.get(`/rooms/total/a/${hotelId}`);
+};
+
+const getOccupiedRoom = async (hotelId) => {
+    return await axios.get(`/rooms/total/b/${hotelId}`);
+};
+
+const getTotalReservation = async (hotelId) => {
+    return await axios.get(`/booking/total/r/${hotelId}`);
+};
+
+const getTodayCheckIn = async (hotelId) => {
+    return await axios.get(`/booking/total/i/${hotelId}`);
+};
+
+const getTodayCheckOut = async (hotelId) => {
+    return await axios.get(`/booking/total/o/${hotelId}`);
+};
+
 export {
     userLogin,
     getProfile,
@@ -258,4 +279,9 @@ export {
     createRoom,
     getRoomType,
     updatePrice,
+    getAvailableRoom,
+    getOccupiedRoom,
+    getTotalReservation,
+    getTodayCheckIn,
+    getTodayCheckOut,
 };

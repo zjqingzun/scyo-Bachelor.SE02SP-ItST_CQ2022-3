@@ -22,6 +22,7 @@ import { Public } from '@/helpers/decorator/public';
 import { GoogleAuthGuard } from './guard/google-auth.guard';
 import { ResetpassAuthDto } from './dto/resetpassword-auth.dto';
 import { Throttle } from '@nestjs/throttler';
+import { Roles } from '@/helpers/decorator/roles';
 
 @Controller('auth')
 export class AuthController {
@@ -48,6 +49,7 @@ export class AuthController {
   }
 
   @Get('profile')
+  @Roles("user", "hotelier")
   getProfile(@Request() req) {
     return req.user;
   }

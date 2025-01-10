@@ -65,13 +65,12 @@ export class RoomTypeService {
         const queryRunner = this.dataSource.createQueryRunner();
         const res = await queryRunner.manager.query(`
             UPDATE room_type
-            SET price = $1, weekend_price = $2, flexible_price = $3, "useFlexiblePrice" = $4, "normalPrice" = $5
-            WHERE type = $6 AND "hotelId" = $7    
+            SET price = $1, weekend_price = $2, flexible_price = $3, "normalPrice" = $4
+            WHERE type = $5 AND "hotelId" = $6    
         `, [
             updatePriceDto.price,
             updatePriceDto.weekendPrice,
             updatePriceDto.flexiblePrice,
-            updatePriceDto.useFlexiblePrice,
             updatePriceDto.price,
             type,
             hotelId
@@ -82,6 +81,32 @@ export class RoomTypeService {
         };
     } catch (error) {
         console.error('Error when update price for rooms:', error);
+        throw new HttpException(
+            {
+                status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+                message: 'Internal server error. Please try again later.',
+                error: error.message || 'Unknown error',
+            },
+            HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+    }
+  }
+
+  async updateUseFlexiblePrice(hotelId: number, type: string, isUse: boolean) {
+    try {
+        const queryRunner = this.dataSource.createQueryRunner();
+        const res = await queryRunner.manager.query(`
+            UPDATE room_type
+            SET "useFlexiblePrice" = $1
+            WHERE "hotelId" = $2 AND type = $3
+        `, [isUse, hotelId, type]);
+        queryRunner.release();
+        return {
+            status: 200,
+            message: "Successfully"
+        }
+    } catch (error) {
+        console.error('Error when set price for rooms:', error);
         throw new HttpException(
             {
                 status_code: HttpStatus.INTERNAL_SERVER_ERROR,

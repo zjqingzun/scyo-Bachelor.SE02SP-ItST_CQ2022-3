@@ -27,5 +27,11 @@ export class RoomTypeController {
     async updatePrice(@Param('hotelId') hotelId: string, @Param('type') type: string, @Body() updatePriceDto: UpdateRoomTypePriceDto) {
         return await this.roomtypeService.updatePriceOfRoomType(+hotelId, +type, updatePriceDto);
     }
+
+    @Get('price/isFlexiblePrice/:hotelId/:type/:isUse')
+    @Roles("hotelier")
+    async updateUseFlexiblePrice(@Param('hotelId') hotelId: string, @Param('type') type: string, @Param('isUse') isUse: boolean) {
+        return await this.roomtypeService.updateUseFlexiblePrice(+hotelId, type, isUse);
+    }
 }
  

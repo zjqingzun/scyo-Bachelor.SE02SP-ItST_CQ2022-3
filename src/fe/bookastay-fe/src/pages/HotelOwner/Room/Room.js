@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./Room.scss";
 
-import { Space, Table, Tag, Button, Popconfirm, Input } from "antd";
+import { Space, Table, Tag, Button, Popconfirm, Input, Modal } from "antd";
 import { QuestionCircleOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import { useNavigate } from "react-router-dom";

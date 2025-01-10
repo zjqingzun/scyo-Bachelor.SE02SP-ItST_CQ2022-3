@@ -1,7 +1,7 @@
 import "./Guest.scss";
 import { useEffect, useRef, useState } from "react";
 
-import { Space, Table, Tag, Button, Popconfirm, Input, Select } from "antd";
+import { Space, Table, Tag, Button, Popconfirm, Input, Select, Modal } from "antd";
 import { QuestionCircleOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 

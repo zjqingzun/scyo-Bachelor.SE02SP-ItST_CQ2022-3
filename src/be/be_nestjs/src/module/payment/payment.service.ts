@@ -47,7 +47,7 @@ export class PaymentService {
   ) { }
 
   async deleteCookie(res: Response){
-    res.clearCookie('bookingData', { path: '/' });
+    res.clearCookie('bookingData');
     res.status(200).send('Cookie "bookingData" đã được xóa!');
   }
 

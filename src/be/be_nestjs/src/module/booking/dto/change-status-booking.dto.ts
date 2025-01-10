@@ -7,6 +7,6 @@ export class ChangeStatusBookingDto {
     bookingId: number
 
     @IsString() // Đảm bảo rằng status là chuỗi
-    @IsIn(['confirmed', 'completed', 'canceled'])
+    @IsIn(['confirmed', 'completed', 'cancelled'])
     status: string;
 }

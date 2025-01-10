@@ -13,7 +13,7 @@ const FinalStep = ({
 }) => {
     const [isOnlinePayment, setIsOnlinePayment] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState("");
-    const [paymentNumber, setPaymentNumber] = useState("");
+    const [paymentAccount, setPaymentAccount] = useState("");
 
     const [isValidating, setIsValidating] = useState(false);
 
@@ -24,7 +24,7 @@ const FinalStep = ({
                 return;
             }
 
-            if (paymentMethod === "momo" && !paymentNumber) {
+            if (paymentMethod === "momo" && !paymentAccount) {
                 return;
             }
         }
@@ -36,9 +36,7 @@ const FinalStep = ({
 
         if (formik.isValid && formik.dirty) {
             updateData({
-                isOnlinePayment,
-                paymentMethod,
-                paymentNumber,
+                ...(isOnlinePayment && { paymentAccount }),
                 doubleRoomPrice: formik.values.doubleRoomPrice,
                 quadRoomPrice: formik.values.quadRoomPrice,
             });
@@ -89,7 +87,7 @@ const FinalStep = ({
                                         onChange={() => {
                                             setIsOnlinePayment(false);
                                             setPaymentMethod("");
-                                            setPaymentNumber("");
+                                            setPaymentAccount("");
                                             setIsValidating(false);
                                         }}
                                     />
@@ -131,12 +129,12 @@ const FinalStep = ({
                                                 className={`fs-4 mt-3 ${
                                                     (isOnlinePayment &&
                                                         isValidating &&
-                                                        !paymentNumber &&
+                                                        !paymentAccount &&
                                                         "is-invalid") ||
                                                     ""
                                                 }`}
-                                                value={paymentNumber}
-                                                onChange={(e) => setPaymentNumber(e.target.value)}
+                                                value={paymentAccount}
+                                                onChange={(e) => setPaymentAccount(e.target.value)}
                                             />
                                             <Form.Control.Feedback>
                                                 Please enter a valid momo number

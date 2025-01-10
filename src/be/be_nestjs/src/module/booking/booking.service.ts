@@ -49,7 +49,7 @@ export class BookingService {
     private readonly roomTypeRepository: Repository<RoomType>,
 
     private readonly minioService: MinioService,
-  ) {}
+  ) { }
 
   async create(
     createBookingDto: CreateBookingDto,
@@ -355,25 +355,18 @@ export class BookingService {
       const note = JSON.parse(noteDT);
       // console.log('NOTE: ', note);
 
-      let status = '';
       if (paymentMethod === 'cash') {
-        status = 'unpaid';
+        const paymentStatus = 'unpaid';
+        const bookingStatus = 'confirmed'
         // console.log('VAO DUOC PAYMENT CASH');
         // console.log('BOOKING DATA TRUOC KHI VAO: ', bookingData);
-        await this.saveDataIntoDatabase(
-          bookingData,
-          status,
-          note,
-          paymentMethod,
-        );
-
+        await this.saveDataIntoDatabase(bookingData, paymentStatus, bookingStatus, note, paymentMethod);
         return res.status(HttpStatus.OK).json({
           status_code: HttpStatus.OK,
           message: 'Cash successful, information saved to database.',
         });
-      } else if (paymentMethod === 'momo') {
-        // Tạm thời chưa xử lý
-        const amount = bookingData.sumPrice;
+      }
+      else if (paymentMethod === 'momo') {
         const orderInfo = `Thanh toán đặt phòng khách sạn thông qua trang web đặt phòng BookAstay`;
 
         const paymentUrl = await this.createMomoPayment(
@@ -516,19 +509,18 @@ export class BookingService {
   }
 
   async updatePaymentStatus(req: Request, res: Response, body) {
-    console.log('BODY: ', body);
-
+    // console.log('BODY: ', body);
     const extraData = Buffer.from(body.extraData, 'base64').toString('utf-8');
     const { bookingData, note } = JSON.parse(extraData);
     // console.log('NOTE: ', note);
     const resultCode = body.resultCode;
-    let status = '';
     if (resultCode === 0) {
-      status = 'paid';
-      this.saveDataIntoDatabase(bookingData, status, note, 'momo');
+      const paymentStatus = 'paid';
+      const bookingStatus = 'confirmed';
+      this.saveDataIntoDatabase(bookingData, paymentStatus, bookingStatus, note, 'momo');
       return res.status(HttpStatus.OK).json({
         message: 'Payment success, save data into database',
-        data: { status, bookingData },
+        data: { paymentStatus, bookingData },
       });
     } else {
       return res.status(HttpStatus.BAD_REQUEST).json({
@@ -567,8 +559,8 @@ export class BookingService {
 
   private async saveBookingDetail(bookingId: number, bookingData: any) {
     try {
-      console.log('BOOKING ID BEFORE QUERY: ', bookingId);
-      console.log('BOOKING DATA: ', bookingData);
+      // console.log('BOOKING ID BEFORE QUERY: ', bookingId);
+      // console.log('BOOKING DATA: ', bookingData);
       const bookingDetailQuery = await this.bookingDetailRepository
         .createQueryBuilder()
         .insert()
@@ -662,19 +654,14 @@ export class BookingService {
     }
   }
 
-  private async saveDataIntoDatabase(
-    bookingData: any,
-    status: string,
-    note: string,
-    paymentMethod: string,
-  ) {
+  private async saveDataIntoDatabase(bookingData: any, paymentStatus: string, bookingStatus: string, note: string, paymentMethod: string) {
     try {
-      const bookingId = await this.saveBooking(bookingData, status, note);
-      console.log('BOOKING ID: ', bookingId);
+      const bookingId = await this.saveBooking(bookingData, bookingStatus, note);
+      // console.log('BOOKING ID: ', bookingId);
       await this.saveBookingDetail(bookingId, bookingData);
       await this.saveBookingRoom(bookingId, bookingData);
       await this.setStatusRoom(bookingData);
-      await this.createPayment(bookingId, bookingData, paymentMethod, status);
+      await this.createPayment(bookingId, bookingData, paymentMethod, paymentStatus);
     } catch (error) {
       console.error('Error saving data into database:', error);
       throw new HttpException(
@@ -687,8 +674,187 @@ export class BookingService {
     }
   }
 
-  findAll() {
-    return `This action returns all booking`;
+  async findAll(getBookingDto) {
+    try {
+      const { userId, page, per_page } = getBookingDto;
+
+      const hotelQuery = await this.hotelRepository
+        .createQueryBuilder('hotel')
+        .select([
+          'hotel.id AS id'
+        ])
+        .where('hotel.ownerId = :userId', { userId: userId })
+
+      const hotel = await hotelQuery.getRawOne();
+      if (!hotel) {
+        throw new Error('No hotel found for the given ownerId');
+      }
+      const hotelId = hotel.id;
+
+      const bookingQuery = await this.bookingRepository
+        .createQueryBuilder('booking')
+        .leftJoin('booking.user', 'user')
+        .leftJoin('booking.payment', 'payment')
+        .select([
+          'booking.id AS id',
+          'user.name AS name',
+          'booking.checkinTime AS "checkInDate"',
+          'booking.checkoutTime AS "checkOutDate"',
+          'booking.status AS status',
+          'payment."totalCost" AS "totalPrice"'
+        ])
+        .where('booking."hotelId" = :hotelId', { hotelId: hotelId })
+        .orderBy('booking.createdAt', 'DESC')
+
+      const offset = (page - 1) * per_page;
+
+      // Áp dụng skip và take trước khi lấy kết quả
+      bookingQuery.limit(per_page).offset(offset);
+
+      const [bookings, totalBookings] = await Promise.all([bookingQuery.getRawMany(), bookingQuery.getCount(),]);
+      const totalPages = Math.ceil(totalBookings / per_page);
+
+      return {
+        status_code: HttpStatus.OK,
+        message: 'Booking data fetched successfully',
+        data: {
+          total: totalBookings,
+          page: Number(page),
+          total_page: totalPages,
+          per_page: Number(per_page),
+          bookings,
+        },
+      };
+    } catch (error) {
+      console.error('Error saving data into database:', error);
+      throw new HttpException(
+        {
+          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error while saving all data.',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async getDetail(viewDetailBookingDto) {
+    try {
+      const { userId, bookingId, page, per_page } = viewDetailBookingDto;
+
+      const userQuery = await this.userRepository
+        .createQueryBuilder('user')
+        .select([
+          'user.name AS name',
+          'user.email AS email',
+          'user.phone AS phone'
+        ])
+        .where('user.id = :userId', { userId: userId })
+
+      const user = await userQuery.getRawOne();
+      if (!user) {
+        throw new Error('No user found for the given userId');
+      }
+
+      const bookingQuery = await this.bookingRepository
+        .createQueryBuilder('booking')
+        .select([
+          'booking.note AS note'
+        ])
+        .where('booking.id = :bookingId', { bookingId })
+      const booking = await bookingQuery.getRawOne();
+      const note = booking.note;
+
+      const bookingRoomQuery = await this.bookingRepository
+        .createQueryBuilder('booking')
+        .leftJoin('booking.bookingRooms', 'booking_room')
+        .leftJoin('booking.bookingDetails', 'booking_detail')
+        .leftJoin('booking_room.room', 'room')
+        .select([
+          'booking.id AS id',
+          'booking_room.room_name AS name',
+          'booking_room.type AS type',
+          'booking_detail.price AS price',
+        ])
+        .where('booking.id = :bookingId', { bookingId })
+
+      const offset = (page - 1) * per_page;
+      // Áp dụng skip và take trước khi lấy kết quả
+      bookingRoomQuery.limit(per_page).offset(offset);
+
+      const [bookingRooms, totalBookingRooms] = await Promise.all([bookingRoomQuery.getRawMany(), bookingRoomQuery.getCount(),]);
+      const totalPages = Math.ceil(totalBookingRooms / per_page);
+
+      return {
+        status_code: HttpStatus.OK,
+        message: 'Booking data fetched successfully',
+        data: {
+          total: totalBookingRooms,
+          page: Number(page),
+          total_page: totalPages,
+          per_page: Number(per_page),
+          user,
+          bookingRooms,
+          note
+        },
+      };
+    } catch (error) {
+      console.error('Error saving data into database:', error);
+      throw new HttpException(
+        {
+          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error while saving all data.',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async updateStatusBooking(changeStatusBookingDto) {
+    try {
+      const { bookingId, status } = changeStatusBookingDto;
+      const bookingRoomQuery = await this.bookingRoomRepository
+        .createQueryBuilder('booking_room')
+        .select('booking_room.roomId', 'roomId')
+        .where('booking_room."bookingId" = :bookingId', { bookingId })
+        .getRawMany();
+      const roomIds = bookingRoomQuery.map((row) => row.roomId);
+      console.log('ROOMIDS: ', roomIds);
+      if (status === 'confirmed' && roomIds.length > 0) {
+        await this.roomRepository
+          .createQueryBuilder()
+          .update()
+          .set({ status: 'booked' })
+          .where('id IN (:...roomIds)', { roomIds })
+          .execute();
+      } else if ((status === 'completed' || status === 'canceled') && roomIds.length > 0) {
+        await this.roomRepository
+          .createQueryBuilder()
+          .update()
+          .set({ status: 'available' })
+          .where('id IN (:...roomIds)', { roomIds })
+          .execute();
+      }
+
+      await this.bookingRepository
+        .createQueryBuilder()
+        .update()
+        .set({ status })
+        .where('id = :bookingId', { bookingId })
+        .execute();
+      return {
+        status_code: HttpStatus.OK,
+        message: `Booking status successfully updated to ${status}.`,
+      };
+    } catch (error) {
+      console.error('Error saving data into database:', error);
+      throw new HttpException(
+        {
+          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error while saving all data.',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   findOne(id: number) {

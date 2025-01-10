@@ -65,13 +65,14 @@ export class RoomTypeService {
         const queryRunner = this.dataSource.createQueryRunner();
         const res = await queryRunner.manager.query(`
             UPDATE room_type
-            SET price = $1, weekend_price = $2, flexible_price = $3, "useFlexiblePrice" = $4
-            WHERE type = $5 AND "hotelId" = $6    
+            SET price = $1, weekend_price = $2, flexible_price = $3, "useFlexiblePrice" = $4, "normalPrice" = $5
+            WHERE type = $6 AND "hotelId" = $7    
         `, [
             updatePriceDto.price,
             updatePriceDto.weekendPrice,
             updatePriceDto.flexiblePrice,
             updatePriceDto.useFlexiblePrice,
+            updatePriceDto.price,
             type,
             hotelId
         ]);

@@ -23,6 +23,7 @@ import { SearchHotelDto } from './dto/search-hotel.dto';
 import { DetailHotelDto } from './dto/detail-hotel.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
+import { Roles } from '@/helpers/decorator/roles';
 
 @Controller('hotels')
 export class HotelsController {
@@ -34,13 +35,13 @@ export class HotelsController {
   }
 
   @Get('getAll')
-  @Public()
+  @Roles("admin")
   findAll(@Req() req) {
     return this.hotelsService.findAll(req);
   }
 
   @Post('add/basicInfo/:userId')
-  @Public()
+  @Roles("hotelier")
   async addBasicInfo(
     @Param('userId') userId: string,
     @Body() createHotelDto: CreateHotelDto,
@@ -49,7 +50,7 @@ export class HotelsController {
   }
 
   @Post('images/upload/:hotelId')
-  @Public()
+  @Roles("hotelier")
   @UseInterceptors(
     FilesInterceptor('images', 15, {
       storage: memoryStorage(),
@@ -69,7 +70,7 @@ export class HotelsController {
   }
 
   @Post('payment/add/:hotelId')
-  @Public()
+  @Roles("hotelier")
   async addPaymentMethod(@Param('hotelId') hotelId: string, @Body() body) {
     return await this.hotelsService.addPaymentMethod(hotelId, body);
   }
@@ -80,13 +81,14 @@ export class HotelsController {
   }
 
   @Delete(':id')
+  @Roles("admin")
   remove(@Param('id') id: string) {
     return this.hotelsService.remove(+id);
   }
 
   // [GET]: /hotels/recommended-hotel
   @Get('recommended-hotel/:userId')
-  @Public()
+  @Roles("user")
   async recommendedHotel(@Param('userId') userId: string) {
     return await this.hotelsService.getTopTenRatingHotel(+userId);
   }
@@ -115,19 +117,19 @@ export class HotelsController {
   }
 
   @Get('admin/dashboard/t/request')
-  @Public()
+  @Roles("admin")
   async totalDashboardRequest() {
     return await this.hotelsService.totalRequest();
   }
 
   @Get('admin/dashboard/ga/request')
-  @Public()
+  @Roles("admin")
   async getDashboardRequest() {
     return await this.hotelsService.getRequest();
   }
 
   @Get('updateHotelStatus/:hotelId/:status')
-  @Public()
+  @Roles("admin")
   async updateHotelStatus(@Param('hotelId') hotelId: number, @Param('status') status: string) {
     return await this.hotelsService.updateHotelStatus(hotelId, status);
   }

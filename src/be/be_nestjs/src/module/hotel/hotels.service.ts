@@ -551,6 +551,7 @@ export class HotelsService {
         'location.detailAddress',
       ])
       .where('hotel.status = :status', {status: 'pending'})
+      .orderBy('hotel.id', 'ASC') 
       .getRawMany();
   }
 

@@ -289,11 +289,12 @@ export class UserService {
 
   async setRole(userId: number, role: string) {
     const queryRunner = this.dataSource.createQueryRunner();
-    const roleObj = await queryRunner.manager.query(
-      `SELECT * FROM role WHERE name = '${role}'`,
+    const roleId = await queryRunner.manager.query(
+      `SELECT id FROM role WHERE name = '${role}'`,
     );
+
     await queryRunner.manager.query(
-      `INSERT INTO users_roles("userId", "roleId") VALUES(${userId}, ${roleObj[0].id})`,
+      `INSERT INTO users_roles("userId", "roleId") VALUES(${userId}, ${roleId[0].id})`,
     );
     await queryRunner.release();
   }

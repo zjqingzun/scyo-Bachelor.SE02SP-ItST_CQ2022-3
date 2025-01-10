@@ -21,6 +21,11 @@ export const doLogin = (email, password) => {
 
                 user = await getProfile();
 
+                // Lưu userId vào localStorage
+                if (user?.id) {
+                    localStorage.setItem("user_id", user.id);
+                }
+
                 dispatch({
                     type: USER_LOGIN_SUCCESS,
                     user: user || {},

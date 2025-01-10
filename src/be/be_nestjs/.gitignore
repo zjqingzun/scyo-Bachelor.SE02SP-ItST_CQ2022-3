@@ -64,3 +64,4 @@ Dockerfile
 .prettierrc
 
 !minio
+*.orig

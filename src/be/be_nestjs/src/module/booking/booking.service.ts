@@ -246,6 +246,7 @@ export class BookingService {
       // Nếu có bookingData, phân tích và trả về kết quả
       const parsedBookingData = JSON.parse(bookingData);
       return res.status(HttpStatus.OK).json({
+        status_code: HttpStatus.OK,
         message: 'Booking data is valid',
         bookingData: parsedBookingData,
       });
@@ -254,6 +255,7 @@ export class BookingService {
 
       // Trả về lỗi phù hợp
       return res.status(HttpStatus.FORBIDDEN).json({
+        status_code: HttpStatus.FORBIDDEN,
         message: error.message || 'Booking data has expired or not found',
       });
     }
@@ -381,6 +383,7 @@ export class BookingService {
         );
 
         return res.status(HttpStatus.OK).json({
+          status_code: HttpStatus.OK,
           message: 'Cash successful, information saved to database.',
         });
       } else if (paymentMethod === 'momo') {
@@ -396,6 +399,7 @@ export class BookingService {
         );
         console.log('Payment URL:', paymentUrl);
         return res.status(HttpStatus.OK).json({
+          status_code: HttpStatus.OK,
           message: 'Redirect to MoMo for payment.',
           paymentUrl,
         });

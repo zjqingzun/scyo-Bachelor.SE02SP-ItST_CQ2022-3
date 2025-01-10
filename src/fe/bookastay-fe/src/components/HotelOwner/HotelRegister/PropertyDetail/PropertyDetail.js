@@ -2,30 +2,54 @@ import { useEffect, useState } from "react";
 
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import axios from "axios";
 
 import icons from "~/assets/icon";
 
 import "./PropertyDetail.scss";
 
-const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () => {} }) => {
+const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = () => { } }) => {
+    const userId = localStorage.getItem("user_id");
     const formik = useFormik({
         initialValues: {
-            hotelName: "",
-            hotelAddress: "",
-            hotelCity: "",
-            hotelDistrict: "",
-            hotelWard: "",
-            hotelStar: "N/A",
+            name: "",
+            detailAddress: "",
+            city: "",
+            district: "",
+            ward: "",
+            star: "N/A",
+            description: "",
+            phone: "",
+            email: "",
         },
         validationSchema: Yup.object({
-            hotelName: Yup.string().required("Hotel name is required"),
-            hotelAddress: Yup.string().required("Hotel address is required"),
-            hotelCity: Yup.string().required("City is required"),
-            hotelDistrict: Yup.string().required("District is required"),
-            hotelWard: Yup.string().required("Ward is required"),
+            name: Yup.string().required("Hotel name is required"),
+            detailAddress: Yup.string().required("Hotel address is required"),
+            city: Yup.string().required("City is required"),
+            district: Yup.string().required("District is required"),
+            ward: Yup.string().required("Ward is required"),
+            description: Yup.string().max(500, "Description cannot exceed 500 characters"),
+            phone: Yup.string()
+                .matches(/^\d{10}$/, "Phone must be a valid 10-digit number")
+                .required("Phone is required"),
+            email: Yup.string()
+                .email("Invalid email address")
+                .required("Email is required"),
         }),
-        onSubmit: (values) => {
-            console.log(values);
+        onSubmit: async (values) => {
+            try {
+                if (userId) {
+                    const response = await axios.post(
+                        `http://localhost:3001/api/hotels/add/basicInfo/${userId}`,
+                        values
+                    );
+                    console.log("Response:", response.data);
+                }
+                alert("Hotel registered successfully!");
+            } catch (error) {
+                console.error("Error:", error.response?.data || error.message);
+                alert("Failed to register hotel. Please try again.");
+            }
         },
     });
 
@@ -43,105 +67,115 @@ const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () 
                 setProvinces(data.data);
             });
 
-        if (formData.hotelCity) {
+        if (formData.city) {
             setIsSelectedProvince(true);
         }
 
-        if (formData.hotelDistrict) {
+        if (formData.district) {
             setIsSelectedDistrict(true);
         }
 
         formik.setValues({
-            hotelName: formData.hotelName || "",
-            hotelAddress: formData.hotelAddress || "",
-            hotelCity: formData.hotelCity || "",
-            hotelDistrict: formData.hotelDistrict || "",
-            hotelWard: formData.hotelWard || "",
-            hotelStar: formData.hotelStar || "N/A",
+            name: formData.name || "",
+            detailAddress: formData.detailAddress || "",
+            city: formData.city || "",
+            district: formData.district || "",
+            ward: formData.ward || "",
+            star: formData.star || "N/A",
+            description: formData.description || "",
+            phone: formData.phone || "",
+            email: formData.email || "",
         });
     }, []);
 
     useEffect(() => {
-        if (isSelectedProvince && formik.values.hotelCity) {
+        if (isSelectedProvince && formik.values.city) {
             fetch(
-                `https://open.oapi.vn/location/districts/${formik.values.hotelCity}?page=0&size=1000`
+                `https://open.oapi.vn/location/districts/${formik.values.city}?page=0&size=1000`
             )
                 .then((res) => res.json())
                 .then((data) => {
                     setDistricts(data.data);
 
                     if (data.data.length === 0) {
-                        formik.values.hotelDistrict = "---";
+                        formik.values.district = "---";
                     }
                 });
         }
-    }, [isSelectedProvince, formik.values.hotelCity]);
+    }, [isSelectedProvince, formik.values.city]);
 
     useEffect(() => {
-        if (isSelectedDistrict && formik.values.hotelDistrict) {
+        if (isSelectedDistrict && formik.values.district) {
             fetch(
-                `https://open.oapi.vn/location/wards/${formik.values.hotelDistrict}?page=0&size=1000`
+                `https://open.oapi.vn/location/wards/${formik.values.district}?page=0&size=1000`
             )
                 .then((res) => res.json())
                 .then((data) => {
                     setWards(data.data);
 
                     if (data.data.length === 0) {
-                        formik.values.hotelWard = "---";
+                        formik.values.ward = "---";
                     }
                 });
         }
-    }, [isSelectedDistrict, formik.values.hotelDistrict]);
+    }, [isSelectedDistrict, formik.values.district]);
 
     const handleCityChange = (e) => {
-        formik.setFieldValue("hotelDistrict", "");
-        formik.setFieldValue("hotelWard", "");
+        formik.setFieldValue("district", "");
+        formik.setFieldValue("ward", "");
         setDistricts([]);
         setWards([]);
-        formik.setFieldValue("hotelCity", e.target.value);
+        formik.setFieldValue("city", e.target.value);
         setIsSelectedProvince(true);
     };
 
     const handleDistrictChange = (e) => {
-        formik.setFieldValue("hotelWard", "");
+        formik.setFieldValue("ward", "");
         setWards([]);
-        formik.setFieldValue("hotelDistrict", e.target.value);
+        formik.setFieldValue("district", e.target.value);
         setIsSelectedDistrict(true);
     };
 
     const checkValidation = () => {
         formik.setTouched({
-            hotelName: true,
-            hotelAddress: true,
-            hotelCity: true,
-            hotelDistrict: true,
-            hotelWard: true,
+            name: true,
+            detailAddress: true,
+            city: true,
+            district: true,
+            ward: true,
+            description: true,
+            phone: true,
+            email: true,
         });
 
         formik.handleSubmit();
 
         if (formik.isValid && formik.dirty) {
             const selectedProvince = provinces.find(
-                (province) => province.id === formik.values.hotelCity
+                (province) => province.id === formik.values.city
             );
             const selectedDistrict = districts.find(
-                (district) => district.id === formik.values.hotelDistrict
+                (district) => district.id === formik.values.district
             );
-            const selectedWard = wards.find((ward) => ward.id === formik.values.hotelWard);
+            const selectedWard = wards.find((ward) => ward.id === formik.values.ward);
 
             const address = {
                 province: selectedProvince.name,
                 district: selectedDistrict.name,
                 ward: selectedWard.name,
-                detail: formik.values.hotelAddress,
+                detail: formik.values.detailAddress,
             };
 
-            updateData({ ...formik.values, address });
+            updateData({
+                ...formik.values,
+                address,
+                description: formik.values.description,
+                phone: formik.values.phone,
+                email: formik.values.email
+            });
             handleNext();
         }
     };
-
-    // console.log(">>> render", formik.values);
 
     return (
         <div>
@@ -149,53 +183,50 @@ const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () 
                 <div className="row row-cols-1 row-cols-md-2 gy-3">
                     <div className="col">
                         <div className="mb-3">
-                            <label htmlFor="hotelName" className="form-label">
+                            <label htmlFor="name" className="form-label">
                                 Hotel Name <span className="red-dot">*</span>
                             </label>
                             <input
                                 type="text"
-                                className={`form-control form-control-lg fs-4 ${
-                                    formik.touched.hotelName && formik.errors.hotelName
-                                        ? "is-invalid"
-                                        : ""
-                                }`}
-                                value={formik.values.hotelName}
+                                className={`form-control form-control-lg fs-4 ${formik.touched.name && formik.errors.name
+                                    ? "is-invalid"
+                                    : ""
+                                    }`}
+                                value={formik.values.name}
                                 onChange={formik.handleChange}
-                                id="hotelName"
+                                id="name"
                             />
-                            <div className="invalid-feedback">{formik.errors.hotelName}</div>
+                            <div className="invalid-feedback">{formik.errors.name}</div>
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="hotelAddress" className="form-label">
+                            <label htmlFor="detailAddress" className="form-label">
                                 Hotel Address <span className="red-dot">*</span>
                             </label>
                             <input
-                                value={formik.values.hotelAddress}
+                                value={formik.values.detailAddress}
                                 onChange={formik.handleChange}
                                 type="text"
-                                className={`form-control form-control-lg fs-4 ${
-                                    formik.touched.hotelAddress && formik.errors.hotelAddress
-                                        ? "is-invalid"
-                                        : ""
-                                }`}
-                                id="hotelAddress"
+                                className={`form-control form-control-lg fs-4 ${formik.touched.detailAddress && formik.errors.detailAddress
+                                    ? "is-invalid"
+                                    : ""
+                                    }`}
+                                id="detailAddress"
                             />
-                            <div className="invalid-feedback">{formik.errors.hotelAddress}</div>
+                            <div className="invalid-feedback">{formik.errors.detailAddress}</div>
                         </div>
                         <div className="row row-cols-2 row-cols-md-3 mb-3">
                             <div className="col">
-                                <label htmlFor="hotelCity" className="form-label">
+                                <label htmlFor="city" className="form-label">
                                     City <span className="red-dot">*</span>
                                 </label>
                                 <select
-                                    className={`form-select form-select-lg fs-4 ${
-                                        formik.touched.hotelCity && formik.errors.hotelCity
-                                            ? "is-invalid"
-                                            : ""
-                                    }`}
+                                    className={`form-select form-select-lg fs-4 ${formik.touched.city && formik.errors.city
+                                        ? "is-invalid"
+                                        : ""
+                                        }`}
                                     name="city"
-                                    id="hotelCity"
-                                    value={formik.values.hotelCity}
+                                    id="city"
+                                    value={formik.values.city}
                                     onChange={(e) => {
                                         handleCityChange(e);
                                     }}
@@ -207,23 +238,22 @@ const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () 
                                         </option>
                                     ))}
                                 </select>
-                                <div className="invalid-feedback">{formik.errors.hotelCity}</div>
+                                <div className="invalid-feedback">{formik.errors.city}</div>
                             </div>
                             <div className="col">
-                                <label htmlFor="hotelDistrict" className="form-label">
+                                <label htmlFor="district" className="form-label">
                                     District{" "}
-                                    {districts.length != 0 && <span className="red-dot">*</span>}
+                                    {districts.length !== 0 && <span className="red-dot">*</span>}
                                 </label>
                                 <select
                                     disabled={!isSelectedProvince || districts.length === 0}
-                                    className={`form-select form-select-lg fs-4 ${
-                                        formik.touched.hotelDistrict && formik.errors.hotelDistrict
-                                            ? "is-invalid"
-                                            : ""
-                                    }`}
-                                    id="hotelDistrict"
+                                    className={`form-select form-select-lg fs-4 ${formik.touched.district && formik.errors.district
+                                        ? "is-invalid"
+                                        : ""
+                                        }`}
+                                    id="district"
                                     name="district"
-                                    value={formik.values.hotelDistrict}
+                                    value={formik.values.district}
                                     onChange={(e) => {
                                         handleDistrictChange(e);
                                     }}
@@ -236,25 +266,24 @@ const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () 
                                     ))}
                                 </select>
                                 <div className="invalid-feedback">
-                                    {formik.errors.hotelDistrict}
+                                    {formik.errors.district}
                                 </div>
                             </div>
                             <div className="col">
-                                <label htmlFor="hotelWard" className="form-label">
-                                    Ward {wards.length != 0 && <span className="red-dot">*</span>}
+                                <label htmlFor="ward" className="form-label">
+                                    Ward {wards.length !== 0 && <span className="red-dot">*</span>}
                                 </label>
                                 <select
                                     disabled={!isSelectedDistrict || wards.length === 0}
-                                    id="hotelWard"
+                                    id="ward"
                                     name="ward"
-                                    className={`form-select form-select-lg fs-4 ${
-                                        formik.touched.hotelWard && formik.errors.hotelWard
-                                            ? "is-invalid"
-                                            : ""
-                                    }`}
-                                    value={formik.values.hotelWard}
+                                    className={`form-select form-select-lg fs-4 ${formik.touched.ward && formik.errors.ward
+                                        ? "is-invalid"
+                                        : ""
+                                        }`}
+                                    value={formik.values.ward}
                                     onChange={(e) =>
-                                        formik.setFieldValue("hotelWard", e.target.value)
+                                        formik.setFieldValue("ward", e.target.value)
                                     }
                                 >
                                     <option value="">Select ward</option>
@@ -264,11 +293,58 @@ const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () 
                                         </option>
                                     ))}
                                 </select>
-                                <div className="invalid-feedback">{formik.errors.hotelWard}</div>
+                                <div className="invalid-feedback">{formik.errors.ward}</div>
                             </div>
                         </div>
+                        <div className="mb-3">
+                            <label htmlFor="description" className="form-label">
+                                Description
+                            </label>
+                            <textarea
+                                className={`form-control form-control-lg fs-4 ${formik.touched.description && formik.errors.description ? "is-invalid" : ""
+                                    }`}
+                                id="description"
+                                name="description"
+                                value={formik.values.description}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                            />
+                            {formik.touched.description && formik.errors.description && (
+                                <div className="invalid-feedback">{formik.errors.description}</div>
+                            )}
+                        </div>
+
                     </div>
                     <div className="col">
+                        <div className="mb-3">
+                            <label htmlFor="phone" className="form-label">
+                                Phone <span className="red-dot">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                className={`form-control form-control-lg fs-4 ${formik.touched.phone && formik.errors.phone ? "is-invalid" : ""
+                                    }`}
+                                id="phone"
+                                value={formik.values.phone}
+                                onChange={formik.handleChange}
+                            />
+                            <div className="invalid-feedback">{formik.errors.phone}</div>
+                        </div>
+
+                        <div className="mb-3">
+                            <label htmlFor="email" className="form-label">
+                                Email <span className="red-dot">*</span>
+                            </label>
+                            <input
+                                type="email"
+                                className={`form-control form-control-lg fs-4 ${formik.touched.email && formik.errors.email ? "is-invalid" : ""
+                                    }`}
+                                id="email"
+                                value={formik.values.email}
+                                onChange={formik.handleChange}
+                            />
+                            <div className="invalid-feedback">{formik.errors.email}</div>
+                        </div>
                         <div className="mb-3">
                             <label className="form-label">
                                 What is the star rating of your hotel?
@@ -277,10 +353,10 @@ const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () 
                                 <input
                                     className="form-check-input"
                                     type="radio"
-                                    name="hotelStar"
+                                    name="star"
                                     id="flexCheckDefault"
                                     value="N/A"
-                                    checked={formik.values.hotelStar === "N/A" ? true : false}
+                                    checked={formik.values.star === "N/A" ? true : false}
                                     onChange={formik.handleChange}
                                 />
                                 <label className="form-check-label" htmlFor="flexCheckDefault">
@@ -291,10 +367,10 @@ const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () 
                                 <input
                                     className="form-check-input"
                                     type="radio"
-                                    name="hotelStar"
+                                    name="star"
                                     id="oneStar"
                                     value="1"
-                                    checked={formik.values.hotelStar === "1" ? true : false}
+                                    checked={formik.values.star === "1" ? true : false}
                                     onChange={formik.handleChange}
                                 />
                                 <label
@@ -315,10 +391,10 @@ const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () 
                                 <input
                                     className="form-check-input"
                                     type="radio"
-                                    name="hotelStar"
+                                    name="star"
                                     id="twoStar"
                                     value="2"
-                                    checked={formik.values.hotelStar === "2" ? true : false}
+                                    checked={formik.values.star === "2" ? true : false}
                                     onChange={formik.handleChange}
                                 />
                                 <label
@@ -346,10 +422,10 @@ const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () 
                                 <input
                                     className="form-check-input"
                                     type="radio"
-                                    name="hotelStar"
+                                    name="star"
                                     id="threeStar"
                                     value="3"
-                                    checked={formik.values.hotelStar === "3" ? true : false}
+                                    checked={formik.values.star === "3" ? true : false}
                                     onChange={formik.handleChange}
                                 />
                                 <label
@@ -376,10 +452,10 @@ const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () 
                                 <input
                                     className="form-check-input"
                                     type="radio"
-                                    name="hotelStar"
+                                    name="star"
                                     id="fourStar"
                                     value="4"
-                                    checked={formik.values.hotelStar === "4"}
+                                    checked={formik.values.star === "4"}
                                     onChange={formik.handleChange}
                                 />
                                 <label
@@ -406,10 +482,10 @@ const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () 
                                 <input
                                     className="form-check-input"
                                     type="radio"
-                                    name="hotelStar"
+                                    name="star"
                                     id="fiveStar"
                                     value="5"
-                                    checked={formik.values.hotelStar === "5" ? true : false}
+                                    checked={formik.values.star === "5" ? true : false}
                                     onChange={formik.handleChange}
                                 />
                                 <label
@@ -445,8 +521,8 @@ const PropertyDetail = ({ handleNext = () => {}, formData = {}, updateData = () 
                         Next
                     </button>
                 </div>
-            </form>
-        </div>
+            </form >
+        </div >
     );
 };
 

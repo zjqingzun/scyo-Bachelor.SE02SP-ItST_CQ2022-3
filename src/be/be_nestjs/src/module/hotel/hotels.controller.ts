@@ -9,6 +9,9 @@ import {
   Query,
   ParseIntPipe,
   Req,
+  UseInterceptors,
+  BadRequestException,
+  UploadedFiles,
 } from '@nestjs/common';
 import { Public } from '@/helpers/decorator/public';
 
@@ -18,6 +21,8 @@ import { CreateHotelDto } from './dto/create-hotel.dto';
 import { UpdateHotelDto } from './dto/update-hotel.dto';
 import { SearchHotelDto } from './dto/search-hotel.dto';
 import { DetailHotelDto } from './dto/detail-hotel.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 
 @Controller('hotels')
 export class HotelsController {
@@ -32,6 +37,37 @@ export class HotelsController {
   @Public()
   findAll(@Req() req) {
     return this.hotelsService.findAll(req);
+  }
+
+  @Post('add/basicInfo/:userId')
+  @Public()
+  async addBasicInfo(@Param('userId') userId: string, @Body() createHotelDto : CreateHotelDto) {
+    return await this.hotelsService.addBasicInfo(createHotelDto, userId);
+  }
+
+  @Post('images/upload/:hotelId')
+  @Public()
+  @UseInterceptors(
+    FilesInterceptor('images', 15, {
+      storage: memoryStorage(),
+      limits: { fileSize: 2 * 1024 * 1024 },
+    }),
+  )
+  async uploadImages(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Param('hotelId') hotelId: string,
+  ) {
+    if (!files || files.length === 0) {
+      throw new BadRequestException('At least one file is required');
+    }
+
+    return await this.hotelsService.uploadImages(files, hotelId);
+  }
+
+  @Post('payment/add/:hotelId')
+  @Public()
+  async addPaymentMethod(@Param('hotelId') hotelId : string, @Body() body) {
+    return await this.hotelsService.addPaymentMethod(hotelId, body);
   }
 
   @Patch(':id')
@@ -74,5 +110,10 @@ export class HotelsController {
     return await this.hotelsService.totalRequest();
   }
 
+  @Get('admin/dashboard/ga/request')
+  @Public()
+  async getDashboardRequest() {
+    return await this.hotelsService.getRequest();
+  }
 
 }

@@ -1,9 +1,18 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { doLogout } from "~/redux/action/accountAction";
 import './sidebar.css';
 
 function Sidebar() {
     const location = useLocation();
+    const navigate = useNavigate();
+    const handleLogout = () => {
+        // Gọi hàm logout
+        doLogout();
+
+        // Chuyển hướng về trang login
+        navigate("/admin/login");
+    };
     return (
         <div className="sidebar d-flex flex-column text-center text-white p-3 py-5" style={{ height: '100vh', width: '250px' }}>
             <div className="my-5 title">BookaStay</div>
@@ -52,7 +61,7 @@ function Sidebar() {
                     className={`nav-item last-nav ${location.pathname === '/' ? 'active' : ''
                         }`}
                 >
-                    <Link to="/admin/login" className="nav-link fw-bold">
+                    <Link to="/admin/login" className="nav-link fw-bold" onClick={handleLogout}>
                         Logout
                     </Link>
                 </li>

@@ -35,10 +35,10 @@ function Login() {
             return;
         }
 
-        if (!isValidPassword(password)) {
-            setErrorMessage("Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số.");
-            return;
-        }
+        // if (!isValidPassword(password)) {
+        //     setErrorMessage("Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số.");
+        //     return;
+        // }
 
         const data = {
             email,

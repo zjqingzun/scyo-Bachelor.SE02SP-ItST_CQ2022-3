@@ -3,19 +3,20 @@ import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { Public } from '@/helpers/decorator/public';
+import { Roles } from '@/helpers/decorator/roles';
 
 @Controller('rooms')
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
   @Post(':hotelId')
-  @Public()
+  @Roles("hotelier")
   create(@Param('hotelId') hotelId: string, @Body() createRoomDtos: CreateRoomDto[]) {
     return this.roomsService.create(createRoomDtos, hotelId);
   }
 
   @Get(':hotelId')
-  @Public()
+  @Roles("hotelier")
   async findAll(@Param('hotelId') hotelId: string, @Query() query) {
     return await this.roomsService.findAll(+hotelId, query);
   }
@@ -31,21 +32,21 @@ export class RoomsController {
   }
 
   @Delete(':id')
-  @Public()
+  @Roles("hotelier")
   remove(@Param('id') id: string) {
     return this.roomsService.remove(+id);
   }
 
   // Room (booked)
   @Get('total/b/:id')
-  @Public()
+  @Roles("hotelier")
   async getTotalOccupiedRooms(@Param('id') id: number) {
     return await this.roomsService.totalOccupied(id);
   }
 
   // Room (available)
   @Get('total/a/:id')
-  @Public()
+  @Roles("hotelier")
   async getTotalAvailableRooms(@Param('id') id: number) {
     return await this.roomsService.totalAvailable(id);
   }

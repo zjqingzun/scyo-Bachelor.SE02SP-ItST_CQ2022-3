@@ -5,13 +5,14 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 import { GetReviewDto } from './dto/get-review.dto';
 import { Public } from '@/helpers/decorator/public';
 import { publishBehavior } from 'rxjs';
+import { Roles } from '@/helpers/decorator/roles';
 
 @Controller('review')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
   @Post('create')
-  @Public()
+  @Roles('user')
   create(@Body() createReviewDto: CreateReviewDto) {
     return this.reviewService.create(createReviewDto);
   }

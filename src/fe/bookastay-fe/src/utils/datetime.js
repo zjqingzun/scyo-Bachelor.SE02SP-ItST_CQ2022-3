@@ -25,6 +25,10 @@ const formatDate = (date, formatType = "dd/mm/yyyy") => {
 };
 
 const formatCheckInOutDate = (dateString, locale = "vi") => {
+    if (!dateString) {
+        return "";
+    }
+
     const date = new Date(dateString);
     const locales = {
         vi,

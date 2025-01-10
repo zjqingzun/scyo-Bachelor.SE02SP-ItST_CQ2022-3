@@ -83,6 +83,12 @@
         "discount": "Discount",
         "totalPrice": "Total Price",
         "double": "Double Room",
-        "quadruple": "Quadruple Room"
+        "quadruple": "Quadruple Room",
+        "stepTitle": {
+            "step1": "Your selection",
+            "step2": "Your details",
+            "step3": "Payment details",
+            "step4": "Finish"
+        }
     }
 }

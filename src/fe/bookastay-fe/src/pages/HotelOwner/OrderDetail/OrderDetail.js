@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 
 const OrderDetail = () => {
     const userInfo = useSelector((state) => state.account.userInfo);
+    const account = useSelector((state) => state.account);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -32,7 +33,7 @@ const OrderDetail = () => {
                 `http://localhost:3001/api/booking/guest/detail?userId=${userId}&bookingId=${reservationID}&page=${tableParams?.pagination?.current}&per_page=${tableParams?.pagination?.pageSize}`,
                 {
                     headers: {
-                        Authorization: `Bearer ${userInfo?.access_token}`,
+                        Authorization: `Bearer ${account?.accessToken}`,
                     },
                 }
             );

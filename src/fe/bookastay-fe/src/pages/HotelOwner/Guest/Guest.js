@@ -22,6 +22,7 @@ const Guest = () => {
     const [bookings, setBookings] = useState([]);
 
     const userInfo = useSelector((state) => state.account.userInfo);
+    const account = useSelector((state) => state.account);
 
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
@@ -218,8 +219,7 @@ const Guest = () => {
                     >
                         View
                     </Button>
-
-                    <Popconfirm
+                    {/* <Popconfirm
                         onConfirm={() => {
                             // Handle delete action
                             console.log("Delete record", record);
@@ -235,7 +235,7 @@ const Guest = () => {
                         }
                     >
                         <Button danger>Delete</Button>
-                    </Popconfirm>
+                    </Popconfirm> */}
                 </Space>
             ),
         },
@@ -258,7 +258,7 @@ const Guest = () => {
                 `http://localhost:3001/api/booking/guest?userId=${userId}&page=${tableParams?.pagination?.current}&per_page=${tableParams?.pagination?.pageSize}`,
                 {
                     headers: {
-                        Authorization: `Bearer ${userInfo?.access_token}`,
+                        Authorization: `Bearer ${account?.accessToken}`,
                     },
                 }
             );

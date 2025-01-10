@@ -98,6 +98,10 @@ export class UserService {
       LIMIT $2 OFFSET $3
     `, [userId, take, skip]);
     await queryRunner.release();
+    allFavHotelPaging = allFavHotelPaging.map(hotel => ({
+      ...hotel,
+      isFav: true
+    }));
     return {
       status: 200,
       message: 'Successfully',

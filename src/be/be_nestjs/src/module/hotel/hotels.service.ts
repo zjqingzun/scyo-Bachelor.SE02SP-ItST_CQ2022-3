@@ -152,7 +152,7 @@ export class HotelsService {
             const queryRunner = this.dataSource.createQueryRunner();
             const res = await queryRunner.query(`
               SELECT *
-              FROM "user_favouriteHotel" where "hotelId" = ${hotel.id}
+              FROM "user_favouriteHotel" where "hotelId" = ${hotel.id} AND "userId" = ${userId}
             `);
             if (res.length > 0) {
               isFav = true;
@@ -347,7 +347,7 @@ export class HotelsService {
             const queryRunner = this.dataSource.createQueryRunner();
             const res = await queryRunner.query(`
               SELECT *
-              FROM "user_favouriteHotel" where "hotelId" = ${hotel.id}
+              FROM "user_favouriteHotel" where "hotelId" = ${hotel.id} AND "userId" = ${userId}
             `);
             if (res.length > 0) {
               isFav = true;

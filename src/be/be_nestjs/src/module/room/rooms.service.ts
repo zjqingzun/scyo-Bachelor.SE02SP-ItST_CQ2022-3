@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,16 +16,36 @@ export class RoomsService {
   ) {}
 
   async create(createRoomDtos: CreateRoomDto[], hotelId: string) {
-    const roomtypes = await this.roomtypeService.getRoomTypeByHotelId(hotelId);
-    const roomtypeIds = roomtypes.map((roomtype: { id: any; }) => roomtype.id);
-    const rooms = createRoomDtos.map(room => ({
-      name: room.name,
-      type: room.type,
-      status: 'available',
-      hotelId: hotelId,
-      roomTypeId: roomtypeIds[(room.type / 2) - 1]
-    }));
-    return rooms;
+    try {
+      const roomtypes = await this.roomtypeService.getRoomTypeByHotelId(hotelId);
+      const roomtypeIds = roomtypes.map((roomtype: { id: any; }) => roomtype.id);
+      const rooms = createRoomDtos.map(room => ({
+        name: room.name,
+        type: room.type,
+        status: 'available',
+        hotelId: hotelId,
+        roomType: {id: roomtypeIds[(room.type / 2) - 1]}
+      }));
+      const queryBuilder = await this.roomRepository.createQueryBuilder()
+        .insert()
+        .into('room')
+        .values(rooms)
+        .execute();
+      return {
+        status: 200,
+        message: "Successfully",
+        rooms: queryBuilder.raw.map(hotel => hotel.id)
+      }
+    } catch (error) {
+      console.error('Error creating rooms:', error);
+      throw new HttpException(
+        {
+          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   findAll() {
@@ -40,8 +60,27 @@ export class RoomsService {
     return `This action updates a #${id} room`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} room`;
+  async remove(id: number) {
+    try {
+      const res = await this.roomRepository.delete({id});
+      if (res.affected > 0) {
+        return {
+          status: 200,
+          message: "Successfully"
+        }
+      } else {
+        throw new BadRequestException("Error when delete room");
+      }
+    } catch (error) {
+      console.error('Error delete room:', error);
+      throw new HttpException(
+        {
+          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
 

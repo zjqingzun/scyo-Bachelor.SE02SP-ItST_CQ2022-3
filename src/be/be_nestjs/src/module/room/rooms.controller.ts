@@ -30,6 +30,7 @@ export class RoomsController {
   }
 
   @Delete(':id')
+  @Public()
   remove(@Param('id') id: string) {
     return this.roomsService.remove(+id);
   }

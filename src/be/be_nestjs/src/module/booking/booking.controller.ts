@@ -1,13 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, HttpCode, HttpStatus, ParseIntPipe, Query } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
+import { GetBookingDto } from './dto/get-booking.dto';
 import { Public } from '@/helpers/decorator/public';
 
 @Controller('booking')
 export class BookingController {
   constructor(private readonly bookingService: BookingService) { }
 
+  // BOOKING
   // [GET]: /booking/check-booking --> Kiểm tra booking còn hạn không
   @Get('check-booking')
   @Public()
@@ -57,12 +59,23 @@ export class BookingController {
     @Res() res,
   ) {
     const paymentMethod = body.paymentMethod;
-    return this.bookingService.processPayment(req, res, paymentMethod);
+    return await this.bookingService.processPayment(req, res, paymentMethod);
   }
 
-  @Get()
-  findAll() {
-    return this.bookingService.findAll();
+
+  // HOTEL - CONTROL 
+  @Get('guest')
+  @Public()
+  async getAllBooking(
+    @Query() getBookingDto: GetBookingDto
+  ){
+    return this.bookingService.findAll(getBookingDto);
+  }
+
+  @Patch('update-status')
+  @Public()
+  async updateStatus(){
+
   }
 
   @Get(':id')
@@ -105,6 +118,4 @@ export class BookingController {
   async getTotalCheckOut(@Param('id') id: number) {
     return await this.bookingService.totalcheckOut(id);
   }
-
-  
 }

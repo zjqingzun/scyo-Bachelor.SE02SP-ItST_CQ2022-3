@@ -53,6 +53,6 @@ export class Booking {
     @OneToMany(() => BookingRoom, (bookingRoom) => bookingRoom.booking)
     bookingRooms: BookingRoom[];
 
-    @OneToMany(() => Payment, (payment) => payment.booking)
-    payments: Payment[];
+    @OneToOne(() => Payment, (payment) => payment.booking)
+    payment: Payment[];
 } 

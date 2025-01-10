@@ -11,12 +11,17 @@ import { Room } from '../room/entities/room.entity'
 import { RoomsModule } from '../room/rooms.module';
 import { Review } from '../review/entities/review.entity';
 import { ReviewModule } from '../review/review.module';
+import { ImageModule } from '../image/image.module';
+import { ImageService } from '../image/image.service';
+import { LocationsModule } from '../location/locations.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Hotel, RoomType, Room, Review]),
     RoomsModule,
     ReviewModule,
-    RoomTypeModule
+    RoomTypeModule,
+    ImageModule,
+    LocationsModule,
   ],
   controllers: [HotelsController],
   providers: [HotelsService, MinioService],

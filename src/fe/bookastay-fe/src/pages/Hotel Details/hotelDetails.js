@@ -8,7 +8,6 @@ import { addFavorite, getHotelDetail, removeFavorite, startBooking } from "~/ser
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { addFavorite, removeFavorite } from "~/services/apiService";
 
 const HotelDetails = () => {
     const { id, isFav } = useParams();

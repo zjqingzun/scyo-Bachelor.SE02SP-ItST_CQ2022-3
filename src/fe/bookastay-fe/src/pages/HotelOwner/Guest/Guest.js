@@ -143,8 +143,7 @@ const Guest = () => {
                 { method: "PUT" }
             );
             const result = await response.json();
-        }
-        catch {
+        } catch {
             console.log("Error when updating status");
         } finally {
             setLoading(false);
@@ -205,9 +204,12 @@ const Guest = () => {
                         type="primary"
                         onClick={() => {
                             // Handle view action
-                            navigate(`/hotel-owner/order-detail/${userId}/${record.reservationID}`, {
-                                state: { reservationID: record.reservationID, userId: userId },
-                            });
+                            navigate(
+                                `/hotel-owner/order-detail/${userId}/${record.reservationID}`,
+                                {
+                                    state: { reservationID: record.reservationID, userId: userId },
+                                }
+                            );
                         }}
                     >
                         View
@@ -278,14 +280,12 @@ const Guest = () => {
         fetchBookings();
     }, [tableParams.pagination.current, tableParams.pagination.pageSize]);
 
-
     const handleTableChange = (pagination, filters, sorter) => {
         setTableParams({
             pagination,
             filters,
         });
     };
-
 
     return (
         <>
@@ -309,7 +309,7 @@ const Guest = () => {
                 </div>
                 <Table
                     columns={columns}
-                    dataSource={data}
+                    dataSource={bookings}
                     scroll={{ x: "max-content" }}
                     tableLayout="auto"
                     loading={loading}

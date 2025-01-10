@@ -7,6 +7,8 @@ import { v4 as uuidv4 } from "uuid";
 
 import "./Room.scss";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const ROOM_TYPE = [
     { label: "Double", value: 2 },
@@ -14,6 +16,10 @@ const ROOM_TYPE = [
 ];
 
 const AddRoom = () => {
+    const navigate = useNavigate();
+
+    const userInfo = useSelector((state) => state.account.userInfo);
+
     const [roomType, setRoomType] = useState(2);
     const [numberOfRooms, setNumberOfRooms] = useState(0);
     const [startingRoomNumber, setStartingRoomNumber] = useState(1);
@@ -183,181 +189,196 @@ const AddRoom = () => {
     };
 
     return (
-        <div className="add-room-page">
-            <h1>Add Room</h1>
+        <>
+            {userInfo && userInfo.hotel === undefined ? (
+                <Modal
+                    open={true}
+                    title="Notice"
+                    content="You have not registered any hotel yet. Please register your hotel first."
+                    closeable={false}
+                    onOk={() => navigate("/hotel-owner/register-hotel")}
+                >
+                    <p>You have not registered any hotel yet. Please register your hotel first.</p>
+                </Modal>
+            ) : null}
+            <div className="add-room-page">
+                <h1>Add Room</h1>
 
-            <div className="card">
-                <div className="card-body">
-                    <div className="add-room-page__form">
-                        <div className="form-group mb-3">
-                            <label className="form-label" htmlFor="roomType">
-                                Room Type
-                            </label>
-                            <select
-                                className="form-select form-select-lg fs-4"
-                                id="roomType"
-                                name="roomType"
-                                value={roomType}
-                                onChange={(e) => setRoomType(+e.target.value)}
-                            >
-                                {ROOM_TYPE.map((item, index) => (
-                                    <option key={index} value={item.value}>
-                                        {item.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="row mb-3">
-                            <div className="form-group col">
-                                <label className="form-label">Number of rooms of this type</label>
-                                <input
-                                    type="number"
-                                    className="form-control form-control-lg fs-4"
-                                    name="numberRoomOfType"
-                                    value={numberOfRooms}
-                                    onChange={handleNumberOfRoomsChange}
-                                />
-                            </div>
-                            <div className="form-group col">
-                                <label className="form-label">Starting Room Number</label>
-                                <input
-                                    type="number"
-                                    className="form-control form-control-lg fs-4"
-                                    name="startingRoomNumber"
-                                    value={startingRoomNumber}
-                                    onChange={handleStartingRoomNumberChange}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="form-group mb-3">
-                            <label className="form-label">Room Number Prefix</label>
-                            <input
-                                type="text"
-                                className="form-control form-control-lg fs-4"
-                                name="prefix"
-                                value={prefix}
-                                onChange={handlePrefixChange}
-                            />
-                        </div>
-
-                        <div className="form-group mb-3">
-                            <label className="form-label">Search Room</label>
-                            <input
-                                type="text"
-                                className="form-control form-control-lg fs-4"
-                                placeholder="Search by Room Number"
-                                value={searchTerm}
-                                onChange={handleSearchChange}
-                            />
-                        </div>
-
-                        <div className="form-group mb-3 d-flex justify-content-between">
-                            <div className="form-check">
-                                <input
-                                    type="checkbox"
-                                    className="form-check-input"
-                                    checked={
-                                        selectedRooms.size === filteredRooms.length &&
-                                        filteredRooms.length > 0
-                                    }
-                                    onChange={toggleSelectAll}
-                                />
-                                <label className="form-check-label">Select All</label>
+                <div className="card">
+                    <div className="card-body">
+                        <div className="add-room-page__form">
+                            <div className="form-group mb-3">
+                                <label className="form-label" htmlFor="roomType">
+                                    Room Type
+                                </label>
+                                <select
+                                    className="form-select form-select-lg fs-4"
+                                    id="roomType"
+                                    name="roomType"
+                                    value={roomType}
+                                    onChange={(e) => setRoomType(+e.target.value)}
+                                >
+                                    {ROOM_TYPE.map((item, index) => (
+                                        <option key={index} value={item.value}>
+                                            {item.label}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
 
-                            <button
-                                type="button"
-                                onClick={removeSelectedRooms}
-                                className="btn btn-danger ml-2 fs-5"
-                            >
-                                Remove Selected
-                            </button>
-                        </div>
-
-                        <div
-                            id="roomList"
-                            style={{
-                                maxHeight: "160px",
-                                overflowY: "auto",
-                            }}
-                        >
-                            {filteredRooms.map((room) => (
-                                <div className="form-group col-6" key={room.id}>
-                                    <div className="d-flex align-items-center">
-                                        <input
-                                            type="checkbox"
-                                            className="form-check-input"
-                                            checked={selectedRooms.has(room.id)}
-                                            onChange={() => toggleRoomSelection(room.id)}
-                                        />
-                                        <input
-                                            type="text"
-                                            className="form-control form-control-lg fs-4 ms-3"
-                                            value={room.roomNumber}
-                                            readOnly
-                                        />
-                                        <button
-                                            type="button"
-                                            className="btn"
-                                            onClick={() => {
-                                                showEditModal(room.roomNumber);
-                                            }}
-                                        >
-                                            <FaEdit size={30} />
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="btn"
-                                            onClick={() => removeRoom(room.id)} // Xóa phòng
-                                        >
-                                            <IoIosRemoveCircle color="red" size={30} />
-                                        </button>
-                                    </div>
+                            <div className="row mb-3">
+                                <div className="form-group col">
+                                    <label className="form-label">
+                                        Number of rooms of this type
+                                    </label>
+                                    <input
+                                        type="number"
+                                        className="form-control form-control-lg fs-4"
+                                        name="numberRoomOfType"
+                                        value={numberOfRooms}
+                                        onChange={handleNumberOfRoomsChange}
+                                    />
                                 </div>
-                            ))}
-                        </div>
+                                <div className="form-group col">
+                                    <label className="form-label">Starting Room Number</label>
+                                    <input
+                                        type="number"
+                                        className="form-control form-control-lg fs-4"
+                                        name="startingRoomNumber"
+                                        value={startingRoomNumber}
+                                        onChange={handleStartingRoomNumberChange}
+                                    />
+                                </div>
+                            </div>
 
-                        <div className="form-group">
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    addRoom();
+                            <div className="form-group mb-3">
+                                <label className="form-label">Room Number Prefix</label>
+                                <input
+                                    type="text"
+                                    className="form-control form-control-lg fs-4"
+                                    name="prefix"
+                                    value={prefix}
+                                    onChange={handlePrefixChange}
+                                />
+                            </div>
+
+                            <div className="form-group mb-3">
+                                <label className="form-label">Search Room</label>
+                                <input
+                                    type="text"
+                                    className="form-control form-control-lg fs-4"
+                                    placeholder="Search by Room Number"
+                                    value={searchTerm}
+                                    onChange={handleSearchChange}
+                                />
+                            </div>
+
+                            <div className="form-group mb-3 d-flex justify-content-between">
+                                <div className="form-check">
+                                    <input
+                                        type="checkbox"
+                                        className="form-check-input"
+                                        checked={
+                                            selectedRooms.size === filteredRooms.length &&
+                                            filteredRooms.length > 0
+                                        }
+                                        onChange={toggleSelectAll}
+                                    />
+                                    <label className="form-check-label">Select All</label>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onClick={removeSelectedRooms}
+                                    className="btn btn-danger ml-2 fs-5"
+                                >
+                                    Remove Selected
+                                </button>
+                            </div>
+
+                            <div
+                                id="roomList"
+                                style={{
+                                    maxHeight: "160px",
+                                    overflowY: "auto",
                                 }}
                             >
-                                <IoAddCircleOutline color="blue" size={30} />
-                            </button>
+                                {filteredRooms.map((room) => (
+                                    <div className="form-group col-6" key={room.id}>
+                                        <div className="d-flex align-items-center">
+                                            <input
+                                                type="checkbox"
+                                                className="form-check-input"
+                                                checked={selectedRooms.has(room.id)}
+                                                onChange={() => toggleRoomSelection(room.id)}
+                                            />
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-lg fs-4 ms-3"
+                                                value={room.roomNumber}
+                                                readOnly
+                                            />
+                                            <button
+                                                type="button"
+                                                className="btn"
+                                                onClick={() => {
+                                                    showEditModal(room.roomNumber);
+                                                }}
+                                            >
+                                                <FaEdit size={30} />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="btn"
+                                                onClick={() => removeRoom(room.id)} // Xóa phòng
+                                            >
+                                                <IoIosRemoveCircle color="red" size={30} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="form-group">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        addRoom();
+                                    }}
+                                >
+                                    <IoAddCircleOutline color="blue" size={30} />
+                                </button>
+                            </div>
                         </div>
                     </div>
+                    <div className="card-footer">
+                        <button
+                            type="button"
+                            className="btn btn-primary fs-3 px-5"
+                            onClick={() => handleSave()}
+                        >
+                            Save
+                        </button>
+                    </div>
                 </div>
-                <div className="card-footer">
-                    <button
-                        type="button"
-                        className="btn btn-primary fs-3 px-5"
-                        onClick={() => handleSave()}
-                    >
-                        Save
-                    </button>
-                </div>
-            </div>
 
-            <Modal
-                title="Edit Room Number"
-                open={openEditModal}
-                onOk={handleOk}
-                onCancel={handleCancel}
-            >
-                <div className="form-group">
-                    <label className="form-label">Room Number</label>
-                    <input
-                        id="editedRoomInput"
-                        type="text"
-                        className="form-control form-control-lg fs-4"
-                    />
-                </div>
-            </Modal>
-        </div>
+                <Modal
+                    title="Edit Room Number"
+                    open={openEditModal}
+                    onOk={handleOk}
+                    onCancel={handleCancel}
+                >
+                    <div className="form-group">
+                        <label className="form-label">Room Number</label>
+                        <input
+                            id="editedRoomInput"
+                            type="text"
+                            className="form-control form-control-lg fs-4"
+                        />
+                    </div>
+                </Modal>
+            </div>
+        </>
     );
 };
 

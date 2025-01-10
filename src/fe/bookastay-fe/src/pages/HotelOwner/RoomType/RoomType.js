@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./RoomType.scss";
-import { Space, Table, Checkbox, Button, Popconfirm } from "antd";
+import { Space, Table, Checkbox, Button, Popconfirm, Modal as AModal } from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 
 import { useNavigate } from "react-router-dom";
@@ -8,6 +8,7 @@ import Modal from "react-bootstrap/Modal";
 import { Button as BButton } from "react-bootstrap";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useSelector } from "react-redux";
 
 const INITIAL_FORM_VALUES = {
     roomType: "",
@@ -41,6 +42,8 @@ const FORM_FIELDS = [
 ];
 
 const RoomType = () => {
+    const userInfo = useSelector((state) => state.account.userInfo);
+
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
@@ -184,62 +187,77 @@ const RoomType = () => {
     );
 
     return (
-        <div className="room">
-            <h1 className="mb-4">Room Type</h1>
-            {/* <div className="d-flex my-3">
-                <button className="btn btn-primary ms-auto fs-4" onClick={() => handleModalShow()}>
-                    Add Room Type
-                </button>
-            </div> */}
+        <>
+            {userInfo && userInfo.hotel === undefined ? (
+                <AModal
+                    open={true}
+                    title="Notice"
+                    content="You have not registered any hotel yet. Please register your hotel first."
+                    closeable={false}
+                    onOk={() => navigate("/hotel-owner/register-hotel")}
+                >
+                    <p>You have not registered any hotel yet. Please register your hotel first.</p>
+                </AModal>
+            ) : null}
+            <div className="room">
+                <h1 className="mb-4">Room Type</h1>
+                {/* <div className="d-flex my-3">
+                    <button className="btn btn-primary ms-auto fs-4" onClick={() => handleModalShow()}>
+                        Add Room Type
+                    </button>
+                </div> */}
 
-            <Table
-                columns={columns}
-                dataSource={dataSource}
-                scroll={{ x: "max-content" }}
-                tableLayout="auto"
-                loading={loading}
-                pagination={tableParams.pagination}
-                onChange={(pagination, filters, sorter) => setTableParams({ pagination, filters })}
-            />
+                <Table
+                    columns={columns}
+                    dataSource={dataSource}
+                    scroll={{ x: "max-content" }}
+                    tableLayout="auto"
+                    loading={loading}
+                    pagination={tableParams.pagination}
+                    onChange={(pagination, filters, sorter) =>
+                        setTableParams({ pagination, filters })
+                    }
+                />
 
-            <Modal
-                show={showModal}
-                onHide={() => setShowModal(false)}
-                size="lg"
-                backdrop="static"
-                keyboard={false}
-                scrollable={true}
-                centered
-                fullscreen="sm-down"
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title>
-                        <span className="h2">
-                            {modalAction === "edit" ? "Edit" : "Add"} Room Type
-                        </span>
-                    </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <div className="px-4">{FORM_FIELDS.map(renderFormField)}</div>
-                </Modal.Body>
-                <Modal.Footer className="p-3">
-                    <BButton
-                        variant="secondary"
-                        className="fs-4"
-                        onClick={() => setShowModal(false)}
-                    >
-                        Close
-                    </BButton>
-                    <BButton
-                        variant={modalAction === "edit" ? "warning" : "primary"}
-                        className="fs-4"
-                        onClick={formik.handleSubmit}
-                    >
-                        {modalAction === "edit" ? "Save Changes" : "Add"}
-                    </BButton>
-                </Modal.Footer>
-            </Modal>
-        </div>
+                <Modal
+                    show={showModal}
+                    onHide={() => setShowModal(false)}
+                    size="lg"
+                    backdrop="static"
+                    keyboard={false}
+                    scrollable={true}
+                    centered
+                    fullscreen="sm-down"
+                >
+                    <Modal.Header closeButton>
+                        <Modal.Title>
+                            <span className="h2">
+                                {modalAction === "edit" ? "Edit" : "Add"} Room Type
+                            </span>
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className="px-4">{FORM_FIELDS.map(renderFormField)}</div>
+                    </Modal.Body>
+                    <Modal.Footer className="p-3">
+                        <BButton
+                            variant="secondary"
+                            className="fs-4"
+                            onClick={() => setShowModal(false)}
+                        >
+                            Close
+                        </BButton>
+                        <BButton
+                            variant={modalAction === "edit" ? "warning" : "primary"}
+                            className="fs-4"
+                            onClick={formik.handleSubmit}
+                        >
+                            {modalAction === "edit" ? "Save Changes" : "Add"}
+                        </BButton>
+                    </Modal.Footer>
+                </Modal>
+            </div>
+        </>
     );
 };
 

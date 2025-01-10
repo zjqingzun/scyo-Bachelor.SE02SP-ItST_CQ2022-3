@@ -125,4 +125,21 @@ export class RoomTypeService {
     queryRunner.release();  
     return roomtypes;
   }
+
+  async applyWeekendPrice() {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.manager.query(`
+        UPDATE room_type
+        SET price = "weekend_price"
+    `);
+    queryRunner.release();
+  }
+
+  async resetNormalPrice() {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.manager.query(`
+        UPDATE room_type
+        SET price = "normalPrice"
+    `);
+  }
 }

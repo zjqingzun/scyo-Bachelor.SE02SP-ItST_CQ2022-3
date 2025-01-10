@@ -52,4 +52,25 @@ export class RoomsService {
     }
   }
 
+  
+  async totalAvailable(id: number) {
+    try {
+      const total = await this.roomRepository
+        .createQueryBuilder('room')
+        .innerJoin('room.hotel', 'hotel') 
+        .where('hotel.id = :hotelId', { hotelId: id }) 
+        .andWhere('room.status = :status', { status: 'available' })
+        .getCount(); 
+  
+      return {
+        status: 200,
+        hotelId: id,
+        total: total,
+      };
+    } catch (error) {
+      throw new Error(`Error fetching total occupied rooms: ${error.message}`);
+    }
+  }
+
+  
 }

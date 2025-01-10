@@ -360,7 +360,7 @@ export class BookingService {
         const bookingStatus = 'confirmed'
         // console.log('VAO DUOC PAYMENT CASH');
         // console.log('BOOKING DATA TRUOC KHI VAO: ', bookingData);
-        await this.saveDataIntoDatabase(bookingData, paymentStatus, bookingStatus, note, paymentMethod);
+        await this.saveDataIntoDatabase(res, bookingData, paymentStatus, bookingStatus, note, paymentMethod);
         return res.status(HttpStatus.OK).json({
           status_code: HttpStatus.OK,
           message: 'Cash successful, information saved to database.',
@@ -517,7 +517,7 @@ export class BookingService {
     if (resultCode === 0) {
       const paymentStatus = 'paid';
       const bookingStatus = 'confirmed';
-      this.saveDataIntoDatabase(bookingData, paymentStatus, bookingStatus, note, 'momo');
+      this.saveDataIntoDatabase(res, bookingData, paymentStatus, bookingStatus, note, 'momo');
       return res.status(HttpStatus.OK).json({
         message: 'Payment success, save data into database',
         data: { paymentStatus, bookingData },
@@ -654,7 +654,7 @@ export class BookingService {
     }
   }
 
-  private async saveDataIntoDatabase(bookingData: any, paymentStatus: string, bookingStatus: string, note: string, paymentMethod: string) {
+  private async saveDataIntoDatabase(res: Response, bookingData: any, paymentStatus: string, bookingStatus: string, note: string, paymentMethod: string) {
     try {
       const bookingId = await this.saveBooking(bookingData, bookingStatus, note);
       // console.log('BOOKING ID: ', bookingId);
@@ -662,6 +662,7 @@ export class BookingService {
       await this.saveBookingRoom(bookingId, bookingData);
       await this.setStatusRoom(bookingData);
       await this.createPayment(bookingId, bookingData, paymentMethod, paymentStatus);
+      res.clearCookie('bookingData');
     } catch (error) {
       console.error('Error saving data into database:', error);
       throw new HttpException(

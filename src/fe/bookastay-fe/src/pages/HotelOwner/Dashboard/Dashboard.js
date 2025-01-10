@@ -38,7 +38,7 @@ const Dashboard = () => {
                             {userInfo.hotel?.phone}
                         </Descriptions.Item>
                         <Descriptions.Item label="Address">
-                            {userInfo.hotel?.address || "N/A"}
+                            {userInfo.hotel?.detailAddress || "N/A"}
                         </Descriptions.Item>
                         <Descriptions.Item label="Star">{userInfo.hotel?.star}</Descriptions.Item>
                         <Descriptions.Item label="Status">

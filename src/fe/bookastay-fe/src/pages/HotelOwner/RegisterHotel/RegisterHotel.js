@@ -1,6 +1,7 @@
 import { useEffect, useReducer, useState } from "react";
 import { Button, Result } from "antd";
 import styled from "styled-components";
+import axios from "axios";
 
 import Stepper from "~/components/Stepper/Stepper";
 import {
@@ -52,9 +53,55 @@ const RegisterHotel = () => {
         payment: {},
     });
 
-    const persistData = () => {
+    const persistData = async () => {
         // Persist data to the server
         console.log(">>> Persist data", formData);
+        const userId = localStorage.getItem("user_id");
+        console.log(">>> User ID", userId);
+        try {
+            // // Gửi propertyDetails
+            const propertyResponse = await axios.post(
+                // `http://localhost:3001/api/hotels/add/basicInfo/${userId}`,
+                // formData.propertyDetails
+            );
+            console.log("Property details response:", propertyResponse.data);
+
+            const hotelId = propertyResponse.data.hotel;
+            console.log("Hotel ID:", hotelId);
+
+            // // Gửi images
+            // // Chuẩn bị FormData cho images
+            // const formData = new FormData();
+            // for (let i = 0; i < formData.images.length; i++) {
+            //     formData.append("images", formData.images[i]);
+            // }
+            // console.log("FormData:", formData);
+            // const imagesResponse = await axios.post(
+            //     `http://localhost:3001/api/hotels/images/upload/${hotelId}`,
+            //     formData.images
+            // );
+            // console.log("Images response:", imagesResponse.data);
+
+            // // Gửi payment
+            const paymentResponse = await axios.post(
+                `http://localhost:3001/api/hotels/payment/add/${hotelId}`,
+                formData.payment.paymentAccount
+            );
+            console.log("Payment response:", paymentResponse.data);
+
+            // // Gửi roomDetails
+            const { doubleRoomPrice, quadRoomPrice } = formData.payment;
+            const roomDetailsResponse = await axios.post(
+                `http://localhost:3001/api/room_types/add/${hotelId}`,
+                {
+                    doubleRoomPrice, quadRoomPrice
+                }
+            );
+            console.log("Room details response:", roomDetailsResponse.data);
+        }
+        catch {
+            console.log("Error when sending property details");
+        }
     };
 
     useEffect(() => {

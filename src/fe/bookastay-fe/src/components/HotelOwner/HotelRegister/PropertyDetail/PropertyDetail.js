@@ -10,10 +10,11 @@ import "./PropertyDetail.scss";
 
 const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = () => { } }) => {
     const userId = localStorage.getItem("user_id");
+    console.log(">>> User ID", userId);
     const formik = useFormik({
         initialValues: {
             name: "",
-            detailAddress: "",
+            address: "",
             city: "",
             district: "",
             ward: "",
@@ -24,7 +25,7 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
         },
         validationSchema: Yup.object({
             name: Yup.string().required("Hotel name is required"),
-            detailAddress: Yup.string().required("Hotel address is required"),
+            address: Yup.string().required("Hotel address is required"),
             city: Yup.string().required("City is required"),
             district: Yup.string().required("District is required"),
             ward: Yup.string().required("Ward is required"),
@@ -36,21 +37,6 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
                 .email("Invalid email address")
                 .required("Email is required"),
         }),
-        onSubmit: async (values) => {
-            try {
-                if (userId) {
-                    const response = await axios.post(
-                        `http://localhost:3001/api/hotels/add/basicInfo/${userId}`,
-                        values
-                    );
-                    console.log("Response:", response.data);
-                }
-                alert("Hotel registered successfully!");
-            } catch (error) {
-                console.error("Error:", error.response?.data || error.message);
-                alert("Failed to register hotel. Please try again.");
-            }
-        },
     });
 
     const [provinces, setProvinces] = useState([]);
@@ -77,7 +63,7 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
 
         formik.setValues({
             name: formData.name || "",
-            detailAddress: formData.detailAddress || "",
+            address: formData.address || "",
             city: formData.city || "",
             district: formData.district || "",
             ward: formData.ward || "",
@@ -139,7 +125,7 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
     const checkValidation = () => {
         formik.setTouched({
             name: true,
-            detailAddress: true,
+            address: true,
             city: true,
             district: true,
             ward: true,
@@ -159,19 +145,18 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
             );
             const selectedWard = wards.find((ward) => ward.id === formik.values.ward);
 
-            const address = {
-                province: selectedProvince.name,
-                district: selectedDistrict.name,
-                ward: selectedWard.name,
-                detail: formik.values.detailAddress,
-            };
+            const detailAddress = `${formik.values.address}, ${selectedWard.name}, ${selectedDistrict.name}, ${selectedProvince.name}`;
 
             updateData({
-                ...formik.values,
-                address,
+                name: formik.values.name,
+                district: selectedDistrict.name,
+                ward: selectedWard.name,
+                city: selectedProvince.name,
+                detailAddress,
                 description: formik.values.description,
                 phone: formik.values.phone,
-                email: formik.values.email
+                email: formik.values.email,
+                star: formik.values.star,
             });
             handleNext();
         }
@@ -203,16 +188,16 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
                                 Hotel Address <span className="red-dot">*</span>
                             </label>
                             <input
-                                value={formik.values.detailAddress}
+                                value={formik.values.address}
                                 onChange={formik.handleChange}
                                 type="text"
-                                className={`form-control form-control-lg fs-4 ${formik.touched.detailAddress && formik.errors.detailAddress
+                                className={`form-control form-control-lg fs-4 ${formik.touched.address && formik.errors.address
                                     ? "is-invalid"
                                     : ""
                                     }`}
-                                id="detailAddress"
+                                id="address"
                             />
-                            <div className="invalid-feedback">{formik.errors.detailAddress}</div>
+                            <div className="invalid-feedback">{formik.errors.address}</div>
                         </div>
                         <div className="row row-cols-2 row-cols-md-3 mb-3">
                             <div className="col">
@@ -513,7 +498,7 @@ const PropertyDetail = ({ handleNext = () => { }, formData = {}, updateData = ()
 
                 <div className="d-flex justify-content-end">
                     <button
-                        type="button"
+                        type="submit"
                         className="btn btn-success btn-lg fs-3 px-4"
                         style={{ background: "#227B94" }}
                         onClick={() => checkValidation()}

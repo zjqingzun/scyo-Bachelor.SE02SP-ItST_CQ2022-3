@@ -1,13 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, HttpCode, HttpStatus, ParseIntPipe, Query } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
+import { GetBookingDto } from './dto/get-booking.dto';
+import { ViewDetailBookingDto } from './dto/view-detail-booking.dto';
+import { ChangeStatusBookingDto } from './dto/change-status-booking.dto';
 import { Public } from '@/helpers/decorator/public';
 
 @Controller('booking')
 export class BookingController {
   constructor(private readonly bookingService: BookingService) { }
 
+  // BOOKING
   // [GET]: /booking/check-booking --> Kiểm tra booking còn hạn không
   @Get('check-booking')
   @Public()
@@ -57,13 +61,39 @@ export class BookingController {
     @Res() res,
   ) {
     const paymentMethod = body.paymentMethod;
-    return this.bookingService.processPayment(req, res, paymentMethod);
+    return await this.bookingService.processPayment(req, res, paymentMethod);
   }
 
-  @Get()
-  findAll() {
-    return this.bookingService.findAll();
+
+  // HOTEL - CONTROL 
+  // [GET]: /booking/guest?userId=...&page=...&per_page=...
+  @Get('guest')
+  @Public()
+  async getAllBooking(
+    @Query() getBookingDto: GetBookingDto
+  ){
+    return this.bookingService.findAll(getBookingDto);
   }
+
+  // [GET]: /booking/guest/detail?userId=...&bookingId=...&page=...&per_page=...
+  @Get('guest/detail')
+  @Public()
+  async getDetailBooking(
+    @Query() viewDetailBookingDto: ViewDetailBookingDto
+  ){
+    return this.bookingService.getDetail(viewDetailBookingDto);
+  }
+
+  // [PATCH]: /booking/guest/update-status?bookingId=...?status='confirmed' || 'canceled' || 'completed'
+  @Patch('guest/update-status')
+  @Public()
+  async updateStatus(@Query() changeStatusBookingDto: ChangeStatusBookingDto
+  ){
+    return await this.bookingService.updateStatusBooking(changeStatusBookingDto);
+  }
+
+  // HISTORY
+
 
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -105,6 +135,4 @@ export class BookingController {
   async getTotalCheckOut(@Param('id') id: number) {
     return await this.bookingService.totalcheckOut(id);
   }
-
-  
 }

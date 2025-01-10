@@ -3,12 +3,12 @@ import { Booking } from "@/module/booking/entities/booking.entity";
 import { User } from "@/module/user/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity({name: "payment"})
+@Entity({ name: "payment" })
 export class Payment {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+    @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
     date: Date;
 
     @Column()
@@ -20,7 +20,7 @@ export class Payment {
     @Column()
     totalCost: number;
 
-    @ManyToOne(() => Booking, (booking) => booking.payments)
-    @JoinColumn({name: "bookingId"})
+    @OneToOne(() => Booking, (booking) => booking.payment)
+    @JoinColumn({ name: "bookingId" })
     booking: Booking;
 }

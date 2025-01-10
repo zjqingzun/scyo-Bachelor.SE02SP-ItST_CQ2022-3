@@ -1,107 +1,135 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import './manageRequests.css';
 import icons from "~/assets/icon";
 
 function ManageRequests() {
-  const [applications, setApplications] = useState([
-    { id: 1, mail: 'owner1@example.com', name: 'Hotel ABC', location: 'City A', time: '18:15 31/12/2024', read: false },
-    { id: 2, mail: 'owner2@example.com', name: 'Hotel BCM', location: 'City B', time: '10:30 30/12/2024', read: false },
-    { id: 3, mail: 'owner3@example.com', name: 'Hotel CAQ', location: 'City C', time: '14:00 29/12/2024', read: false },
-    { id: 4, mail: 'owner4@example.com', name: 'Hotel ABB', location: 'City A', time: '08:15 29/12/2024', read: true },
-    { id: 5, mail: 'owner5@example.com', name: 'Hotel BMM', location: 'City B', time: '10:30 28/12/2024', read: false },
-    { id: 6, mail: 'owner6@example.com', name: 'Hotel XYS', location: 'City C', time: '14:00 27/12/2024', read: true },
-    { id: 7, mail: 'owner7@example.com', name: 'Hotel DEF', location: 'City D', time: '11:30 26/12/2024', read: false },
-    { id: 8, mail: 'owner8@example.com', name: 'Hotel GHI', location: 'City E', time: '15:45 25/12/2024', read: false },
-    { id: 9, mail: 'owner9@example.com', name: 'Hotel JKL', location: 'City F', time: '09:15 24/12/2024', read: true },
-    { id: 10, mail: 'owner10@example.com', name: 'Hotel MNO', location: 'City G', time: '12:00 23/12/2024', read: false },
-    { id: 11, mail: 'owner1@example.com', name: 'Hotel ABC', location: 'City A', time: '18:15 31/12/2024', read: false },
-    { id: 12, mail: 'owner2@example.com', name: 'Hotel BCM', location: 'City B', time: '10:30 30/12/2024', read: false },
-    { id: 13, mail: 'owner3@example.com', name: 'Hotel CAQ', location: 'City C', time: '14:00 29/12/2024', read: false },
-    { id: 14, mail: 'owner4@example.com', name: 'Hotel ABB', location: 'City A', time: '08:15 29/12/2024', read: true },
-    { id: 15, mail: 'owner5@example.com', name: 'Hotel BMM', location: 'City B', time: '10:30 28/12/2024', read: false },
-    { id: 16, mail: 'owner6@example.com', name: 'Hotel XYS', location: 'City C', time: '14:00 27/12/2024', read: true },
-    { id: 17, mail: 'owner7@example.com', name: 'Hotel DEF', location: 'City D', time: '11:30 26/12/2024', read: false },
-    { id: 18, mail: 'owner8@example.com', name: 'Hotel GHI', location: 'City E', time: '15:45 25/12/2024', read: false },
-    { id: 19, mail: 'owner9@example.com', name: 'Hotel JKL', location: 'City F', time: '09:15 24/12/2024', read: true },
-    { id: 20, mail: 'owner10@example.com', name: 'Hotel MNO', location: 'City G', time: '12:00 23/12/2024', read: false },
-  ]);
-
+  const [requests, setRequests] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 5; // Số lượng request trên mỗi trang
+  const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [inputPage, setInputPage] = useState('');
 
-  const navigate = useNavigate();
-
-  const handleRowClick = (app) => {
-    navigate(`/request/details/${app.id}`);
+  const handleInputPageChange = (e) => {
+    setInputPage(e.target.value);
   };
 
-  const totalPages = Math.ceil(applications.length / itemsPerPage);
+  // Hàm fetch toàn bộ dữ liệu từ API
+  const fetchRequests = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:3001/api/hotels/admin/dashboard/ga/request');
+      const data = await response.json();
 
-  const displayedApplications = applications.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+      // Cập nhật state với dữ liệu từ API
+      setRequests(data);
+      setTotalPages(Math.ceil(data.length / itemsPerPage));
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+
+  // Xử lý phân trang
   const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
+    if (newPage > 0 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
   };
+
+  const handleGoToPage = () => {
+    const page = parseInt(inputPage, 10);
+    if (!isNaN(page) && page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    } else {
+      alert(`Please enter a valid page number between 1 and ${totalPages}`);
+    }
+  };
+
+  // Lấy danh sách requests cho trang hiện tại
+  const currentRequests = requests.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div className="d-flex flex-column px-5 py-3 m-5 reqs">
-      <h1 className="title mb-4">Requests</h1>
-      <table className="table table-hover">
-        <thead className='table-dark fs-3'>
-          <tr>
-            <th>ID</th>
-            <th>Mail</th>
-            <th>Name</th>
-            <th>Location</th>
-            <th>Time</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {displayedApplications.map((app) => (
-            
-            <tr
-              key={app.id}
-              onClick={() => handleRowClick(app)}
-              style={{
-                fontWeight: app.read ? 'normal' : 'bold',
-                cursor: 'pointer',
-              }}
-            >
-              <td>{app.id}</td>
-              <td>{app.mail}</td>
-              <td>{app.name}</td>
-              <td>{app.location}</td>
-              <td>{app.time}</td>
-              <td>{app.read ? 'Read' : 'Unread'}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <div className="d-flex justify-content-evenly align-items-center mt-5">
-        <button
-          className="btn" style={{ backgroundColor: '#1C2D6E' }}
-          disabled={currentPage === 1}
-          onClick={() => handlePageChange(currentPage - 1)}
-        >
-          <img src={icons.chevronLeftPinkIcon} class="left-icon icon m-2"/>
-        </button>
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          className="btn" style={{ backgroundColor: '#1C2D6E' }}
-          disabled={currentPage === totalPages}
-          onClick={() => handlePageChange(currentPage + 1)}
-        >
-          <img src={icons.chevronRightPinkIcon} class="right-icon icon m-2"/>
-        </button>
+    <div className="d-flex flex-column px-5 py-3 m-5 requests">
+      <div className='d-flex justify-content-between mb-3'>
+        <div className="title">Requests</div>
+        <div className="text-white p-4 rounded text-center box" style={{ width: '20%' }}>
+          <h3>Total Requests</h3>
+          <h1>{requests.length}</h1>
+        </div>
       </div>
+
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <>
+          <table className="table table-hover">
+            <thead className='table-dark fs-3'>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Address</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentRequests.map((request) => (
+                <tr key={request.hotel_id}>
+                  <td>{request.hotel_id}</td>
+                  <td>{request.hotel_name}</td>
+                  <td>{request.hotel_email}</td>
+                  <td>{request.hotel_status}</td>
+                  <td>{request.location_detailAddress}</td>
+                  <td>{new Date(request.createdat).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div className="d-flex justify-content-evenly align-items-center mt-4">
+            <button
+              className="btn" style={{ backgroundColor: '#1C2D6E' }}
+              disabled={currentPage === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
+              <img src={icons.chevronLeftPinkIcon} className="left-icon icon m-2" />
+            </button>
+            <span className="fs-2">
+              {currentPage} / {totalPages}
+            </span>
+            <div className="d-flex justify-content-center align-items-center">
+              <input
+                type="number"
+                value={inputPage}
+                onChange={handleInputPageChange}
+                className="form-control mx-2 fs-4"
+                placeholder="Page"
+                style={{ width: '100px', padding: "5px 15px" }}
+              />
+              <button
+                onClick={handleGoToPage}
+                className="btn btn-success mx-2 fs-4" style={{ padding: "5px 15px" }}
+              >
+                Go to
+              </button>
+            </div>
+            <button
+              className="btn" style={{ backgroundColor: '#1C2D6E' }}
+              disabled={currentPage === totalPages}
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
+              <img src={icons.chevronRightPinkIcon} className="right-icon icon m-2" />
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

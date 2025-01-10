@@ -12,11 +12,11 @@ function Dashboard() {
     { id: 6, mail: 'owner6@example.com', name: 'Hotel XYS', location: 'City C', time: '14:00 27/12/2024', read: true },
     { id: 7, mail: 'owner7@example.com', name: 'Hotel XYS', location: 'City C', time: '14:00 27/12/2024', read: true },
   ]);
-
   const [totals, setTotals] = useState({
     hotels: 0,
     users: 0,
     hoteliers: 0,
+    requests: 0,
   });
 
   const navigate = useNavigate();
@@ -38,9 +38,13 @@ function Dashboard() {
       const usersResponse = await fetch('http://localhost:3001/api/user/getAll/user');
       const usersData = await usersResponse.json();
 
+      const requestsResponse = await fetch('http://localhost:3001/api/hotels/admin/dashboard/t/request');
+      const requestsData = await requestsResponse.json();
+
       setTotals({
         hotels: hotelsData.total || 0,
         users: usersData.total || 0,
+        requests: requestsData.total || 0,
       });
     } catch (error) {
       console.error('Error fetching totals:', error);
@@ -62,7 +66,7 @@ function Dashboard() {
         </div>
         <div className="text-white p-4 rounded text-center box" style={{ width: '20%' }}>
           <h3>Total Requests</h3>
-          <h1>1203</h1>
+          <h1>{ totals.requests }</h1>
         </div>
       </div>
       <div className="applications">

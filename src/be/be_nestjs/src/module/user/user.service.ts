@@ -81,25 +81,29 @@ export class UserService {
         WHERE "userId" = ${userId}
       )
     `);
-    const allPage = Math.ceil(parseInt(allFavHotel[0].count) / take);
+    const allPage = parseInt(allFavHotel[0].count);
 
     let allFavHotelPaging = await queryRunner.query(`
-      SELECT *
-      FROM hotel
-      WHERE id IN (
-        SELECT "hotelId"
-        FROM "user_favouriteHotel"
-        WHERE "userId" = ${userId}
-      )
+      SELECT 
+        h.*, 
+        MIN(rt.price) AS price,
+        json_agg(i.url) AS images
+      FROM hotel h
+      JOIN "user_favouriteHotel" uf ON uf."hotelId" = h.id
+      LEFT JOIN room_type rt ON rt."hotelId" = h.id
+      LEFT JOIN image i ON i."hotelId" = h.id
+      WHERE uf."userId" = $1
+      GROUP BY h.id
       ORDER BY ${sortBy} ${order}
-      LIMIT ${take} OFFSET ${skip}
-    `);
+      LIMIT $2 OFFSET $3
+    `, [userId, take, skip]);
     await queryRunner.release();
     return {
       status: 200,
       message: 'Successfully',
       data: {
-        all_page: allPage,
+        all_page: Math.ceil(allPage / take),
+        total: allPage,
         hotels: allFavHotelPaging,
       },
     };

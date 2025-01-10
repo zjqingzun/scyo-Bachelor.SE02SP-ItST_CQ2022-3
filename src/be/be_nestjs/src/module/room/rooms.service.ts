@@ -2,18 +2,30 @@ import { Injectable } from '@nestjs/common';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Room } from './entities/room.entity';
+import { RoomTypeService } from '../room_type/room_type.service';
 
 @Injectable()
 export class RoomsService {
   constructor(
+    private readonly roomtypeService: RoomTypeService,
+    private readonly dataSource: DataSource,
     @InjectRepository(Room)
     private readonly roomRepository: Repository<Room>,
   ) {}
 
-  create(createRoomDto: CreateRoomDto) {
-    return 'This action adds a new room';
+  async create(createRoomDtos: CreateRoomDto[], hotelId: string) {
+    const roomtypes = await this.roomtypeService.getRoomTypeByHotelId(hotelId);
+    const roomtypeIds = roomtypes.map((roomtype: { id: any; }) => roomtype.id);
+    const rooms = createRoomDtos.map(room => ({
+      name: room.name,
+      type: room.type,
+      status: 'available',
+      hotelId: hotelId,
+      roomTypeId: roomtypeIds[(room.type / 2) - 1]
+    }));
+    return rooms;
   }
 
   findAll() {

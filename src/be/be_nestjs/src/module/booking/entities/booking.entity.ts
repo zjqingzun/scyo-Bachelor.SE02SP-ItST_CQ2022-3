@@ -54,5 +54,5 @@ export class Booking {
     bookingRooms: BookingRoom[];
 
     @OneToOne(() => Payment, (payment) => payment.booking)
-    payment: Payment[];
+    payment: Payment;
 } 

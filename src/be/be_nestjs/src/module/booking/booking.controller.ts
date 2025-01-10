@@ -3,6 +3,8 @@ import { BookingService } from './booking.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { GetBookingDto } from './dto/get-booking.dto';
+import { ViewDetailBookingDto } from './dto/view-detail-booking.dto';
+import { ChangeStatusBookingDto } from './dto/change-status-booking.dto';
 import { Public } from '@/helpers/decorator/public';
 
 @Controller('booking')
@@ -64,6 +66,7 @@ export class BookingController {
 
 
   // HOTEL - CONTROL 
+  // [GET]: /booking/guest?userId=...&page=...&per_page=...
   @Get('guest')
   @Public()
   async getAllBooking(
@@ -72,11 +75,25 @@ export class BookingController {
     return this.bookingService.findAll(getBookingDto);
   }
 
-  @Patch('update-status')
+  // [GET]: /booking/guest/detail?userId=...&bookingId=...&page=...&per_page=...
+  @Get('guest/detail')
   @Public()
-  async updateStatus(){
-
+  async getDetailBooking(
+    @Query() viewDetailBookingDto: ViewDetailBookingDto
+  ){
+    return this.bookingService.getDetail(viewDetailBookingDto);
   }
+
+  // [PATCH]: /booking/guest/update-status?bookingId=...?status='confirmed' || 'canceled' || 'completed'
+  @Patch('guest/update-status')
+  @Public()
+  async updateStatus(@Query() changeStatusBookingDto: ChangeStatusBookingDto
+  ){
+    return await this.bookingService.updateStatusBooking(changeStatusBookingDto);
+  }
+
+  // HISTORY
+
 
   @Get(':id')
   findOne(@Param('id') id: string) {

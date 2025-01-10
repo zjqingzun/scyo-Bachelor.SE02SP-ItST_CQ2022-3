@@ -614,11 +614,11 @@ export class BookingService {
       const { userId, page, per_page } = getBookingDto;
 
       const hotelQuery = await this.hotelRepository
-      .createQueryBuilder('hotel')
-      .select([
-        'hotel.id AS id'
-      ])
-      .where('hotel.ownerId = :userId', { userId: userId })
+        .createQueryBuilder('hotel')
+        .select([
+          'hotel.id AS id'
+        ])
+        .where('hotel.ownerId = :userId', { userId: userId })
 
       const hotel = await hotelQuery.getRawOne();
       if (!hotel) {
@@ -627,19 +627,19 @@ export class BookingService {
       const hotelId = hotel.id;
 
       const bookingQuery = await this.bookingRepository
-      .createQueryBuilder('booking')
-      .leftJoin('booking.user', 'user')
-      .leftJoin('booking.payment', 'payment')
-      .select([
-        'booking.id AS id',
-        'user.name AS name',
-        'booking.checkinTime AS "checkInDate"',
-        'booking.checkoutTime AS "checkOutDate"',
-        'booking.status AS status',
-        'payment."totalCost" AS "totalPrice"'
-      ])
-      .where('booking."hotelId" = :hotelId', { hotelId: hotelId })
-      .orderBy('booking.createdAt', 'DESC')
+        .createQueryBuilder('booking')
+        .leftJoin('booking.user', 'user')
+        .leftJoin('booking.payment', 'payment')
+        .select([
+          'booking.id AS id',
+          'user.name AS name',
+          'booking.checkinTime AS "checkInDate"',
+          'booking.checkoutTime AS "checkOutDate"',
+          'booking.status AS status',
+          'payment."totalCost" AS "totalPrice"'
+        ])
+        .where('booking."hotelId" = :hotelId', { hotelId: hotelId })
+        .orderBy('booking.createdAt', 'DESC')
 
       const offset = (page - 1) * per_page;
 
@@ -648,7 +648,7 @@ export class BookingService {
 
       const [bookings, totalBookings] = await Promise.all([bookingQuery.getRawMany(), bookingQuery.getCount(),]);
       const totalPages = Math.ceil(totalBookings / per_page);
-      
+
       return {
         status_code: HttpStatus.OK,
         message: 'Booking data fetched successfully',
@@ -659,6 +659,126 @@ export class BookingService {
           per_page: Number(per_page),
           bookings,
         },
+      };
+    } catch (error) {
+      console.error('Error saving data into database:', error);
+      throw new HttpException(
+        {
+          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error while saving all data.',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async getDetail(viewDetailBookingDto) {
+    try {
+      const { userId, bookingId, page, per_page } = viewDetailBookingDto;
+
+      const userQuery = await this.userRepository
+        .createQueryBuilder('user')
+        .select([
+          'user.name AS name',
+          'user.email AS email',
+          'user.phone AS phone'
+        ])
+        .where('user.id = :userId', { userId: userId })
+
+      const user = await userQuery.getRawOne();
+      if (!user) {
+        throw new Error('No user found for the given userId');
+      }
+
+      const bookingQuery = await this.bookingRepository
+        .createQueryBuilder('booking')
+        .select([
+          'booking.note AS note'
+        ])
+        .where('booking.id = :bookingId', { bookingId })
+      const booking = await bookingQuery.getRawOne();
+      const note = booking.note;
+
+      const bookingRoomQuery = await this.bookingRepository
+        .createQueryBuilder('booking')
+        .leftJoin('booking.bookingRooms', 'booking_room')
+        .leftJoin('booking.bookingDetails', 'booking_detail')
+        .leftJoin('booking_room.room', 'room')
+        .select([
+          'booking.id AS id',
+          'booking_room.room_name AS name',
+          'booking_room.type AS type',
+          'booking_detail.price AS price',
+        ])
+        .where('booking.id = :bookingId', { bookingId })
+
+      const offset = (page - 1) * per_page;
+      // Áp dụng skip và take trước khi lấy kết quả
+      bookingRoomQuery.limit(per_page).offset(offset);
+
+      const [bookingRooms, totalBookingRooms] = await Promise.all([bookingRoomQuery.getRawMany(), bookingRoomQuery.getCount(),]);
+      const totalPages = Math.ceil(totalBookingRooms / per_page);
+
+      return {
+        status_code: HttpStatus.OK,
+        message: 'Booking data fetched successfully',
+        data: {
+          total: totalBookingRooms,
+          page: Number(page),
+          total_page: totalPages,
+          per_page: Number(per_page),
+          user,
+          bookingRooms,
+          note
+        },
+      };
+    } catch (error) {
+      console.error('Error saving data into database:', error);
+      throw new HttpException(
+        {
+          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error while saving all data.',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async updateStatusBooking(changeStatusBookingDto) {
+    try {
+      const { bookingId, status } = changeStatusBookingDto;
+      const bookingRoomQuery = await this.bookingRoomRepository
+        .createQueryBuilder('booking_room')
+        .select('booking_room.roomId', 'roomId')
+        .where('booking_room."bookingId" = :bookingId', { bookingId })
+        .getRawMany();
+      const roomIds = bookingRoomQuery.map((row) => row.roomId);
+      console.log('ROOMIDS: ', roomIds);
+      if (status === 'confirmed' && roomIds.length > 0) {
+        await this.roomRepository
+          .createQueryBuilder()
+          .update()
+          .set({ status: 'booked' })
+          .where('id IN (:...roomIds)', { roomIds })
+          .execute();
+      } else if ((status === 'completed' || status === 'canceled') && roomIds.length > 0) {
+        await this.roomRepository
+          .createQueryBuilder()
+          .update()
+          .set({ status: 'available' })
+          .where('id IN (:...roomIds)', { roomIds })
+          .execute();
+      }
+
+      await this.bookingRepository
+        .createQueryBuilder()
+        .update()
+        .set({ status })
+        .where('id = :bookingId', { bookingId })
+        .execute();
+      return {
+        status_code: HttpStatus.OK,
+        message: `Booking status successfully updated to ${status}.`,
       };
     } catch (error) {
       console.error('Error saving data into database:', error);

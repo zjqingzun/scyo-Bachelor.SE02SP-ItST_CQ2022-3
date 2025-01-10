@@ -57,12 +57,37 @@ function ManageHotels() {
 
   const [showModal, setShowModal] = useState(false);
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = (hotelId) => {
+    setSelectedHotelId(hotelId);
     setShowModal(true);
   };
+  const yourAccessToken = localStorage.getItem('accessToken');
 
-  const handleConfirmDelete = () => {
-    console.log('Item deleted!');
+  const handleConfirmDelete = async () => {
+    if (selectedHotelId) {
+      try {
+        const response = await fetch(`http://localhost:3001/api/hotels/${selectedHotelId}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${yourAccessToken}`, // Thêm token tại đây
+          },
+        });
+
+        if (response.ok) {
+          alert('Hotel deleted successfully!');
+          // Cập nhật danh sách người dùng
+          fetchHotels(currentPage, itemsPerPage);
+        } else {
+          const errorData = await response.json();
+          alert(`Error deleting hotel: ${errorData.message}`);
+        }
+      } catch (error) {
+        console.error('Error deleting hotel:', error);
+        alert('An error occurred while deleting the hotel.');
+      } finally {
+        setShowModal(false); // Đóng modal
+      }
+    }
     setShowModal(false);
   };
 
@@ -106,7 +131,7 @@ function ManageHotels() {
                   <td>{app.hotelierName}</td>
                   <td>{app.location}</td>
                   <td>
-                    <a style={{ cursor: 'pointer' }} onClick={handleDeleteClick}>
+                    <a style={{ cursor: 'pointer' }} onClick={() => handleDeleteClick(app.id)}>
                       <img src={icons.trashIcon} alt='Delete' className='icon trash-icon' />
                     </a>
                   </td>
@@ -141,20 +166,20 @@ function ManageHotels() {
               {currentPage} / {totalPages}
             </span>
             <div className="d-flex justify-content-center align-items-center">
+              <input
+                type="number"
+                value={inputPage}
+                onChange={handleInputPageChange}
+                className="form-control mx-2 fs-4"
+                placeholder="Page"
+                style={{ width: '100px', padding: "5px 15px" }}
+              />
               <button
                 onClick={handleGoToPage}
                 className="btn btn-success mx-2 fs-4" style={{ padding: "5px 15px" }}
               >
                 Go to
               </button>
-              <input
-                type="number"
-                value={inputPage}
-                onChange={handleInputPageChange}
-                className="form-control mx-2 fs-4"
-                placeholder="Enter page number"
-                style={{ width: '70px', padding: "5px 15px" }}
-              />
             </div>
             <button
               className="btn" style={{ backgroundColor: '#1C2D6E' }}

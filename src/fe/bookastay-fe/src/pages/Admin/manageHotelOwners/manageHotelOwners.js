@@ -57,12 +57,38 @@ function ManageHotelOwners() {
 
   const [showModal, setShowModal] = useState(false);
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = (userId) => {
+    setSelectedUserId(userId);
     setShowModal(true);
   };
 
-  const handleConfirmDelete = () => {
-    console.log('Item deleted!');
+  const yourAccessToken = localStorage.getItem('accessToken');
+
+  const handleConfirmDelete = async () => {
+    if (selectedUserId) {
+      try {
+        const response = await fetch(`http://localhost:3001/api/user/delete/${selectedUserId}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${yourAccessToken}`, // Thêm token tại đây
+          },
+        });
+
+        if (response.ok) {
+          alert('User deleted successfully!');
+          // Cập nhật danh sách người dùng
+          fetchUsers(currentPage, itemsPerPage);
+        } else {
+          const errorData = await response.json();
+          alert(`Error deleting user: ${errorData.message}`);
+        }
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        alert('An error occurred while deleting the user.');
+      } finally {
+        setShowModal(false); // Đóng modal
+      }
+    }
     setShowModal(false);
   };
 
@@ -76,7 +102,7 @@ function ManageHotelOwners() {
         <div className="title">Hotel owners</div>
         <div className="text-white p-4 rounded text-center box" style={{ width: '20%' }}>
           <h3>Total Owners</h3>
-          <h1>{ totalUsers }</h1>
+          <h1>{totalUsers}</h1>
         </div>
       </div>
       {loading ? (
@@ -110,7 +136,7 @@ function ManageHotelOwners() {
                   <td>{new Date(app.dob).toLocaleDateString()}</td>
                   <td>{app.cccd}</td>
                   <td>
-                    <a style={{ cursor: 'pointer' }} onClick={handleDeleteClick}>
+                    <a style={{ cursor: 'pointer' }} onClick={() => handleDeleteClick(app.id)}>
                       <img src={icons.trashIcon} alt='Delete' className='icon trash-icon' />
                     </a>
                   </td>
@@ -145,20 +171,20 @@ function ManageHotelOwners() {
               {currentPage} / {totalPages}
             </span>
             <div className="d-flex justify-content-center align-items-center">
-              <button
-                onClick={handleGoToPage}
-                className="btn btn-success mx-2 fs-4" style={{ padding: "5px 15px"}}
-              >
-                Go to
-              </button>
               <input
                 type="number"
                 value={inputPage}
                 onChange={handleInputPageChange}
-                className="form-control mx-2 fs-4" 
-                placeholder="Enter page number"
-                style={{ width: '70px', padding: "5px 15px" }}
+                className="form-control mx-2 fs-4"
+                placeholder="Page"
+                style={{ width: '100px', padding: "5px 15px" }}
               />
+              <button
+                onClick={handleGoToPage}
+                className="btn btn-success mx-2 fs-4" style={{ padding: "5px 15px" }}
+              >
+                Go to
+              </button>
             </div>
             <button
               className="btn" style={{ backgroundColor: '#1C2D6E' }}

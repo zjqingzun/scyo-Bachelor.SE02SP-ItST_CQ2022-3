@@ -38,13 +38,9 @@ function Dashboard() {
       const usersResponse = await fetch('http://localhost:3001/api/user/getAll/user');
       const usersData = await usersResponse.json();
 
-      const hoteliersResponse = await fetch('http://localhost:3001/api/user/getAll/hotelier');
-      const hoteliersData = await hoteliersResponse.json();
-
       setTotals({
         hotels: hotelsData.total || 0,
         users: usersData.total || 0,
-        hoteliers: hoteliersData.total || 0,
       });
     } catch (error) {
       console.error('Error fetching totals:', error);
@@ -63,10 +59,6 @@ function Dashboard() {
         <div className="text-white p-4 rounded text-center box" style={{ width: '20%' }}>
           <h3>Total Users</h3>
           <h1>{ totals.users }</h1>
-        </div>
-        <div className="text-white p-4 rounded text-center box" style={{ width: '20%' }}>
-          <h3>Total Owners</h3>
-          <h1>{ totals.hoteliers }</h1>
         </div>
         <div className="text-white p-4 rounded text-center box" style={{ width: '20%' }}>
           <h3>Total Requests</h3>

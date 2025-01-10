@@ -52,7 +52,7 @@ function Sidebar() {
                     className={`nav-item last-nav ${location.pathname === '/' ? 'active' : ''
                         }`}
                 >
-                    <Link to="/admin" className="nav-link fw-bold">
+                    <Link to="/admin/login" className="nav-link fw-bold">
                         Logout
                     </Link>
                 </li>

@@ -101,10 +101,10 @@ export class BookingService {
         ]);
 
       const canBooking = await canBookingQuery.getRawMany();
-      console.log('CAN BOOKING: ', canBooking);
+      // console.log('CAN BOOKING: ', canBooking);
 
       const rooms = [...availableRoom, ...canBooking];
-      console.log('ALL AVAILABLE ROOMS: ', rooms);
+      // console.log('ALL AVAILABLE ROOMS: ', rooms);
       // Lấy ra phòng loại 2 và 4
       const roomsType2 = rooms.filter((room) => room.type === 2);
       const roomsType4 = rooms.filter((room) => room.type === 4);
@@ -118,7 +118,7 @@ export class BookingService {
       const randomRoomsType2 = getRandomRooms(roomsType2, roomType2);
       const randomRoomsType4 = getRandomRooms(roomsType4, roomType4);
       const selectedRooms = [...randomRoomsType2, ...randomRoomsType4];
-      console.log('SELECTED ROOMS: ', selectedRooms);
+      // console.log('SELECTED ROOMS: ', selectedRooms);
 
       const roomIds = selectedRooms.map((room) => room.id);
       await this.roomRepository
@@ -150,6 +150,17 @@ export class BookingService {
         httpOnly: true,
       });
 
+      const oldState = {
+        hotelId,
+        availableRoom,
+        canBooking,
+      };
+      console.log('OLD STATE: ', oldState);
+      res.cookie('oldState', JSON.stringify(oldState), {
+        maxAge: 6 * 60 * 1000,
+        httpOnly: true,
+      });
+
       return res.status(200).json({
         message: 'Booking data saved to cookie',
         bookingData,
@@ -172,27 +183,60 @@ export class BookingService {
     try {
       const bookingData = req.cookies['bookingData'];
 
+      // Kiểm tra cookie bookingData
       if (!bookingData) {
+        const oldStateCookie = req.cookies['oldState'];
+
+        // Kiểm tra cookie oldState
+        if (!oldStateCookie) {
+          throw new HttpException(
+            'Old state cookie has expired or is not found',
+            HttpStatus.NOT_FOUND,
+          );
+        }
+
+        const oldState = JSON.parse(oldStateCookie);
+        const { hotelId, availableRoom, canBooking } = oldState;
+
+        // Lấy danh sách ID từ availableRoom và canBooking
+        const availableRoomIds = availableRoom.map((room) => room.id);
+        const canBookingIds = canBooking.map((room) => room.id);
+
+        // Cập nhật trạng thái "booked" cho các phòng trong canBooking
+        if (canBookingIds.length > 0) {
+          await this.roomRepository
+            .createQueryBuilder()
+            .update()
+            .set({ status: 'booked' })
+            .where('hotelId = :hotelId AND id IN (:...ids)', {
+              hotelId,
+              ids: canBookingIds,
+            })
+            .execute();
+        }
+
+        // Cập nhật trạng thái "available" cho các phòng trong availableRoom
+        if (availableRoomIds.length > 0) {
+          await this.roomRepository
+            .createQueryBuilder()
+            .update()
+            .set({ status: 'available' })
+            .where('hotelId = :hotelId AND id IN (:...ids)', {
+              hotelId,
+              ids: availableRoomIds,
+            })
+            .execute();
+        }
+
+        // Nếu không tìm thấy bookingData, trả về lỗi
         throw new HttpException(
           'Booking data not found in cookies',
           HttpStatus.NOT_FOUND,
         );
       }
 
+      // Nếu có bookingData, phân tích và trả về kết quả
       const parsedBookingData = JSON.parse(bookingData);
-      const currentTime = Date.now();
-
-      // Kiểm tra xem cookie có hết hạn chưa (5 phút trong trường hợp này)
-      const isExpired =
-        currentTime - parsedBookingData.createdAt > 5 * 60 * 1000;
-
-      if (isExpired) {
-        throw new HttpException(
-          'Booking data has expired',
-          HttpStatus.FORBIDDEN,
-        );
-      }
-
       return res.status(HttpStatus.OK).json({
         message: 'Booking data is valid',
         bookingData: parsedBookingData,
@@ -200,8 +244,9 @@ export class BookingService {
     } catch (error) {
       console.error('Error checking booking:', error);
 
+      // Trả về lỗi phù hợp
       return res.status(HttpStatus.FORBIDDEN).json({
-        message: 'Booking data has expired or not found',
+        message: error.message || 'Booking data has expired or not found',
       });
     }
   }
@@ -330,9 +375,7 @@ export class BookingService {
         return res.status(HttpStatus.OK).json({
           message: 'Cash successful, information saved to database.',
         });
-      }
-
-      if (paymentMethod === 'momo') {
+      } else if (paymentMethod === 'momo') {
         // Tạm thời chưa xử lý
         const amount = bookingData.sumPrice;
         const orderInfo = `Đặt phòng tại khách sạn ${bookingData.hotelId} - Loại phòng: ${bookingData.roomType2} và ${bookingData.roomType4}.`;
@@ -365,7 +408,7 @@ export class BookingService {
     const partnerCode = 'MOMO';
     const accessKey = process.env.MOMO_ACCESS_KEY;
     const secretKey = process.env.MOMO_SECRET_KEY;
-    const redirectUrl = 'http://localhost:3000';
+    const redirectUrl = 'http://localhost:3000/reserve';
     const ipnUrl =
       'https://240b-2402-800-6315-309c-9cdf-3795-d2c5-46c.ngrok-free.app/callback';
     const requestId = `${partnerCode}-${new Date().getTime()}`;
@@ -554,6 +597,29 @@ export class BookingService {
     }
   }
 
+  private async setStatusRoom(bookingData: any) {
+    try {
+      const hotelId = bookingData.hotelId;
+      const rooms = bookingData.rooms;
+      const roomIds = rooms.map((room) => room.id);
+      if (roomIds.length > 0) {
+        // Cập nhật trạng thái "booked" cho các phòng đã được đặt thành công
+        await this.roomRepository
+          .createQueryBuilder()
+          .update()
+          .set({ status: 'booked' })
+          .where('hotelId = :hotelId AND id IN (:...ids)', {
+            hotelId,
+            ids: roomIds,
+          })
+          .execute();
+      }
+    } catch (error) {
+      console.error('Error saving payment:', error);
+      throw error;
+    }
+  }
+
   private async saveDataIntoDatabase(
     bookingData: any,
     status: string,
@@ -565,6 +631,7 @@ export class BookingService {
       console.log('BOOKING ID: ', bookingId);
       await this.saveBookingDetail(bookingId, bookingData);
       await this.saveBookingRoom(bookingId, bookingData);
+      await this.setStatusRoom(bookingData);
       await this.createPayment(bookingId, bookingData, paymentMethod, status);
     } catch (error) {
       console.error('Error saving data into database:', error);
@@ -593,60 +660,68 @@ export class BookingService {
   remove(id: number) {
     return `This action removes a #${id} booking`;
   }
+
+  async totalReservation(id: number) {
+    try {
+      const today = new Date();
+      const todayDate = today.toISOString().split('T')[0];
+
+      const count = await this.bookingRepository
+        .createQueryBuilder('booking')
+        .where('booking.hotelId = :hotelId', { hotelId: id })
+        .andWhere('DATE(booking.checkinTime) <= :today', { today: todayDate })
+        .andWhere('DATE(booking.checkoutTime) >= :today', { today: todayDate })
+        .getCount();
+
+      return {
+        status: 200,
+        hotelId: id,
+        total: count,
+      };
+    } catch (error) {
+      throw new Error(`Error fetching total occupied rooms: ${error.message}`);
+    }
+  }
+
+  async totalcheckIn(id: number) {
+    try {
+      const today = new Date();
+      const todayDate = today.toISOString().split('T')[0];
+
+      const count = await this.bookingRepository
+        .createQueryBuilder('booking')
+        .where('booking.hotelId = :hotelId', { hotelId: id })
+        .andWhere('DATE(booking.checkinTime) = :today', { today: todayDate })
+        .getCount();
+
+      return {
+        status: 200,
+        hotelId: id,
+        total: count,
+      };
+    } catch (error) {
+      throw new Error(`Error fetching total occupied rooms: ${error.message}`);
+    }
+  }
+
+  async totalcheckOut(id: number) {
+    try {
+      const today = new Date();
+      const todayDate = today.toISOString().split('T')[0];
+
+      const count = await this.bookingRepository
+        .createQueryBuilder('booking')
+        .where('booking.hotelId = :hotelId', { hotelId: id })
+        .andWhere('DATE(booking.checkoutTime) = :today', { today: todayDate })
+        .getCount();
+
+      return {
+        status: 200,
+        hotelId: id,
+        total: count,
+      };
+    } catch (error) {
+      throw new Error(`Error fetching total occupied rooms: ${error.message}`);
+    }
+  }
 }
-
-// async function saveDataIntoDatabase(bookingData: any, status: string, note: string) {
-//   try {
-//     // Đầu tiên là save vào bảng booking
-//     const bookingQuery = await this.bookingRepository
-//       .createQueryBuilder()
-//       .insert()
-//       .into('booking')
-//       .values({
-//         hotelId: bookingData.hotelId,
-//         userId: bookingData.userId,
-//         createdAt: Date.now(),
-//         checkInDate: bookingData.checkInDate,
-//         checkOutDate: bookingData.checkOutDate,
-//         status: status,
-//         sumPrice: bookingData.sumPrice,
-//         note: note
-//       })
-//       .returning('id')
-//       .execute();
-//       const bookingId = bookingQuery.raw[0].id;
-
-//       const bookingDetailQuery = await this.bookingDetailRepository
-//       .createQueryBuilder('booking_detail')
-//       .createQueryBuilder()
-//       .insert()
-//       .into('booking_detail')
-//       .values([
-//         {
-//           bookingId: bookingId,
-//           type: 2,
-//           nums: bookingData.roomType2,
-//           price: bookingData.type2Price
-//         },
-//         {
-//           bookingId: bookingId,
-//           type: 4,
-//           nums: bookingData.roomType4,
-//           price: bookingData.type4Price
-//         }
-//       ])
-//       .execute();
-
-//       // Chỗ này xử lý lưu vào bảng booking_room (Lấy các phòng ở trong list selected lưu vào)
-
-//   } catch (error) {
-//     console.error('Error saving booking with query builder:', error);
-//     throw new HttpException(
-//       {
-//         status_code: HttpStatus.INTERNAL_SERVER_ERROR,
-//         message: 'Internal server error while saving booking.',
-//       },
-//       HttpStatus.INTERNAL_SERVER_ERROR,
-//     );
-//   }
-// }

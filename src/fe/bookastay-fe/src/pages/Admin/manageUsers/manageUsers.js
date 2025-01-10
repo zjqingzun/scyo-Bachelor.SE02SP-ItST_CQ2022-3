@@ -61,12 +61,16 @@ function ManageUsers() {
     setSelectedUserId(userId);
     setShowModal(true);
   };
+  const yourAccessToken = localStorage.getItem('accessToken');
 
   const handleConfirmDelete = async () => {
     if (selectedUserId) {
       try {
         const response = await fetch(`http://localhost:3001/api/user/delete/${selectedUserId}`, {
           method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${yourAccessToken}`, // Thêm token tại đây
+          },
         });
 
         if (response.ok) {
@@ -167,20 +171,20 @@ function ManageUsers() {
               {currentPage} / {totalPages}
             </span>
             <div className="d-flex justify-content-center align-items-center">
+              <input
+                type="number"
+                value={inputPage}
+                onChange={handleInputPageChange}
+                className="form-control mx-2 fs-4"
+                placeholder="Page"
+                style={{ width: '100px', padding: "5px 15px" }}
+              />
               <button
                 onClick={handleGoToPage}
                 className="btn btn-success mx-2 fs-4" style={{ padding: "5px 15px" }}
               >
                 Go to
               </button>
-              <input
-                type="number"
-                value={inputPage}
-                onChange={handleInputPageChange}
-                className="form-control mx-2 fs-4"
-                placeholder="Enter page number"
-                style={{ width: '70px', padding: "5px 15px" }}
-              />
             </div>
             <button
               className="btn" style={{ backgroundColor: '#1C2D6E' }}

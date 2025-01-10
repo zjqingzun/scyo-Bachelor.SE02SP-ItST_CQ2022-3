@@ -20,10 +20,6 @@ export class Payment {
     @Column()
     totalCost: number;
 
-    @OneToOne(() => Bill, (bill) => bill.payment)
-    @JoinColumn({name: "billId"})
-    bill: Bill;
-
     @ManyToOne(() => Booking, (booking) => booking.payments)
     @JoinColumn({name: "bookingId"})
     booking: Booking;

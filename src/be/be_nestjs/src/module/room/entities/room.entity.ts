@@ -20,6 +20,9 @@ export class Room {
     @Column()
     status: string;
 
+    @Column()
+    hotelId: number;
+
     @ManyToOne(() => Hotel, (hotel) => hotel.rooms)
     @JoinColumn({ name: "hotelId" })
     hotel: Hotel;

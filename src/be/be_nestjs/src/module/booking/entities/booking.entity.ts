@@ -55,4 +55,4 @@ export class Booking {
 
     @OneToMany(() => Payment, (payment) => payment.booking)
     payments: Payment[];
-}
+} 

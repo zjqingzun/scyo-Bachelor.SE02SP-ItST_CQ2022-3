@@ -60,7 +60,7 @@ export class UserController {
   }
 
   @Post('avatar/upload/:email')
-  @Roles("user")
+  @Roles("user", "hotelier")
   @UseInterceptors(
     FileInterceptor('file', {
       storage: memoryStorage(),
@@ -82,7 +82,7 @@ export class UserController {
   }
 
   @Get('avatar/url/:email')
-  @Roles("user")
+  @Roles("user", "hotelier")
   async getImageUrl(@Param('email') email: string) {
     const result = await this.userService.getAvatarUrl(email);
     return result;

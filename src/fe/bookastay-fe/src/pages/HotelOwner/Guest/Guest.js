@@ -7,6 +7,7 @@ import Highlighter from "react-highlight-words";
 
 import { useNavigate } from "react-router-dom";
 import StyledStatusSelect from "./StyledStatusSelect";
+import axios from "axios";
 
 const STATUS_OPTIONS = [
     { label: "Pending", value: "Pending" },
@@ -46,9 +47,13 @@ const data = [
 
 const Guest = () => {
     const navigate = useNavigate();
+    const yourAccessToken = localStorage.getItem('accessToken');
 
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
+
+    const [data, setData] = useState([]);
+
     const searchInput = useRef(null);
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -253,16 +258,39 @@ const Guest = () => {
         },
     });
 
-    useEffect(() => {
+    const fetchData = async (params = {}) => {
         setLoading(true);
-        setTimeout(() => {
+        try {
+            const response = await axios.get("http://localhost:3001/api/booking/guest", {
+                headers: {
+                    Authorization: `Bearer ${yourAccessToken}`,
+                },
+                params: {
+                    userId: "", // Thay bằng userId nếu cần
+                    page: params.pagination?.current || 1,
+                    per_page: params.pagination?.pageSize || 10,
+                },
+            });
+
+            const { data: guests, total } = response.data; // Giả sử API trả về { data, total }
+            setData(guests);
+            setTableParams((prev) => ({
+                ...prev,
+                pagination: {
+                    ...prev.pagination,
+                    total, // Số lượng bản ghi từ API
+                },
+            }));
+        } catch (error) {
+            console.error("Error fetching guest data:", error);
+        } finally {
             setLoading(false);
-        }, 1000);
-    }, [
-        tableParams.pagination?.current,
-        tableParams.pagination?.pageSize,
-        JSON.stringify(tableParams.filters),
-    ]);
+        }
+    };
+
+    useEffect(() => {
+        fetchData(tableParams);
+    }, [JSON.stringify(tableParams)]);
 
     const handleTableChange = (pagination, filters, sorter) => {
         console.log(pagination, filters, sorter);
@@ -272,10 +300,6 @@ const Guest = () => {
             filters,
         });
     };
-
-    // const handleAddRoom = () => {
-    //     navigate("/hotel-owner/room/add-room");
-    // };
 
     return (
         <div className="guest">

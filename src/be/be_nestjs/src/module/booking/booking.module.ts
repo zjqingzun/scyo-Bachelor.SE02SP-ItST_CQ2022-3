@@ -16,5 +16,6 @@ import { Payment } from '../payment/entities/payment.entity';
   imports: [TypeOrmModule.forFeature([Booking, Hotel, RoomType, Room, User, BookingDetail, BookingRoom, Payment])],
   controllers: [BookingController],
   providers: [BookingService, MinioService],
+  exports: [BookingService]
 })
 export class BookingModule {}

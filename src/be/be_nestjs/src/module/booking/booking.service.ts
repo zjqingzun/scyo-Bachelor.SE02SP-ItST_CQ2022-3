@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { Repository } from 'typeorm';
@@ -121,6 +126,9 @@ export class BookingService {
       // console.log('SELECTED ROOMS: ', selectedRooms);
 
       const roomIds = selectedRooms.map((room) => room.id);
+      if (!roomIds || roomIds.length === 0) {
+        throw new BadRequestException('No room IDs provided');
+      }
       await this.roomRepository
         .createQueryBuilder()
         .update()
@@ -378,9 +386,15 @@ export class BookingService {
       } else if (paymentMethod === 'momo') {
         // Tạm thời chưa xử lý
         const amount = bookingData.sumPrice;
-        const orderInfo = `Đặt phòng tại khách sạn ${bookingData.hotelId} - Loại phòng: ${bookingData.roomType2} và ${bookingData.roomType4}.`;
+        const orderInfo = `Thanh toán đặt phòng khách sạn thông qua trang web đặt phòng BookAstay`;
 
-        const paymentUrl = await this.createMomoPayment(amount, orderInfo);
+        const paymentUrl = await this.createMomoPayment(
+          res,
+          orderInfo,
+          bookingData,
+          note,
+        );
+        console.log('Payment URL:', paymentUrl);
         return res.status(HttpStatus.OK).json({
           message: 'Redirect to MoMo for payment.',
           paymentUrl,
@@ -402,56 +416,102 @@ export class BookingService {
   }
 
   private async createMomoPayment(
-    amount: number,
+    res: Response,
     orderInfo: string,
-  ): Promise<string> {
-    const partnerCode = 'MOMO';
+    bookingData,
+    note,
+  ) {
     const accessKey = process.env.MOMO_ACCESS_KEY;
     const secretKey = process.env.MOMO_SECRET_KEY;
-    const redirectUrl = 'http://localhost:3000/reserve';
-    const ipnUrl =
-      'https://240b-2402-800-6315-309c-9cdf-3795-d2c5-46c.ngrok-free.app/callback';
-    const requestId = `${partnerCode}-${new Date().getTime()}`;
-    const orderId = requestId;
-    const requestType = 'captureWallet';
-    const extraData = '';
+    var orderInfo = orderInfo;
+    var partnerCode = 'MOMO';
+    var redirectUrl = 'http://localhost:3000';
+    var ipnUrl =
+      'https://d886-2402-800-6315-309c-dc00-b07e-6724-3a00.ngrok-free.app/callback';
+    var requestType = 'payWithMethod';
+    var amount = bookingData.sumPrice;
+    var orderId = partnerCode + new Date().getTime();
+    var requestId = orderId;
+    var orderGroupId = '';
+    var autoCapture = true;
+    var lang = 'vi';
 
-    const rawSignature = `accessKey=${accessKey}&amount=${amount}&extraData=${extraData}&ipnUrl=${ipnUrl}&orderId=${orderId}&orderInfo=${orderInfo}&partnerCode=${partnerCode}&redirectUrl=${redirectUrl}&requestId=${requestId}&requestType=${requestType}`;
-    const signature = crypto
+    const extraData = Buffer.from(
+      JSON.stringify({ bookingData, note }),
+    ).toString('base64');
+
+    //before sign HMAC SHA256 with format
+    //accessKey=$accessKey&amount=$amount&extraData=$extraData&ipnUrl=$ipnUrl&orderId=$orderId&orderInfo=$orderInfo&partnerCode=$partnerCode&redirectUrl=$redirectUrl&requestId=$requestId&requestType=$requestType
+    var rawSignature =
+      'accessKey=' +
+      accessKey +
+      '&amount=' +
+      amount +
+      '&extraData=' +
+      extraData +
+      '&ipnUrl=' +
+      ipnUrl +
+      '&orderId=' +
+      orderId +
+      '&orderInfo=' +
+      orderInfo +
+      '&partnerCode=' +
+      partnerCode +
+      '&redirectUrl=' +
+      redirectUrl +
+      '&requestId=' +
+      requestId +
+      '&requestType=' +
+      requestType;
+    //puts raw signature
+    console.log('--------------------RAW SIGNATURE----------------');
+    console.log(rawSignature);
+    //signature
+    const crypto = require('crypto');
+    var signature = crypto
       .createHmac('sha256', secretKey)
       .update(rawSignature)
       .digest('hex');
+    console.log('--------------------SIGNATURE----------------');
+    console.log(signature);
 
-    const requestBody = {
-      partnerCode,
-      partnerName: 'YourPartnerName',
-      storeId: 'StoreID',
-      requestId,
-      amount,
-      orderId,
-      orderInfo,
-      redirectUrl,
-      ipnUrl,
-      requestType,
-      extraData,
-      lang: 'vi',
-      autoCapture: true,
-      signature,
+    //json object send to MoMo endpoint
+    const requestBody = JSON.stringify({
+      partnerCode: partnerCode,
+      partnerName: 'Test',
+      storeId: 'MomoTestStore',
+      requestId: requestId,
+      amount: amount,
+      orderId: orderId,
+      orderInfo: orderInfo,
+      redirectUrl: redirectUrl,
+      ipnUrl: ipnUrl,
+      lang: lang,
+      requestType: requestType,
+      autoCapture: autoCapture,
+      extraData: extraData,
+      orderGroupId: orderGroupId,
+      signature: signature,
+    });
+
+    // Option for axios
+    const options = {
+      method: 'POST',
+      url: 'https://test-payment.momo.vn/v2/gateway/api/create',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(requestBody),
+      },
+      data: requestBody,
     };
 
     try {
-      const response = await axios.post(
-        'https://test-payment.momo.vn/v2/gateway/api/create',
-        requestBody,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      );
+      // Make HTTP request using axios
+      const response = await axios(options);
+      const result = response.data;
 
-      if (response.data && response.data.payUrl) {
-        return response.data.payUrl;
+      if (result && result.payUrl) {
+        return result.payUrl;
       } else {
         throw new Error('Failed to get payment URL from MoMo.');
       }
@@ -467,28 +527,22 @@ export class BookingService {
     }
   }
 
-  async updatePaymentStatus(req: Request, res: Response, detailPay) {
-    const bookingDT = req.cookies['bookingData'];
-    const noteDT = req.cookies['note'];
-    if (!bookingDT || !noteDT) {
-      throw new HttpException(
-        'Booking data not found in cookies',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    const bookingData = JSON.parse(bookingDT);
-    const note = JSON.parse(noteDT);
+  async updatePaymentStatus(req: Request, res: Response, body) {
+    console.log('BODY: ', body);
+
+    const extraData = Buffer.from(body.extraData, 'base64').toString('utf-8');
+    const { bookingData, note } = JSON.parse(extraData);
     // console.log('NOTE: ', note);
-    const paymentStatus = detailPay.status;
+    const resultCode = body.resultCode;
     let status = '';
-    if (paymentStatus === 'success') {
+    if (resultCode === 0) {
       status = 'paid';
       this.saveDataIntoDatabase(bookingData, status, note, 'momo');
       return res.status(HttpStatus.OK).json({
         message: 'Payment success, save data into database',
         data: { status, bookingData },
       });
-    } else if (paymentStatus === 'fail') {
+    } else {
       return res.status(HttpStatus.BAD_REQUEST).json({
         message: 'Payment failed, please try again.',
       });

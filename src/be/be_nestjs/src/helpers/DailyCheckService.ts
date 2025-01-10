@@ -10,15 +10,16 @@ export class DailyCheckService {
         
     }
 
-    @Cron('0 0 * * *')
-    async updateWeekendPriceForHotel() {
-        const currenDate = new Date();
-        if (currenDate.getDay() === 0 || currenDate.getDay() === 6) {
-            await this.roomtypeService.applyWeekendPrice();
-        } else {
-            await this.roomtypeService.resetNormalPrice();
-        }
-        
+    @Cron('0 0 * * 6')
+    async setWeekendPrice() {
+        console.log("weekend start");
+        await this.roomtypeService.applyWeekendPrice();
+    }
+
+    @Cron('0 0 * * 1')
+    async resetWeekendPrice() {
+        console.log("weekend end");
+        await this.roomtypeService.resetNormalPrice();
     }
 
 }

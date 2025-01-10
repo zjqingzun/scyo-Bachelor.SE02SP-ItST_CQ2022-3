@@ -124,7 +124,7 @@ const publicRoutes = [
         requiredRole: ["hotelier"],
     },
     {
-        path: "/hotel-owner/order-detail",
+        path: "/hotel-owner/order-detail/:userId/:reservationId",
         component: OrderDetail,
         layout: HotelOwnerLayout,
         requiredRole: ["hotelier"],

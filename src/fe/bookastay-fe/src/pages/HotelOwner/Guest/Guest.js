@@ -1,11 +1,31 @@
 import "./Guest.scss";
 import { useEffect, useRef, useState } from "react";
 
-import { Space, Table, Tag, Button, Popconfirm, Input } from "antd";
+import { Space, Table, Tag, Button, Popconfirm, Input, Select } from "antd";
 import { QuestionCircleOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 
 import { useNavigate } from "react-router-dom";
+import StyledStatusSelect from "./StyledStatusSelect";
+
+const STATUS_OPTIONS = [
+    { label: "Pending", value: "Pending" },
+    { label: "Confirmed", value: "Confirmed" },
+    { label: "Cancelled", value: "Cancelled" },
+];
+
+const getStatusColor = (status) => {
+    switch (status) {
+        case "Pending":
+            return "volcano";
+        case "Confirmed":
+            return "green";
+        case "Cancelled":
+            return "red";
+        default:
+            return "geekblue";
+    }
+};
 
 const data = [
     {
@@ -150,6 +170,12 @@ const Guest = () => {
             ),
     });
 
+    const handleStatusChange = (recordKey, newStatus) => {
+        // setData((prevData) =>
+        //     prevData.map((item) => (item.key === recordKey ? { ...item, status: newStatus } : item))
+        // );
+    };
+
     const columns = [
         {
             title: "Reservation ID",
@@ -183,39 +209,14 @@ const Guest = () => {
             title: "Status",
             key: "status",
             dataIndex: "status",
-            filters: [
-                {
-                    text: "Pending",
-                    value: "Pending",
-                },
-                {
-                    text: "Confirmed",
-                    value: "Confirmed",
-                },
-                {
-                    text: "Cancelled",
-                    value: "Cancelled",
-                },
-            ],
-            render: (status) => (
+            filters: STATUS_OPTIONS,
+            render: (status, record) => (
                 <>
-                    {status.map((tag) => {
-                        let color = tag.length > 5 ? "geekblue" : "green";
-                        if (tag === "Pending") {
-                            color = "volcano";
-                        }
-                        if (tag === "Confirmed") {
-                            color = "green";
-                        }
-                        if (tag === "Cancelled") {
-                            color = "red";
-                        }
-                        return (
-                            <Tag color={color} key={tag}>
-                                {tag.toUpperCase()}
-                            </Tag>
-                        );
-                    })}
+                    <StyledStatusSelect
+                        status={status}
+                        record={record}
+                        handleStatusChange={handleStatusChange}
+                    />
                 </>
             ),
         },

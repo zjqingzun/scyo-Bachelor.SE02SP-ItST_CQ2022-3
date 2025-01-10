@@ -49,7 +49,7 @@ export class AuthController {
   }
 
   @Get('profile')
-  @Roles('user', 'hotelier', 'admin')
+  @Roles("user", "hotelier", "admin")
   getProfile(@Request() req) {
     return req.user;
   }

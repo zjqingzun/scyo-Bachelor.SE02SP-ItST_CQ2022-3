@@ -82,8 +82,7 @@ export class HotelsService {
         .leftJoinAndSelect('hotels_locations', 'hl', 'hl."hotelId" = hotel.id')
         .leftJoinAndSelect('user', 'u', 'u.id = hotel."ownerId"')
         .leftJoinAndSelect('location', 'l', 'l.id = hl."locationId"')
-        .select(['hotel.id', 'hotel.name', 'u.name', 'l.city'])
-        .where('hotel.status = :status', { status: 'approved' });
+        .select(['hotel.id', 'hotel.name', 'u.name', 'l.city']);
 
       queryBuilder.orderBy(`hotel.${sortBy}`, order === 'ASC' ? 'ASC' : 'DESC');
 

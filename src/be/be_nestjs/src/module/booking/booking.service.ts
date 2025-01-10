@@ -769,7 +769,6 @@ export class BookingService {
         .createQueryBuilder('booking')
         .leftJoin('booking.bookingRooms', 'booking_room')
         .leftJoin('booking.bookingDetails', 'booking_detail')
-        .leftJoin('booking_room.room', 'room')
         .select([
           'booking.id AS id',
           'booking_room.room_name AS name',
@@ -777,18 +776,34 @@ export class BookingService {
           'booking_detail.price AS price',
         ])
         .where('booking.id = :bookingId', { bookingId })
+        .andWhere('booking_detail.type = booking_room.type');
+
+      const totalBookingRoomsQuery = this.bookingRepository
+        .createQueryBuilder('booking')
+        .leftJoin('booking.bookingRooms', 'booking_room')
+        .leftJoin('booking.bookingDetails', 'booking_detail')
+        .select('COUNT(*)', 'total')
+        .where('booking.id = :bookingId', { bookingId })
+        .andWhere('booking_detail.type = booking_room.type');
 
       const offset = (page - 1) * per_page;
       bookingRoomQuery.limit(per_page).offset(offset);
 
-      const [bookingRooms, totalBookingRooms] = await Promise.all([bookingRoomQuery.getRawMany(), bookingRoomQuery.getCount(),]);
+      // Thực thi cả hai truy vấn
+      const [bookingRooms, totalBookingRoomsResult] = await Promise.all([
+        bookingRoomQuery.getRawMany(),
+        totalBookingRoomsQuery.getRawOne(),
+      ]);
+
+      // Đảm bảo lấy tổng số bản ghi chính xác
+      const totalBookingRooms = totalBookingRoomsResult?.total || 0;
       const totalPages = Math.ceil(totalBookingRooms / per_page);
 
       return {
         status_code: HttpStatus.OK,
         message: 'Booking data fetched successfully',
         data: {
-          total: totalBookingRooms,
+          total: Number(totalBookingRooms),
           page: Number(page),
           total_page: totalPages,
           per_page: Number(per_page),
@@ -826,7 +841,7 @@ export class BookingService {
           .set({ status: 'booked' })
           .where('id IN (:...roomIds)', { roomIds })
           .execute();
-      } else if ((status === 'completed' || status === 'canceled') && roomIds.length > 0) {
+      } else if ((status === 'completed' || status === 'cancelled') && roomIds.length > 0) {
         await this.roomRepository
           .createQueryBuilder()
           .update()

@@ -238,7 +238,7 @@ const History = () => {
                         id={pendingBooking.hotelId}
                         hotelName={pendingBooking.hotelName}
                         money={pendingBooking.totalCost}
-                        onClick={() => handleCardClick(card)} // Set trực tiếp
+                        onClick={() => handleCardClick(pendingBooking)} // Set trực tiếp
                     />
                 </div>
             )}

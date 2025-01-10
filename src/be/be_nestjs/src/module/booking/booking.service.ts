@@ -778,7 +778,6 @@ export class BookingService {
         .where('booking.id = :bookingId', { bookingId })
 
       const offset = (page - 1) * per_page;
-      // Áp dụng skip và take trước khi lấy kết quả
       bookingRoomQuery.limit(per_page).offset(offset);
 
       const [bookingRooms, totalBookingRooms] = await Promise.all([bookingRoomQuery.getRawMany(), bookingRoomQuery.getCount(),]);
@@ -851,6 +850,78 @@ export class BookingService {
         {
           status_code: HttpStatus.INTERNAL_SERVER_ERROR,
           message: 'Internal server error while saving all data.',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async getAllHistoryBooking(req: Request, getAllHistoryBooking) {
+    try {
+      const { userId, page, per_page } = getAllHistoryBooking;
+      const bookingQuery = await this.bookingRepository
+        .createQueryBuilder('booking')
+        .leftJoin('booking.hotel', 'hotel')
+        .leftJoin('booking.payment', 'payment')
+        .select([
+          'booking.id AS id',
+          'booking.createdAt AS created',  // Thêm dấu ngoặc kép
+          'hotel.name AS name',
+          'payment.totalCost AS totalcost',  // Thêm dấu ngoặc kép
+          'booking.status AS status'
+        ])
+        .where('booking.userId = :userId', { userId: userId });
+
+      const offset = (page - 1) * per_page;
+      bookingQuery.limit(per_page).offset(offset);
+
+      const [bookings, totalBookings] = await Promise.all([bookingQuery.getRawMany(), bookingQuery.getCount(),]);
+      const totalPages = Math.ceil(totalBookings / per_page);
+
+      // Kiểm tra cookie 'bookingData'
+      const bookingDT = req.cookies['bookingData'];
+      let tempBooking = [];
+
+      if (bookingDT) {
+        const bookingData = JSON.parse(bookingDT);
+
+        const hotelId = bookingData.hotelId;
+        const totalCost = bookingData.sumPrice;
+        const createAt = bookingData.createAt;
+        const hotelQuery = await this.hotelRepository
+          .createQueryBuilder('hotel')
+          .select(['hotel.name AS name'])
+          .where('hotel.id = :hotelId', { hotelId });
+        const hotel = await hotelQuery.getRawOne();
+        const hotelName = hotel.name;
+        const status = 'Pending';
+
+        tempBooking = {
+          hotelId: bookingData.hotelId,
+          totalCost: bookingData.sumPrice,
+          createAt: bookingData.createAt,
+          hotelName: hotel.name,
+          status: 'Pending',
+        };
+      }
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Successfully fetched booking history.',
+        data: {
+          tempBooking,
+          total: totalBookings,
+          page: page,
+          total_page: totalPages,
+          bookings,
+        },
+      };
+    } catch (error) {
+      console.error('Error get history:', error);
+      throw new HttpException(
+        {
+          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error while get data.',
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );

@@ -29,7 +29,12 @@ const OrderDetail = () => {
         setLoading(true);
         try {
             const response = await fetch(
-                `http://localhost:3001/api/booking/guest/detail?userId=${userId}&bookingId=${reservationID}&page=${tableParams?.pagination?.current}&per_page=${tableParams?.pagination?.pageSize}`
+                `http://localhost:3001/api/booking/guest/detail?userId=${userId}&bookingId=${reservationID}&page=${tableParams?.pagination?.current}&per_page=${tableParams?.pagination?.pageSize}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${userInfo?.access_token}`,
+                    },
+                }
             );
             const data = await response.json();
             if (data.status_code === 200) {

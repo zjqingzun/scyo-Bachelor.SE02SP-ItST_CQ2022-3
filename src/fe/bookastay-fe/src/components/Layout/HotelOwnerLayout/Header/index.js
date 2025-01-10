@@ -85,20 +85,14 @@ const Header = ({ toggle = () => {} }) => {
         },
         {
             key: "3",
-            label: "Billing",
-            extra: "⌘B",
-        },
-        {
-            key: "4",
-            label: "Settings",
-            icon: <SettingOutlined />,
-            extra: "⌘S",
+            label: "Delete Hotel",
+            extra: "⌘D",
         },
         {
             type: "divider",
         },
         {
-            key: "5",
+            key: "4",
             icon: <LoginOutlined />,
             label: (
                 <span

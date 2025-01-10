@@ -255,7 +255,12 @@ const Guest = () => {
         setLoading(true);
         try {
             const response = await fetch(
-                `http://localhost:3001/api/booking/guest?userId=${userId}&page=${tableParams?.pagination?.current}&per_page=${tableParams?.pagination?.pageSize}`
+                `http://localhost:3001/api/booking/guest?userId=${userId}&page=${tableParams?.pagination?.current}&per_page=${tableParams?.pagination?.pageSize}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${userInfo?.access_token}`,
+                    },
+                }
             );
             const result = await response.json();
             if (result.status_code === 200) {

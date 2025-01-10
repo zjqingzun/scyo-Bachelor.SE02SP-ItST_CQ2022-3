@@ -9,7 +9,7 @@ import { Button as BButton } from "react-bootstrap";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useSelector } from "react-redux";
-import { getRoomType, updatePrice } from "~/services/apiService";
+import { getRoomType, updatePrice, updateUseFlexiblePrice } from "~/services/apiService";
 import { toast } from "react-toastify";
 
 const INITIAL_FORM_VALUES = {
@@ -112,15 +112,10 @@ const RoomType = () => {
 
     const handleFlexiblePriceChange = async (checked, record) => {
         try {
-            const res = await updatePrice(
+            const res = await updateUseFlexiblePrice(
                 userInfo.hotel.id,
                 record.roomType === "Double Room" ? 2 : 4,
-                {
-                    price: record.roomPrice,
-                    weekendPrice: record.roomWeekendPrice,
-                    flexiblePrice: record.roomFlexiblePrice,
-                    useFlexiblePrice: checked,
-                }
+                checked
             );
 
             if (res && +res.status === 200) {
@@ -222,7 +217,6 @@ const RoomType = () => {
                     price: formik.values.roomPrice,
                     weekendPrice: formik.values.roomWeekendPrice,
                     flexiblePrice: formik.values.roomFlexiblePrice,
-                    useFlexiblePrice: formik.values.isFlexiblePriceEnabled,
                 });
 
                 if (res && +res.status === 200) {

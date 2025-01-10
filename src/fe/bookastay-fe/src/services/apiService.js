@@ -225,10 +225,13 @@ const updatePrice = async (hotelId, type, data) => {
         price: data.price || 0,
         weekendPrice: data.weekendPrice || 0,
         flexiblePrice: data.flexiblePrice || 0,
-        useFlexiblePrice: data.useFlexiblePrice || false,
     };
 
     return await axios.post(`/room_types/price/${hotelId}/${type}`, price);
+};
+
+const updateUseFlexiblePrice = async (hotelId, type, isUse) => {
+    return await axios.get(`/room_types/price/isFlexiblePrice/${hotelId}/${type}/${isUse}`);
 };
 
 // Dashboard
@@ -286,6 +289,7 @@ export {
     createRoom,
     getRoomType,
     updatePrice,
+    updateUseFlexiblePrice,
     getAvailableRoom,
     getOccupiedRoom,
     getTotalReservation,

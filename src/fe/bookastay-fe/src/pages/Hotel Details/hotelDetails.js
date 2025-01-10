@@ -4,11 +4,10 @@ import React, { useRef, useMemo, useCallback } from "react";
 import "./hotelDetails.css";
 import icons from "~/assets/icon";
 import SearchBarNoLocation from "~/components/SearchBarNoLocation";
-import { getHotelDetail, startBooking } from "~/services/apiService";
+import { addFavorite, getHotelDetail, removeFavorite, startBooking } from "~/services/apiService";
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { addFavorite, removeFavorite } from "~/services/apiService";
 
 const HotelDetails = () => {
     const { id, isFav } = useParams();
@@ -111,6 +110,21 @@ const HotelDetails = () => {
         return day === 6 || day === 0; // Thứ 7 hoặc Chủ nhật
     };
 
+    const handleToggleHeart = async () => {
+        try {
+            if (isHearted) {
+                await removeFavorite(userInfo.id, id);
+            } else {
+                await addFavorite(userInfo.id, id);
+            }
+
+            setIsHearted((prev) => !prev);
+        } catch (error) {
+            console.error(">>> Error: ", error);
+            toast.error("Error while toggling favorite");
+        }
+    };
+
     const toggleImageView = () => {
         setShowAllImages((prev) => !prev);
     };
@@ -138,7 +152,10 @@ const HotelDetails = () => {
             checkOutDate = "2025-01-02",
             roomType2 = 0,
             roomType4 = 0,
+            isFav,
         } = location.state || {};
+
+        setIsHearted(isFav);
 
         setIsWeekend(checkWeekend(checkInDate) || checkWeekend(checkOutDate));
 
@@ -230,10 +247,13 @@ const HotelDetails = () => {
             sumPrice: room_types.reduce((total, room) => {
                 const count = roomCounts[room.id] || 0;
                 const price = isWeekend ? room.weekend_price : room.price;
+
                 return total + count * price;
             }, 0),
             userId: +userInfo.id,
         };
+
+        console.log(">>> Start booking data: ", data);
 
         try {
             const res = await startBooking(data);
@@ -256,6 +276,8 @@ const HotelDetails = () => {
             toast.error("Error while starting booking");
         }
     };
+
+    console.log(">>> location.state: ", location.state);
 
     return (
         <div className="mx-auto p-5">

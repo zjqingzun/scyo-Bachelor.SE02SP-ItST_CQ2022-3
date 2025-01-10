@@ -35,10 +35,16 @@ const FinalStep = ({
         });
 
         if (formik.isValid && formik.dirty) {
+            const data = {
+                paymentAccount: paymentAccount,
+                doubleRoomPrice: Number(formik.values.doubleRoomPrice),
+                quadRoomPrice: Number(formik.values.quadRoomPrice),
+            };
+
+            console.log(">>> data", data);
+
             updateData({
-                ...(isOnlinePayment && { paymentAccount }),
-                doubleRoomPrice: formik.values.doubleRoomPrice,
-                quadRoomPrice: formik.values.quadRoomPrice,
+                ...data,
             });
             handleComplete();
         }

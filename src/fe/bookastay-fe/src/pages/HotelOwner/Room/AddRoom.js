@@ -8,12 +8,13 @@ import { v4 as uuidv4 } from "uuid";
 import "./Room.scss";
 import { toast } from "react-toastify";
 
-const roomType = [
-    { label: "Double", value: "double" },
-    { label: "Quad", value: "quad" },
+const ROOM_TYPE = [
+    { label: "Double", value: 2 },
+    { label: "Quad", value: 4 },
 ];
 
 const AddRoom = () => {
+    const [roomType, setRoomType] = useState(2);
     const [numberOfRooms, setNumberOfRooms] = useState(0);
     const [startingRoomNumber, setStartingRoomNumber] = useState(1);
     const [rooms, setRooms] = useState([]);
@@ -33,7 +34,8 @@ const AddRoom = () => {
         const roomNumbers = [];
         const startingNum = parseInt(start, 10);
         for (let i = 0; i < count; i++) {
-            roomNumbers.push({ roomNumber: `${prefix}-${startingNum + i}`, id: uuidv4() });
+            let number = `${startingNum + i}`.padStart(3, "0");
+            roomNumbers.push({ roomNumber: `${prefix}${number}`, id: uuidv4() });
         }
         setRooms(roomNumbers);
     }, []);
@@ -172,7 +174,12 @@ const AddRoom = () => {
     };
 
     const handleSave = () => {
-        console.log(rooms);
+        const data = {
+            roomType,
+            rooms: rooms.map((room) => room.roomNumber),
+        };
+
+        console.log(data);
     };
 
     return (
@@ -190,8 +197,10 @@ const AddRoom = () => {
                                 className="form-select form-select-lg fs-4"
                                 id="roomType"
                                 name="roomType"
+                                value={roomType}
+                                onChange={(e) => setRoomType(+e.target.value)}
                             >
-                                {roomType.map((item, index) => (
+                                {ROOM_TYPE.map((item, index) => (
                                     <option key={index} value={item.value}>
                                         {item.label}
                                     </option>

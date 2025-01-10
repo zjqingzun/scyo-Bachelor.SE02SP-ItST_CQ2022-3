@@ -14,19 +14,6 @@ const STATUS_OPTIONS = [
     { label: "Cancelled", value: "Cancelled" },
 ];
 
-const getStatusColor = (status) => {
-    switch (status) {
-        case "Pending":
-            return "volcano";
-        case "Confirmed":
-            return "green";
-        case "Cancelled":
-            return "red";
-        default:
-            return "geekblue";
-    }
-};
-
 const data = [
     {
         key: "1",

@@ -25,6 +25,7 @@ import { Public } from '@/helpers/decorator/public';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { MinioService } from '@/minio/minio.service';
+import { Roles } from '@/helpers/decorator/roles';
 
 @Controller('user')
 export class UserController {
@@ -36,7 +37,7 @@ export class UserController {
   }
 
   @Get('getAll/:role')
-  @Public()
+  @Roles('admin')
   async getAllUsers(@Param('role') role: string, @Req() req) {
     return await this.userService.findAll(role, req);
   }

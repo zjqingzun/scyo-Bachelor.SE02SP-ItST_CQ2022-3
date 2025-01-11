@@ -358,12 +358,12 @@ export class HotelsService {
 
       // Lọc
       // Lọc theo số sao của khách sạn
-      if (minStar) {
-        queryBuilder.andWhere('hotel.star = :minStar', { minStar });
-      }
-      // if (minStar && minStar.length > 0) {
-      //   queryBuilder.andWhere('hotel.star IN (:...minStar)', { minStar });
+      // if (minStar) {
+      //   queryBuilder.andWhere('hotel.star >= :minStar', { minStar });
       // }
+      if (minStar && minStar.length > 0) {
+        queryBuilder.andWhere('hotel.star IN (:...minStar)', { minStar });
+      }
       // Lọc theo đánh giá trung bình tối thiểu
       if (minRating) {
         queryBuilder.having('AVG(review.rating) >= :minRating', { minRating });

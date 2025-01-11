@@ -56,24 +56,24 @@ export class SearchHotelDto {
     @Min(0)
     minRating?: number;
 
-    @Transform(({ value }) => (value ? parseInt(value, 10) : undefined))
-    @IsInt()
-    @IsOptional()
-    @Min(0)
-    minStar?: number;
-
-    // @Transform(({ value }) => {a
-    //     if (!value) return [];
-    //     if (typeof value === 'string') {
-    //         return value.split(',').map((v: string) => parseInt(v.trim(), 10)).filter((v) => !isNaN(v));
-    //     }
-    //     return Array.isArray(value) ? value.map((v: any) => parseInt(v, 10)).filter((v) => !isNaN(v)) : [];
-    // })
-    // @IsArray()
-    // @IsInt({ each: true }) // Kiểm tra từng phần tử trong mảng có phải số nguyên hay không
-    // @Min(0, { each: true }) // Đảm bảo từng phần tử >= 0
+    // @Transform(({ value }) => (value ? parseInt(value, 10) : undefined))
+    // @IsInt()
     // @IsOptional()
-    // minStar?: number[];
+    // @Min(0)
+    // minStar?: number;
+
+    @Transform(({ value }) => {
+        if (!value) return [];
+        if (typeof value === 'string') {
+            return value.split(',').map((v: string) => parseInt(v.trim(), 10)).filter((v) => !isNaN(v));
+        }
+        return Array.isArray(value) ? value.map((v: any) => parseInt(v, 10)).filter((v) => !isNaN(v)) : [];
+    })
+    @IsArray()
+    @IsInt({ each: true }) // Kiểm tra từng phần tử trong mảng có phải số nguyên hay không
+    @Min(0, { each: true }) // Đảm bảo từng phần tử >= 0
+    @IsOptional()
+    minStar?: number[];
 
     // Trường page, mặc định là 1 nếu không có giá trị
     @Transform(({ value }) => (value ? parseInt(value, 10) : 1))

@@ -173,7 +173,7 @@ const SearchBar = (props) => {
                     />
                 </div>
                 <div
-                    className="search-bar__input-group search-bar__input-group-people"
+                    className="search-bar__input-group search-bar__input-group-people" style={{ cursor: "pointer"}}
                     onClick={() => handleTurnPopup()}
                 >
                     <div className="search-bar__input">

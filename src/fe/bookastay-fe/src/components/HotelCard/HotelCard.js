@@ -158,9 +158,9 @@ const HotelCard = ({
                 </button>
             </div>
             <div className="hotel-card__info">
-                <h3 title={name} className="hotel-card__name">
+                <a title={name} className="hotel-card__name" onClick={() => handleBookNow()} style={{ fontSize: "20px", cursor: "pointer" }}>
                     {name}
-                </h3>
+                </a>
                 <p title={address} className="hotel-card__address">
                     {address}
                 </p>

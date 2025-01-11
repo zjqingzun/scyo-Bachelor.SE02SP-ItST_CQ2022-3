@@ -283,13 +283,6 @@ const HotelDetails = () => {
 
     console.log(">>> location.state: ", location.state);
 
-    const handleCloseMapModel = () => setShowMapModal(false);
-    const handleShowMapModel = async (address) => {
-        mapPositionRef.current = await geocodeAddress(address);
-
-        setShowMapModal(true);
-    };
-
     return (
         <div className="mx-auto p-5">
             <div className="row px-5 py-2">
@@ -372,7 +365,7 @@ const HotelDetails = () => {
                     </div>
                 </div>
                 <div className="col-md-4 ps-5">
-                    <h2>{t("hotelDetail.ratingOverall")}:</h2>
+                    {/* <h2>{t("hotelDetail.ratingOverall")}:</h2> */}
                     <div className="star-rating py-2 mb-5">
                         <p className="fs-2 fw-bold mb-2">Rating overall:</p>
                         <div className="star-rating py-2 mb-4">

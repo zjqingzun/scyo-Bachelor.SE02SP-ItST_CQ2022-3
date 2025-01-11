@@ -183,9 +183,9 @@ const HotelAfterSearchCard = ({
                 </button>
             </div>
             <div className="hotel-card__info flex-grow-1 mt-0 d-flex flex-column">
-                <h3 title={name} className="hotel-card__name fs-1">
+                <a title={name} className="hotel-card__name fs-1" onClick={() => handleBookNow()} style={{ fontSize: "20px", cursor: "pointer" }}>
                     {name}
-                </h3>
+                </a>
                 <div className="hotel-card__star d-flex gap-2">
                     {[...Array(star)].map((_, index) => (
                         <img

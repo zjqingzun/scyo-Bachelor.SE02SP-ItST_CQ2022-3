@@ -239,7 +239,7 @@ const AccountSetting = () => {
                             <img
                                 src={
                                     personalDetails.avatar ||
-                                    "https://scontent.fsgn8-1.fna.fbcdn.net/v/t39.30808-6/472219740_1936837300138014_2401011983813679479_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeG6Fmr-BAQKdhh2ewaDivFosRYc2nCLHvuxFhzacIse-2uRmjAejNA4nBgfdDmQzbIaTKDnhaICQ5oDE7fVkWm7&_nc_ohc=ErLnqiDVoKwQ7kNvgHBkrVN&_nc_oc=AdhkO5jqzhPpwYA7roi8a2CGbn7kVSeOIRWiPrMHuRs_QTvl56H3uNzS1Mm-oFM743ZOV0aJWNER-n3kweF_QClX&_nc_zt=23&_nc_ht=scontent.fsgn8-1.fna&_nc_gid=A5noT5KVoCb-elQhCLTXe85&oh=00_AYDVpELzxAX2_3rzhoAKLwi82sMDQ5wNtMuc42R9krOuCA&oe=67849507"
+                                    "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
                                 }
                                 alt="Avatar"
                                 className="img-fluid shadow"

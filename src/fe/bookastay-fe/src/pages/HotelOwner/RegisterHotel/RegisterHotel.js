@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useState } from "react";
 import { Button, Result } from "antd";
 import styled from "styled-components";
-import axios from "~/utils/axiosCustomize";
+import axios from "axios";
 
 import Stepper from "~/components/Stepper/Stepper";
 import {
@@ -12,7 +12,7 @@ import {
 } from "~/components/HotelOwner/HotelRegister";
 import "./RegisterHotel.scss";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { doGetAccount } from "~/redux/action/accountAction";
 
 const StyledStepLabel = styled.div`
@@ -37,6 +37,8 @@ const formReducer = (state, action) => {
 const RegisterHotel = () => {
     const reduxDispatch = useDispatch();
     const navigate = useNavigate();
+
+    const account = useSelector((state) => state.account);
 
     const stepsConfig = [
         {
@@ -67,8 +69,9 @@ const RegisterHotel = () => {
         try {
             // // Gửi propertyDetails
             const propertyResponse = await axios.post(
-                `/hotels/add/basicInfo/${userId}`,
-                formData.propertyDetails
+                `http://localhost:3001/api/hotels/add/basicInfo/${userId}`,
+                formData.propertyDetails,
+                {}
             );
             // console.log("Property details response:", propertyResponse.data);
 
@@ -84,7 +87,7 @@ const RegisterHotel = () => {
             });
             console.log("FormData:", formDataFiles);
             const imagesResponse = await axios.post(
-                `/hotels/images/upload/${hotelId}`,
+                `http://localhost:3001/api/hotels/images/upload/${hotelId}`,
                 formDataFiles,
                 {
                     headers: {
@@ -96,17 +99,20 @@ const RegisterHotel = () => {
 
             // Gửi payment
             const paymentResponse = await axios.post(
-                `/hotels/payment/add/${hotelId}`,
+                `http://localhost:3001/api/hotels/payment/add/${hotelId}`,
                 formData.payment.paymentAccount
             );
             // console.log("Payment response:", paymentResponse.data);
 
             // // Gửi roomDetails
             const { doubleRoomPrice, quadRoomPrice } = formData.payment;
-            const roomDetailsResponse = await axios.post(`/room_types/add/${hotelId}`, {
-                doubleRoomPrice,
-                quadRoomPrice,
-            });
+            const roomDetailsResponse = await axios.post(
+                `http://localhost:3001/api/room_types/add/${hotelId}`,
+                {
+                    doubleRoomPrice,
+                    quadRoomPrice,
+                }
+            );
 
             reduxDispatch(doGetAccount());
 

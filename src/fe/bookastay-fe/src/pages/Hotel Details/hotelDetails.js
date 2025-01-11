@@ -8,6 +8,11 @@ import { addFavorite, getHotelDetail, removeFavorite, startBooking } from "~/ser
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import geocodeAddress from "~/utils/geocodeAddress";
+import { Modal } from "react-bootstrap";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import L from "leaflet";
+import staticImages from "~/assets/image";
 
 const HotelDetails = () => {
     const { id, isFav } = useParams();
@@ -18,6 +23,8 @@ const HotelDetails = () => {
     const [isFavorite, setIsFavorite] = useState(isFav);
     console.log("check in: ", checkInDate);
     console.log("isFavorite: ", isFav);
+    const mapPositionRef = useRef([10.5279716, 107.3921728]);
+    const [showMapModal, setShowMapModal] = useState(true);
 
     const currency = useSelector((state) => state.currency.currency);
     const exchangeRate = useSelector((state) => state.currency.exchangeRate);
@@ -271,6 +278,13 @@ const HotelDetails = () => {
 
     console.log(">>> location.state: ", location.state);
 
+    const handleCloseMapModel = () => setShowMapModal(false);
+    const handleShowMapModel = async (address) => {
+        mapPositionRef.current = await geocodeAddress(address);
+
+        setShowMapModal(true);
+    };
+
     return (
         <div className="mx-auto p-5">
             <div className="row px-5 py-2">
@@ -351,18 +365,39 @@ const HotelDetails = () => {
                     </div>
                 </div>
                 <div className="col-md-4 ps-5">
-                    <h2>Rating overall:</h2>
-                    <div className="star-rating py-2 mb-5">
+                    <p className="fs-2 fw-bold mb-2">Rating overall:</p>
+                    <div className="star-rating py-2 mb-4">
                         {Array.from({ length: star }, (_, index) => (
                             <img
                                 key={index}
                                 src={icons.starYellowIcon}
                                 alt="Star"
                                 className="star-icon mt-2"
-                                style={{ width: "40px" }}
+                                style={{ width: "50px" }}
                             />
                         ))}
                     </div>
+                    <p className="fs-2 fw-bold mb-3">Location: </p>
+                    <MapContainer center={mapPositionRef.current} zoom={13}
+                        style={{ height: "460px", width: "100%", borderRadius: "12px", border: "10px solid white" }}>
+                        <TileLayer
+                            maxZoom={30}
+                            attribution="Google Maps"
+                            url="https://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}"
+                        />
+                        <Marker
+                            position={mapPositionRef.current}
+                            icon={L.divIcon({
+                                className: "custom-marker",
+                                html: `<img src="${staticImages.mapMarkerIcon}" alt="marker" />`,
+                                iconSize: [50, 30],
+                            })}
+                        >
+                            <Popup>
+                                <h2>{name}</h2>
+                            </Popup>
+                        </Marker>
+                    </MapContainer>
                 </div>
             </div>
             <div className="px-5 py-4">

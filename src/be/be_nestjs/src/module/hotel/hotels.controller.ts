@@ -41,7 +41,7 @@ export class HotelsController {
   }
 
   @Post('add/basicInfo/:userId')
-  @Roles('hotelier')
+  @Public()
   async addBasicInfo(
     @Param('userId') userId: string,
     @Body() createHotelDto: CreateHotelDto,
@@ -50,7 +50,7 @@ export class HotelsController {
   }
 
   @Post('images/upload/:hotelId')
-  @Roles('hotelier')
+  @Public()
   @UseInterceptors(
     FilesInterceptor('images', 15, {
       storage: memoryStorage(),
@@ -70,7 +70,7 @@ export class HotelsController {
   }
 
   @Post('payment/add/:hotelId')
-  @Roles('hotelier')
+  @Public()
   async addPaymentMethod(@Param('hotelId') hotelId: string, @Body() body) {
     return await this.hotelsService.addPaymentMethod(hotelId, body);
   }

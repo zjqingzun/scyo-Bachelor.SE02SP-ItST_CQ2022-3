@@ -26,7 +26,7 @@ function ManageRequests() {
 
             // Cập nhật state với dữ liệu từ API
             setRequests(response);
-            setTotalPages(response.total_pages);
+            setTotalPages(Math.ceil(response.length / itemsPerPage));
         } catch (error) {
             console.error("Error fetching data:", error);
         } finally {
@@ -37,7 +37,6 @@ function ManageRequests() {
     useEffect(() => {
         fetchRequests();
     }, []);
-
     // Xử lý phân trang
     const handlePageChange = (newPage) => {
         if (newPage > 0 && newPage <= totalPages) {
@@ -83,7 +82,7 @@ function ManageRequests() {
     };
 
     return (
-        <div className="d-flex flex-column px-5 py-3 m-5 requests">
+        <div className="d-flex flex-column px-5 py-3 mx-5 my-3 requests">
             <div className="d-flex justify-content-between mb-3">
                 <div className="title">Requests</div>
                 <div className="text-white p-4 rounded text-center box" style={{ width: "20%" }}>

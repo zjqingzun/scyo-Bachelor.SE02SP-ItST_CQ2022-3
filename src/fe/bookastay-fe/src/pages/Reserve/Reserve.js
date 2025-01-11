@@ -156,7 +156,7 @@ const Reserve = () => {
                 }
             };
 
-            clearCookie();
+            // clearCookie();
         };
     }, [resultCode]);
 
@@ -224,7 +224,7 @@ const Reserve = () => {
                 }
             };
 
-            clearCookie();
+            // clearCookie();
         };
     }, []);
 

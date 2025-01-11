@@ -1,5 +1,5 @@
 import "./Guest.scss";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Space, Table, Tag, Button, Popconfirm, Input, Select, Modal } from "antd";
 import { QuestionCircleOutlined, SearchOutlined } from "@ant-design/icons";
@@ -8,129 +8,132 @@ import Highlighter from "react-highlight-words";
 import { useNavigate } from "react-router-dom";
 import StyledStatusSelect from "./StyledStatusSelect";
 import { useSelector } from "react-redux";
+import { updateStatus } from "~/services/apiService";
+import { formatDate } from "~/utils/datetime";
 
-const STATUS_OPTIONS = [
-    { label: "Pending", value: "Pending" },
-    { label: "Confirmed", value: "Confirmed" },
-    { label: "Cancelled", value: "Cancelled" },
-];
+import axios from "~/utils/axiosCustomize";
+
+// const STATUS_OPTIONS = [
+//     { label: "Completed", value: "COMPLETED" },
+//     { label: "Confirmed", value: "CONFIRMED" },
+//     { label: "Cancelled", value: "CANCELLED" },
+// ];
 
 const Guest = () => {
     const navigate = useNavigate();
     const [bookings, setBookings] = useState([]);
-    const [totalBookings, setTotalBookings] = useState(0);
 
     const userInfo = useSelector((state) => state.account.userInfo);
 
-    const [searchText, setSearchText] = useState("");
-    const [searchedColumn, setSearchedColumn] = useState("");
-    const searchInput = useRef(null);
-    const handleSearch = (selectedKeys, confirm, dataIndex) => {
-        confirm();
-        setSearchText(selectedKeys[0]);
-        setSearchedColumn(dataIndex);
-    };
-    const handleReset = (clearFilters) => {
-        clearFilters();
-        setSearchText("");
-    };
+    // const [searchText, setSearchText] = useState("");
+    // const [searchedColumn, setSearchedColumn] = useState("");
+    // const searchInput = useRef(null);
+    // const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    //     confirm();
+    //     setSearchText(selectedKeys[0]);
+    //     setSearchedColumn(dataIndex);
+    // };
+    // const handleReset = (clearFilters) => {
+    //     clearFilters();
+    //     setSearchText("");
+    // };
 
-    const getColumnSearchProps = (dataIndex) => ({
-        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-            <div
-                style={{
-                    padding: 8,
-                }}
-                onKeyDown={(e) => e.stopPropagation()}
-            >
-                <Input
-                    ref={searchInput}
-                    placeholder={`Search ${dataIndex}`}
-                    value={selectedKeys[0]}
-                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-                    onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                    style={{
-                        marginBottom: 8,
-                        display: "block",
-                    }}
-                />
-                <Space>
-                    <Button
-                        type="primary"
-                        onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                        icon={<SearchOutlined />}
-                        size="small"
-                        style={{
-                            width: 90,
-                        }}
-                    >
-                        Search
-                    </Button>
-                    <Button
-                        onClick={() => clearFilters && handleReset(clearFilters)}
-                        size="small"
-                        style={{
-                            width: 90,
-                        }}
-                    >
-                        Reset
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
-                            confirm({
-                                closeDropdown: false,
-                            });
-                            setSearchText(selectedKeys[0]);
-                            setSearchedColumn(dataIndex);
-                        }}
-                    >
-                        Filter
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
-                            close();
-                        }}
-                    >
-                        close
-                    </Button>
-                </Space>
-            </div>
-        ),
-        filterIcon: (filtered) => (
-            <SearchOutlined
-                style={{
-                    color: filtered ? "#1677ff" : undefined,
-                }}
-            />
-        ),
-        onFilter: (value, record) =>
-            record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-        filterDropdownProps: {
-            onOpenChange(open) {
-                if (open) {
-                    setTimeout(() => searchInput.current?.select(), 100);
-                }
-            },
-        },
-        render: (text) =>
-            searchedColumn === dataIndex ? (
-                <Highlighter
-                    highlightStyle={{
-                        backgroundColor: "#ffc069",
-                        padding: 0,
-                    }}
-                    searchWords={[searchText]}
-                    autoEscape
-                    textToHighlight={text ? text.toString() : ""}
-                />
-            ) : (
-                text
-            ),
-    });
+    // const getColumnSearchProps = (dataIndex) => ({
+    //     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+    //         <div
+    //             style={{
+    //                 padding: 8,
+    //             }}
+    //             onKeyDown={(e) => e.stopPropagation()}
+    //         >
+    //             <Input
+    //                 ref={searchInput}
+    //                 placeholder={`Search ${dataIndex}`}
+    //                 value={selectedKeys[0]}
+    //                 onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+    //                 onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+    //                 style={{
+    //                     marginBottom: 8,
+    //                     display: "block",
+    //                 }}
+    //             />
+    //             <Space>
+    //                 <Button
+    //                     type="primary"
+    //                     onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+    //                     icon={<SearchOutlined />}
+    //                     size="small"
+    //                     style={{
+    //                         width: 90,
+    //                     }}
+    //                 >
+    //                     Search
+    //                 </Button>
+    //                 <Button
+    //                     onClick={() => clearFilters && handleReset(clearFilters)}
+    //                     size="small"
+    //                     style={{
+    //                         width: 90,
+    //                     }}
+    //                 >
+    //                     Reset
+    //                 </Button>
+    //                 <Button
+    //                     type="link"
+    //                     size="small"
+    //                     onClick={() => {
+    //                         confirm({
+    //                             closeDropdown: false,
+    //                         });
+    //                         setSearchText(selectedKeys[0]);
+    //                         setSearchedColumn(dataIndex);
+    //                     }}
+    //                 >
+    //                     Filter
+    //                 </Button>
+    //                 <Button
+    //                     type="link"
+    //                     size="small"
+    //                     onClick={() => {
+    //                         close();
+    //                     }}
+    //                 >
+    //                     close
+    //                 </Button>
+    //             </Space>
+    //         </div>
+    //     ),
+    //     filterIcon: (filtered) => (
+    //         <SearchOutlined
+    //             style={{
+    //                 color: filtered ? "#1677ff" : undefined,
+    //             }}
+    //         />
+    //     ),
+    //     onFilter: (value, record) =>
+    //         record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+    //     filterDropdownProps: {
+    //         onOpenChange(open) {
+    //             if (open) {
+    //                 setTimeout(() => searchInput.current?.select(), 100);
+    //             }
+    //         },
+    //     },
+    //     render: (text) =>
+    //         searchedColumn === dataIndex ? (
+    //             <Highlighter
+    //                 highlightStyle={{
+    //                     backgroundColor: "#ffc069",
+    //                     padding: 0,
+    //                 }}
+    //                 searchWords={[searchText]}
+    //                 autoEscape
+    //                 textToHighlight={text ? text.toString() : ""}
+    //             />
+    //         ) : (
+    //             text
+    //         ),
+    // });
 
     const handleStatusChange = async (recordKey, newStatus) => {
         try {
@@ -138,11 +141,14 @@ const Guest = () => {
                 console.error("Invalid record key:", recordKey);
                 return;
             }
-            const response = await fetch(
-                `http://localhost:3001/api/booking/guest/update-status?bookingId=${recordKey}&status=${newStatus}`,
-                { method: "PUT" }
-            );
-            const result = await response.json();
+
+            setLoading(true);
+
+            const res = await updateStatus(recordKey, newStatus);
+
+            if (res && +res.status_code === 200) {
+                fetchBookings();
+            }
         } catch {
             console.log("Error when updating status");
         } finally {
@@ -162,7 +168,7 @@ const Guest = () => {
             dataIndex: "guestName",
             key: "guestName",
             fixed: "left",
-            ...getColumnSearchProps("guestName"),
+            // ...getColumnSearchProps("guestName"),
         },
         {
             title: "Check-in Date",
@@ -183,7 +189,7 @@ const Guest = () => {
             title: "Status",
             key: "status",
             dataIndex: "status",
-            filters: STATUS_OPTIONS,
+            // filters: STATUS_OPTIONS,
             render: (status, record) => (
                 <>
                     <StyledStatusSelect
@@ -214,8 +220,7 @@ const Guest = () => {
                     >
                         View
                     </Button>
-
-                    <Popconfirm
+                    {/* <Popconfirm
                         onConfirm={() => {
                             // Handle delete action
                             console.log("Delete record", record);
@@ -231,7 +236,7 @@ const Guest = () => {
                         }
                     >
                         <Button danger>Delete</Button>
-                    </Popconfirm>
+                    </Popconfirm> */}
                 </Space>
             ),
         },
@@ -242,41 +247,50 @@ const Guest = () => {
         pagination: {
             current: 1,
             pageSize: 10,
+            position: ["bottomCenter"],
         },
     });
 
     const userId = localStorage.getItem("user_id");
+    const fetchBookings = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get(
+                `/booking/guest?userId=${userId}&page=${tableParams?.pagination?.current}&per_page=${tableParams?.pagination?.pageSize}`
+            );
+            const result = response;
+            if (result.status_code === 200) {
+                const formattedData = result.data.bookings.map((booking) => ({
+                    key: booking.id,
+                    reservationID: booking.id,
+                    guestName: booking.name,
+                    checkInDate: formatDate(booking.checkInDate),
+                    checkOutDate: formatDate(booking.checkOutDate),
+                    totalPrice: booking.totalPrice,
+                    status: [booking.status],
+                }));
+
+                setBookings(formattedData);
+
+                setTableParams({
+                    pagination: {
+                        ...tableParams.pagination,
+                        current: result.data.page,
+                        pageSize: result.data.per_page,
+                        total: result.data.total,
+                    },
+                });
+            } else {
+                console.error("Failed to fetch bookings:", result.message);
+            }
+        } catch (error) {
+            console.error("Error fetching bookings:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchBookings = async () => {
-            setLoading(true);
-            try {
-                const response = await fetch(
-                    `http://localhost:3001/api/booking/guest?userId=${userId}&page=${tableParams.pagination.current}&per_page=${tableParams.pagination.pageSize}`
-                );
-                const result = await response.json();
-                if (result.status_code === 200) {
-                    const formattedData = result.data.bookings.map((booking) => ({
-                        key: booking.id,
-                        reservationID: booking.id,
-                        guestName: booking.name,
-                        checkInDate: booking.checkInDate,
-                        checkOutDate: booking.checkOutDate,
-                        totalPrice: booking.totalPrice,
-                        status: [booking.status],
-                    }));
-                    setBookings(formattedData);
-                    setTotalBookings(result.data.total);
-                } else {
-                    console.error("Failed to fetch bookings:", result.message);
-                }
-            } catch (error) {
-                console.error("Error fetching bookings:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchBookings();
     }, [tableParams.pagination.current, tableParams.pagination.pageSize]);
 

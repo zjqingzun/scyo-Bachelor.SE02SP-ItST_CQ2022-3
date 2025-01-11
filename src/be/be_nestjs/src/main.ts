@@ -24,6 +24,7 @@ async function bootstrap() {
     }),
   );
   app.setGlobalPrefix('api', { exclude: ['/callback'] });
+  console.log(new Date().toString());
   //app.use(logger); //use global middleware
   await app.listen(port);
 }

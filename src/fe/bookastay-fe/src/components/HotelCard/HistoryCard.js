@@ -19,7 +19,7 @@ function HistoryCard({ date, time, status, id, hotelName, money, onClick }) {
                                 color:
                                     status === "confirmed"
                                         ? "green"
-                                        : "black" && status === "canceled"
+                                        : "black" && status === "cancelled"
                                         ? "red"
                                         : "black" && status === "completed"
                                         ? "blue"
@@ -58,7 +58,9 @@ function HistoryCard({ date, time, status, id, hotelName, money, onClick }) {
                                 className="btn btn-primary px-3 fs-4"
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    navigate("/reserve");
+                                    navigate("/reserve", {
+                                        state: { hotelId: id, isReturn: true },
+                                    });
                                 }}
                             >
                                 Return

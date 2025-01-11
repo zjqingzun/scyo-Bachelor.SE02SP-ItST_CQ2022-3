@@ -249,13 +249,13 @@ const Header = () => {
                         </BDropdown>
                     </div>
 
-                    <a href="#!" className="header__about d-none d-md-block">
+                    {/* <a href="#!" className="header__about d-none d-md-block">
                         <img
                             src={icons.questionIcon}
                             alt=""
                             className="header__about-icon header__icon"
                         />
-                    </a>
+                    </a> */}
 
                     {/* <a href="#!" className="header__notify">
                         <img
@@ -395,13 +395,13 @@ const Header = () => {
                         </BDropdown>
                     </div>
 
-                    <a href="#!" className="header__about">
+                    {/* <a href="#!" className="header__about">
                         <img
                             src={icons.questionIcon}
                             alt=""
                             className="header__about-icon header__icon"
                         />
-                    </a>
+                    </a> */}
 
                     {/* <a href="#!" className="header__notify">
                         <img

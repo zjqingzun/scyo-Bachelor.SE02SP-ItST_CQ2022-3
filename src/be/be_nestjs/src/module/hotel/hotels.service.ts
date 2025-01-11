@@ -50,9 +50,11 @@ export class HotelsService {
   async findOneByOwnerId(ownerId: number) {
     const queryRunner = this.dataSource.createQueryRunner();
     const res = await queryRunner.manager.query(`
-      SELECT *
-      FROM hotel
-      WHERE "ownerId" = ${ownerId}  
+      SELECT h.*, l."detailAddress"
+      FROM hotel h
+        JOIN hotels_locations hl ON h.id = hl."hotelId"
+        JOIN location l ON l.id = hl."locationId"
+      WHERE "ownerId" = ${ownerId}
     `);
     queryRunner.release();
     return res[0];
@@ -80,8 +82,7 @@ export class HotelsService {
         .leftJoinAndSelect('hotels_locations', 'hl', 'hl."hotelId" = hotel.id')
         .leftJoinAndSelect('user', 'u', 'u.id = hotel."ownerId"')
         .leftJoinAndSelect('location', 'l', 'l.id = hl."locationId"')
-        .select(['hotel.id', 'hotel.name', 'u.name', 'l.city'])
-        .where('hotel.status = :status', { status: 'approved' });
+        .select(['hotel.id', 'hotel.name', 'u.name', 'l.city']);
 
       queryBuilder.orderBy(`hotel.${sortBy}`, order === 'ASC' ? 'ASC' : 'DESC');
 
@@ -714,6 +715,31 @@ export class HotelsService {
       };
     } catch (error) {
       console.error('Error when set payment for hotel:', error);
+      throw new HttpException(
+        {
+          status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error. Please try again later.',
+          error: error.message || 'Unknown error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async updateHotelStatus(hotelId: number, status: string) {
+    try {
+      const queryRunner = this.dataSource.createQueryRunner();
+      const res = await queryRunner.manager.query(`
+        UPDATE hotel
+        SET status = $1
+        WHERE id = $2  
+      `, [status, hotelId]);
+      return {
+        status: 200,
+        message: "Successfully"
+      };
+    } catch (error) {
+      console.error('Error update status for hotel:', error);
       throw new HttpException(
         {
           status_code: HttpStatus.INTERNAL_SERVER_ERROR,

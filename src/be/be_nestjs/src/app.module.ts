@@ -32,6 +32,7 @@ import { BookingDetailModule } from './module/booking_detail/booking_detail.modu
 import { BookingRoomModule } from './module/booking_room/booking_room.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { DailyCheckService } from './helpers/DailyCheckService';
+import { RolesGuard } from './auth/guard/role.guard';
 
 @Module({
   imports: [
@@ -109,7 +110,11 @@ import { DailyCheckService } from './helpers/DailyCheckService';
     AppService,
     {
       provide: APP_GUARD,
-      useClass: JwtAuthGuard,
+      useClass: JwtAuthGuard
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard
     },
     MinioService,
     DailyCheckService

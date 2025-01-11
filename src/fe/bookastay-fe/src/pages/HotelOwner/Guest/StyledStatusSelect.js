@@ -2,26 +2,26 @@ import React from "react";
 import { Select, Tag } from "antd";
 
 const STATUS_OPTIONS = [
-    { label: "Pending", value: "Pending" },
-    { label: "Confirmed", value: "Confirmed" },
-    { label: "Cancelled", value: "Cancelled" },
+    { label: "Completed", value: "COMPLETED" },
+    { label: "Confirmed", value: "CONFIRMED" },
+    { label: "Cancelled", value: "CANCELLED" },
 ];
 
 const getStatusColor = (status) => {
     switch (status) {
-        case "Pending":
+        case "COMPLETED":
             return {
                 color: "volcano",
                 background: "#fff2e8",
                 borderColor: "#ffbb96",
             };
-        case "Confirmed":
+        case "CONFIRMED":
             return {
                 color: "green",
                 background: "#f6ffed",
                 borderColor: "#b7eb8f",
             };
-        case "Cancelled":
+        case "CANCELLED":
             return {
                 color: "red",
                 background: "#fff1f0",
@@ -37,7 +37,7 @@ const getStatusColor = (status) => {
 };
 
 const StyledStatusSelect = ({ status = "", record, handleStatusChange }) => {
-    const currentStatus = String(status || "");
+    const currentStatus = String(status || "").toUpperCase();
     const statusStyle = getStatusColor(currentStatus);
 
     return (
@@ -71,7 +71,7 @@ const StyledStatusSelect = ({ status = "", record, handleStatusChange }) => {
 
 // CSS để áp dụng style cho Select
 const styles = `
-.status-select-pending .ant-select-selector {
+.status-select-completed .ant-select-selector {
   background-color: #fff2e8 !important;
   border-color: #ffbb96 !important;
 }

@@ -49,7 +49,7 @@ export class BookingService {
     private readonly roomTypeRepository: Repository<RoomType>,
 
     private readonly minioService: MinioService,
-  ) { }
+  ) {}
 
   async create(
     createBookingDto: CreateBookingDto,
@@ -357,16 +357,22 @@ export class BookingService {
 
       if (paymentMethod === 'cash') {
         const paymentStatus = 'unpaid';
-        const bookingStatus = 'confirmed'
+        const bookingStatus = 'confirmed';
         // console.log('VAO DUOC PAYMENT CASH');
         // console.log('BOOKING DATA TRUOC KHI VAO: ', bookingData);
-        await this.saveDataIntoDatabase(res, bookingData, paymentStatus, bookingStatus, note, paymentMethod);
+        await this.saveDataIntoDatabase(
+          bookingData,
+          paymentStatus,
+          bookingStatus,
+          note,
+          paymentMethod,
+        );
+        res.clearCookie('bookingData');
         return res.status(HttpStatus.OK).json({
           status_code: HttpStatus.OK,
           message: 'Cash successful, information saved to database.',
         });
-      }
-      else if (paymentMethod === 'momo') {
+      } else if (paymentMethod === 'momo') {
         const orderInfo = `Thanh toán đặt phòng khách sạn thông qua trang web đặt phòng BookAstay`;
 
         const paymentUrl = await this.createMomoPayment(
@@ -408,7 +414,7 @@ export class BookingService {
     var orderInfo = orderInfo;
     var partnerCode = 'MOMO';
     var redirectUrl = 'http://localhost:3000/reserve';
-    var ipnUrl = 'https://064c-42-118-113-230.ngrok-free.app/callback';
+    var ipnUrl = 'http://064c-42-118-113-230.ngrok-free.app/callback';
     var requestType = 'payWithMethod';
     var amount = bookingData.sumPrice;
     var orderId = partnerCode + new Date().getTime();
@@ -517,7 +523,13 @@ export class BookingService {
     if (resultCode === 0) {
       const paymentStatus = 'paid';
       const bookingStatus = 'confirmed';
-      this.saveDataIntoDatabase(res, bookingData, paymentStatus, bookingStatus, note, 'momo');
+      this.saveDataIntoDatabase(
+        bookingData,
+        paymentStatus,
+        bookingStatus,
+        note,
+        'momo',
+      );
       return res.status(HttpStatus.OK).json({
         message: 'Payment success, save data into database',
         data: { paymentStatus, bookingData },
@@ -654,15 +666,29 @@ export class BookingService {
     }
   }
 
-  private async saveDataIntoDatabase(res: Response, bookingData: any, paymentStatus: string, bookingStatus: string, note: string, paymentMethod: string) {
+  private async saveDataIntoDatabase(
+    bookingData: any,
+    paymentStatus: string,
+    bookingStatus: string,
+    note: string,
+    paymentMethod: string,
+  ) {
     try {
-      const bookingId = await this.saveBooking(bookingData, bookingStatus, note);
+      const bookingId = await this.saveBooking(
+        bookingData,
+        bookingStatus,
+        note,
+      );
       // console.log('BOOKING ID: ', bookingId);
       await this.saveBookingDetail(bookingId, bookingData);
       await this.saveBookingRoom(bookingId, bookingData);
       await this.setStatusRoom(bookingData);
-      await this.createPayment(bookingId, bookingData, paymentMethod, paymentStatus);
-      res.clearCookie('bookingData');
+      await this.createPayment(
+        bookingId,
+        bookingData,
+        paymentMethod,
+        paymentStatus,
+      );
     } catch (error) {
       console.error('Error saving data into database:', error);
       throw new HttpException(
@@ -681,10 +707,8 @@ export class BookingService {
 
       const hotelQuery = await this.hotelRepository
         .createQueryBuilder('hotel')
-        .select([
-          'hotel.id AS id'
-        ])
-        .where('hotel.ownerId = :userId', { userId: userId })
+        .select(['hotel.id AS id'])
+        .where('hotel.ownerId = :userId', { userId: userId });
 
       const hotel = await hotelQuery.getRawOne();
       if (!hotel) {
@@ -702,17 +726,20 @@ export class BookingService {
           'booking.checkinTime AS "checkInDate"',
           'booking.checkoutTime AS "checkOutDate"',
           'booking.status AS status',
-          'payment."totalCost" AS "totalPrice"'
+          'payment."totalCost" AS "totalPrice"',
         ])
         .where('booking."hotelId" = :hotelId', { hotelId: hotelId })
-        .orderBy('booking.createdAt', 'DESC')
+        .orderBy('booking.createdAt', 'DESC');
 
       const offset = (page - 1) * per_page;
 
       // Áp dụng skip và take trước khi lấy kết quả
       bookingQuery.limit(per_page).offset(offset);
 
-      const [bookings, totalBookings] = await Promise.all([bookingQuery.getRawMany(), bookingQuery.getCount(),]);
+      const [bookings, totalBookings] = await Promise.all([
+        bookingQuery.getRawMany(),
+        bookingQuery.getCount(),
+      ]);
       const totalPages = Math.ceil(totalBookings / per_page);
 
       return {
@@ -747,9 +774,9 @@ export class BookingService {
         .select([
           'user.name AS name',
           'user.email AS email',
-          'user.phone AS phone'
+          'user.phone AS phone',
         ])
-        .where('user.id = :userId', { userId: userId })
+        .where('user.id = :userId', { userId: userId });
 
       const user = await userQuery.getRawOne();
       if (!user) {
@@ -758,10 +785,8 @@ export class BookingService {
 
       const bookingQuery = await this.bookingRepository
         .createQueryBuilder('booking')
-        .select([
-          'booking.note AS note'
-        ])
-        .where('booking.id = :bookingId', { bookingId })
+        .select(['booking.note AS note'])
+        .where('booking.id = :bookingId', { bookingId });
       const booking = await bookingQuery.getRawOne();
       const note = booking.note;
 
@@ -769,7 +794,6 @@ export class BookingService {
         .createQueryBuilder('booking')
         .leftJoin('booking.bookingRooms', 'booking_room')
         .leftJoin('booking.bookingDetails', 'booking_detail')
-        .leftJoin('booking_room.room', 'room')
         .select([
           'booking.id AS id',
           'booking_room.room_name AS name',
@@ -777,24 +801,40 @@ export class BookingService {
           'booking_detail.price AS price',
         ])
         .where('booking.id = :bookingId', { bookingId })
+        .andWhere('booking_detail.type = booking_room.type');
+
+      const totalBookingRoomsQuery = this.bookingRepository
+        .createQueryBuilder('booking')
+        .leftJoin('booking.bookingRooms', 'booking_room')
+        .leftJoin('booking.bookingDetails', 'booking_detail')
+        .select('COUNT(*)', 'total')
+        .where('booking.id = :bookingId', { bookingId })
+        .andWhere('booking_detail.type = booking_room.type');
 
       const offset = (page - 1) * per_page;
       bookingRoomQuery.limit(per_page).offset(offset);
 
-      const [bookingRooms, totalBookingRooms] = await Promise.all([bookingRoomQuery.getRawMany(), bookingRoomQuery.getCount(),]);
+      // Thực thi cả hai truy vấn
+      const [bookingRooms, totalBookingRoomsResult] = await Promise.all([
+        bookingRoomQuery.getRawMany(),
+        totalBookingRoomsQuery.getRawOne(),
+      ]);
+
+      // Đảm bảo lấy tổng số bản ghi chính xác
+      const totalBookingRooms = totalBookingRoomsResult?.total || 0;
       const totalPages = Math.ceil(totalBookingRooms / per_page);
 
       return {
         status_code: HttpStatus.OK,
         message: 'Booking data fetched successfully',
         data: {
-          total: totalBookingRooms,
+          total: Number(totalBookingRooms),
           page: Number(page),
           total_page: totalPages,
           per_page: Number(per_page),
           user,
           bookingRooms,
-          note
+          note,
         },
       };
     } catch (error) {
@@ -826,7 +866,10 @@ export class BookingService {
           .set({ status: 'booked' })
           .where('id IN (:...roomIds)', { roomIds })
           .execute();
-      } else if ((status === 'completed' || status === 'canceled') && roomIds.length > 0) {
+      } else if (
+        (status === 'completed' || status === 'cancelled') &&
+        roomIds.length > 0
+      ) {
         await this.roomRepository
           .createQueryBuilder()
           .update()
@@ -866,17 +909,20 @@ export class BookingService {
         .leftJoin('booking.payment', 'payment')
         .select([
           'booking.id AS id',
-          'booking.createdAt AS created',  // Thêm dấu ngoặc kép
+          'booking.createdAt AS created', // Thêm dấu ngoặc kép
           'hotel.name AS name',
-          'payment.totalCost AS totalcost',  // Thêm dấu ngoặc kép
-          'booking.status AS status'
+          'payment.totalCost AS totalcost', // Thêm dấu ngoặc kép
+          'booking.status AS status',
         ])
         .where('booking.userId = :userId', { userId: userId });
 
       const offset = (page - 1) * per_page;
       bookingQuery.limit(per_page).offset(offset);
 
-      const [bookings, totalBookings] = await Promise.all([bookingQuery.getRawMany(), bookingQuery.getCount(),]);
+      const [bookings, totalBookings] = await Promise.all([
+        bookingQuery.getRawMany(),
+        bookingQuery.getCount(),
+      ]);
       const totalPages = Math.ceil(totalBookings / per_page);
 
       // Kiểm tra cookie 'bookingData'

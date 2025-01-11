@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "./RoomType.scss";
 import { Space, Table, Checkbox, Button, Popconfirm, Modal as AModal } from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
@@ -9,6 +9,8 @@ import { Button as BButton } from "react-bootstrap";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useSelector } from "react-redux";
+import { getRoomType, updatePrice, updateUseFlexiblePrice } from "~/services/apiService";
+import { toast } from "react-toastify";
 
 const INITIAL_FORM_VALUES = {
     roomType: "",
@@ -48,27 +50,45 @@ const RoomType = () => {
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [modalAction, setModalAction] = useState("add");
-    const [dataSource, setDataSource] = useState([
-        {
-            key: "1",
-            roomType: "Single Room",
-            roomPrice: "1000",
-            roomWeekendPrice: "1200",
-            roomFlexiblePrice: "800",
-            isFlexiblePriceEnabled: false,
-        },
-        {
-            key: "2",
-            roomType: "Double Room",
-            roomPrice: "1000",
-            roomWeekendPrice: "1200",
-            roomFlexiblePrice: "800",
-            isFlexiblePriceEnabled: true,
-        },
+
+    const [roomTypes, setRoomTypes] = useState([]);
+
+    const fetchRoomTypes = useCallback(async () => {
+        try {
+            setLoading(true);
+
+            const res = await getRoomType(userInfo.hotel.id);
+
+            if (res && res.length > 0) {
+                const myRoomTypes = res.map((roomType) => ({
+                    key: roomType.id,
+                    roomType: +roomType.type === 2 ? "Double Room" : "Quad Room",
+                    roomPrice: roomType.price,
+                    roomWeekendPrice: roomType.weekend_price,
+                    roomFlexiblePrice: roomType.flexible_price,
+                    numberOfRooms: roomType.nums,
+                    isFlexiblePriceEnabled: roomType.useFlexiblePrice,
+                }));
+
+                setRoomTypes(myRoomTypes);
+            }
+        } catch (error) {
+            console.error("fetchRoomTypes -> error", error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchRoomTypes();
+    }, [
+        fetchRoomTypes,
+        userInfo.hotel && userInfo.hotel.id,
+        userInfo.hotel && userInfo.hotel.id !== undefined,
     ]);
 
     const [tableParams, setTableParams] = useState({
-        pagination: { current: 1, pageSize: 10 },
+        pagination: { current: 1, pageSize: 10, position: ["bottomCenter"] },
     });
 
     const formik = useFormik({
@@ -90,12 +110,22 @@ const RoomType = () => {
         setShowModal(true);
     };
 
-    const handleFlexiblePriceChange = (checked, record) => {
-        setDataSource((prevData) =>
-            prevData.map((item) =>
-                item.key === record.key ? { ...item, isFlexiblePriceEnabled: checked } : item
-            )
-        );
+    const handleFlexiblePriceChange = async (checked, record) => {
+        try {
+            const res = await updateUseFlexiblePrice(
+                userInfo.hotel.id,
+                record.roomType === "Double Room" ? 2 : 4,
+                checked
+            );
+
+            if (res && +res.status === 200) {
+                fetchRoomTypes();
+            }
+
+            console.log("handleFlexiblePriceChange -> res", res);
+        } catch (error) {
+            console.error("handleFlexiblePriceChange -> error", error);
+        }
     };
 
     const columns = [
@@ -130,30 +160,18 @@ const RoomType = () => {
             ),
         },
         {
+            title: "Number of Rooms",
+            dataIndex: "numberOfRooms",
+            key: "numberOfRooms",
+        },
+        {
             title: "Action",
             key: "action",
             render: (_, record) => (
                 <Space size="middle">
-                    <a onClick={() => handleModalShow(record)}>Edit</a>
-                    {record.roomType !== "Single Room" && record.roomType !== "Double Room" && (
-                        <Popconfirm
-                            onConfirm={() => {
-                                // Handle delete action
-                                console.log("Delete record", record);
-                            }}
-                            title="Delete the room type?"
-                            description="Are you sure to delete this room type?"
-                            icon={
-                                <QuestionCircleOutlined
-                                    style={{
-                                        color: "red",
-                                    }}
-                                />
-                            }
-                        >
-                            <Button danger>Delete</Button>
-                        </Popconfirm>
-                    )}
+                    <Button color="primary" onClick={() => handleModalShow(record)}>
+                        Edit
+                    </Button>
                 </Space>
             ),
         },
@@ -177,7 +195,7 @@ const RoomType = () => {
                 disabled={
                     name === "roomType" &&
                     modalAction === "edit" &&
-                    ["Single Room", "Double Room"].includes(formik.values.roomType)
+                    ["Quad Room", "Double Room"].includes(formik.values.roomType)
                 }
             />
             {formik.errors[name] && formik.touched[name] && (
@@ -185,6 +203,33 @@ const RoomType = () => {
             )}
         </div>
     );
+
+    const handleSave = async () => {
+        try {
+            formik.handleSubmit();
+
+            if (formik.isValid) {
+                console.log("formik.values", formik.values);
+
+                const type = formik.values.roomType === "Double Room" ? 2 : 4;
+
+                const res = await updatePrice(userInfo.hotel.id, type, {
+                    price: formik.values.roomPrice,
+                    weekendPrice: formik.values.roomWeekendPrice,
+                    flexiblePrice: formik.values.roomFlexiblePrice,
+                });
+
+                if (res && +res.status === 200) {
+                    fetchRoomTypes();
+                    setShowModal(false);
+
+                    toast.success("Updated price successfully");
+                }
+            }
+        } catch (error) {
+            console.error("handleSave -> error", error);
+        }
+    };
 
     return (
         <>
@@ -209,7 +254,7 @@ const RoomType = () => {
 
                 <Table
                     columns={columns}
-                    dataSource={dataSource}
+                    dataSource={roomTypes}
                     scroll={{ x: "max-content" }}
                     tableLayout="auto"
                     loading={loading}
@@ -250,7 +295,9 @@ const RoomType = () => {
                         <BButton
                             variant={modalAction === "edit" ? "warning" : "primary"}
                             className="fs-4"
-                            onClick={formik.handleSubmit}
+                            onClick={() => {
+                                handleSave();
+                            }}
                         >
                             {modalAction === "edit" ? "Save Changes" : "Add"}
                         </BButton>

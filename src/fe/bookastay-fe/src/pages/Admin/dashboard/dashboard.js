@@ -1,6 +1,8 @@
-import { useNavigate } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
-import './dashboard.css';
+import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import "./dashboard.css";
+
+import axios from "~/utils/axiosCustomize";
 
 function Dashboard() {
   const [applications, setApplications] = useState([]); // Chỉ lưu 7 request mới nhất
@@ -10,12 +12,11 @@ function Dashboard() {
     requests: 0,
   });
 
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  const handleRowClick = (app) => {
-    navigate(`/admin/request/${app.id}`);
-  };
-
+    const handleRowClick = (app) => {
+        navigate(`/admin/request/${app.id}`);
+    };
   useEffect(() => {
     fetchDashboardData();
   }, []);
@@ -26,11 +27,11 @@ function Dashboard() {
       const hotelsResponse = await fetch('http://localhost:3001/api/hotels/getAll');
       const hotelsData = await hotelsResponse.json();
 
-      const usersResponse = await fetch('http://localhost:3001/api/user/getAll/user');
-      const usersData = await usersResponse.json();
+            const usersResponse = await axios.get("/user/getAll/user");
+            const usersData = usersResponse;
 
-      const requestsResponse = await fetch('http://localhost:3001/api/hotels/admin/dashboard/t/request');
-      const requestsData = await requestsResponse.json();
+            const requestsResponse = await axios.get("/hotels/admin/dashboard/t/request");
+            const requestsData = requestsResponse;
 
       setTotals({
         hotels: hotelsData.total || 0,
@@ -92,8 +93,8 @@ function Dashboard() {
         </table>
         <button className="px-4 mt-4" onClick={() => navigate('/admin/manage-requests')}>See more</button>
       </div>
-    </div>
-  );
+        </div>
+    );
 }
 
 export default Dashboard;

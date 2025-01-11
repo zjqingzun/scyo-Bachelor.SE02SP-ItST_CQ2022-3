@@ -1,0 +1,93 @@
+{
+    "homepage": {
+        "topDestinations": "Điểm đến hàng đầu",
+        "recommendedForYou": "Được đề xuất cho bạn"
+    },
+    "header": {
+        "signIn": "Đăng nhập",
+        "listYourProperty": "Liệt kê khách sạn của bạn"
+    },
+    "searchBar": {
+        "search": "Tìm",
+        "checkIn": "Check-in",
+        "checkOut": "Check-out",
+        "adults": "Đôi",
+        "children": "Trẻ em",
+        "rooms": "Bốn",
+        "double": "Phòng đôi",
+        "quadruple": "Phòng bốn người"
+    },
+    "hotelCard": {
+        "Great": "Tuyệt vời",
+        "Good": "Tốt",
+        "Average": "Trung bình",
+        "BookNow": "Đặt ngay",
+        "Reviews": "đánh giá",
+        "OpenMap": "Xem bản đồ"
+    },
+    "filter": {
+        "filter": "Lọc",
+        "price": "Giá (mỗi đêm)",
+        "starRating": {
+            "title": "Đánh giá sao",
+            "5stars": "5 sao",
+            "4stars": "4 sao",
+            "3stars": "3 sao",
+            "2stars": "2 sao",
+            "1star": "1 sao"
+        },
+        "reviewScore": {
+            "title": "Điểm đánh giá",
+            "excellent": "Xuất sắc: 9 điểm trở lên",
+            "veryGood": "Rất tốt: 8 điểm trở lên",
+            "good": "Tốt: 7 điểm trở lên",
+            "pleasant": "Dễ chịu: 6 điểm trở lên"
+        }
+    },
+    "calendar": {
+        "sunday": "CN",
+        "monday": "T2",
+        "tuesday": "T3",
+        "wednesday": "T4",
+        "thursday": "T5",
+        "friday": "T6",
+        "saturday": "T7",
+        "ok": "OK",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "hours": "Giờ",
+        "minutes": "Phút",
+        "seconds": "Giây"
+    },
+    "reserve": {
+        "detailHeader": "Nhập thông tin của bạn",
+        "name": "Tên",
+        "email": "Email",
+        "phone": "Phone",
+        "identityNumber": "CCCD/CMND",
+        "specialRequests": "Yêu cầu đặc biệt - không bắt buộc",
+        "paymentHeader": "Chọn phương thức thanh toán",
+        "cash": "Thanh toán khi nhận phòng",
+        "back": "Quay lại",
+        "next": "Tiếp",
+        "finish": "Hoàn tất",
+        "bookingHeader": "Thông tin đặt phòng của bạn",
+        "hotel": "Khách sạn",
+        "yourChoice": "Bạn đã chọn",
+        "room": "Phòng",
+        "rooms": "Phòng",
+        "changeYourChoice": "Đổi lựa chọn của bạn",
+        "summaryHeader": "Tóm tắt giá",
+        "originalPrice": "Giá gốc",
+        "discount": "Giảm giá",
+        "totalPrice": "Tổng giá",
+        "double": "Phòng đôi",
+        "quadruple": "Phòng bốn người",
+        "stepTitle": {
+            "step1": "Lựa chọn của bạn",
+            "step2": "Thông tin của bạn",
+            "step3": "Thông tin thanh toán",
+            "step4": "Hoàn tất"
+        }
+    }
+}

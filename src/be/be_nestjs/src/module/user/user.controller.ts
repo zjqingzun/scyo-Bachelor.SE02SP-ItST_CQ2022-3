@@ -25,6 +25,7 @@ import { Public } from '@/helpers/decorator/public';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { MinioService } from '@/minio/minio.service';
+import { Roles } from '@/helpers/decorator/roles';
 
 @Controller('user')
 export class UserController {
@@ -36,7 +37,7 @@ export class UserController {
   }
 
   @Get('getAll/:role')
-  @Public()
+  @Roles('admin')
   async getAllUsers(@Param('role') role: string, @Req() req) {
     return await this.userService.findAll(role, req);
   }
@@ -59,7 +60,7 @@ export class UserController {
   }
 
   @Post('avatar/upload/:email')
-  @Public()
+  @Roles("user", "hotelier")
   @UseInterceptors(
     FileInterceptor('file', {
       storage: memoryStorage(),
@@ -81,37 +82,38 @@ export class UserController {
   }
 
   @Get('avatar/url/:email')
-  @Public()
+  @Roles("user", "hotelier")
   async getImageUrl(@Param('email') email: string) {
     const result = await this.userService.getAvatarUrl(email);
     return result;
   }
 
   @Delete('delete/:id')
+  @Roles("admin")
   async delete(@Param('id') id: number) {
     return await this.userService.remove(+id);
   }
 
   @Get('fav')
-  @Public()
+  @Roles("user")
   async getFavs(@Req() req) {
     return await this.userService.findAllFav(req);
   }
 
   @Get('addFav')
-  @Public()
+  @Roles("user")
   async addFav(@Req() req) {
     return await this.userService.addFav(req);
   }
 
   @Get('deleteFav')
-  @Public()
+  @Roles("user")
   async deleteFav(@Req() req) {
     return await this.userService.deleteFav(req);
   }
 
   @Get('hotelier/dashboard/:hotelierId')
-  @Public()
+  @Roles("hotelier")
   async dashboardForHotelier(@Param('hotelierId') hotelierId: string) {
     return this.userService.dashboardForHotelier(
       hotelierId as unknown as number,
@@ -119,13 +121,13 @@ export class UserController {
   }
 
   @Get('admin/dashboard/t/user')
-  @Public()
+  @Roles("admin")
   async getTotalUsers() {
     return await this.userService.totalUsers();
   }
 
   @Get('admin/dashboard/t/hotel')
-  @Public()
+  @Roles("admin")
   async getTotalHotels() {
     return await this.userService.totalHotels();
   }

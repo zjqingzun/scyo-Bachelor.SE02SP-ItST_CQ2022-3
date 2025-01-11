@@ -13,7 +13,4 @@ export class UpdateRoomTypePriceDto {
     @Transform(({ value }) => (value ? parseInt(value, 10) : 0))
     @IsInt()
     flexiblePrice: number;
-    
-    @IsBoolean()
-    useFlexiblePrice: boolean;
 }

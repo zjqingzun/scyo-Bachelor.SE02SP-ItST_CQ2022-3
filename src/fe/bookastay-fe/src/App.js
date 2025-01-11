@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import "./utils/i18n";
 
 import { publicRoutes } from "./routes";
@@ -125,6 +125,7 @@ function App() {
                                     />
                                 );
                             })}
+                            <Route path="*" element={<Navigate to="/not-found" />} />
                         </Routes>
                     </div>
                 </Suspense>

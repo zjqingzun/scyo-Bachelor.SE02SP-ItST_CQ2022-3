@@ -1,8 +1,11 @@
 import "./OrderDetail.scss";
+
 import { useEffect, useState } from "react";
 import { Space, Table, Descriptions, Spin, Modal } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+
+import axios from "~/utils/axiosCustomize";
 
 const OrderDetail = () => {
     const userInfo = useSelector((state) => state.account.userInfo);
@@ -12,15 +15,32 @@ const OrderDetail = () => {
     const [loading, setLoading] = useState(false);
     const [orderData, setOrderData] = useState(null);
 
+    const [tableParams, setTableParams] = useState({
+        pagination: {
+            current: 1,
+            pageSize: 5,
+            position: ["bottomCenter"],
+        },
+    });
+
     const fetchOrderDetails = async () => {
         setLoading(true);
         try {
-            const response = await fetch(
-                `http://localhost:3001/api/booking/guest/detail?userId=${userId}&bookingId=${reservationID}&page=1&per_page=5`
+            const response = await axios.get(
+                `/booking/guest/detail?userId=${userId}&bookingId=${reservationID}&page=${tableParams?.pagination?.current}&per_page=${tableParams?.pagination?.pageSize}`
             );
             const data = await response.json();
             if (data.status_code === 200) {
                 setOrderData(data.data); // Cập nhật dữ liệu đặt phòng
+
+                setTableParams({
+                    pagination: {
+                        ...tableParams.pagination,
+                        current: data.data.page,
+                        pageSize: data.data.per_page,
+                        total: data.data.total,
+                    },
+                });
             } else {
                 console.error("Failed to fetch order details", data.message);
             }
@@ -35,6 +55,14 @@ const OrderDetail = () => {
         fetchOrderDetails();
     }, [userId, reservationID]);
 
+    const handleTableChange = (pagination, filters, sorter) => {
+        console.log(pagination, filters, sorter);
+
+        setTableParams({
+            pagination,
+        });
+    };
+
     const columns = [
         {
             title: "Room Name",
@@ -48,9 +76,9 @@ const OrderDetail = () => {
             render: (type) => {
                 const roomTypes = {
                     1: "Single",
-                    2: "Double",
+                    2: "Double Room",
                     3: "Suite",
-                    4: "Family",
+                    4: "Quad Room",
                 };
                 return roomTypes[type] || "Unknown";
             },
@@ -114,7 +142,9 @@ const OrderDetail = () => {
                     }))}
                     scroll={{ x: "max-content" }}
                     tableLayout="auto"
-                    pagination={false}
+                    loading={loading}
+                    pagination={tableParams.pagination}
+                    onChange={handleTableChange}
                 />
 
                 <div className="order-detail__special-request bg-white p-3 mb-5">

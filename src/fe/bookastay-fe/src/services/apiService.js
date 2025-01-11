@@ -171,6 +171,10 @@ const getBookingHistory = async (
     return await axios.get(`/booking/history?${params.toString()}`);
 };
 
+const deleteCookie = async () => {
+    return await axios.get("/callback/delete-cookie");
+};
+
 // Review
 const postReview = async (review) => {
     const data = {
@@ -180,6 +184,87 @@ const postReview = async (review) => {
         userId: review.userId || "",
     };
     return await axios.post("/review/create", data);
+};
+
+// Room
+const getAllRooms = async (
+    query = {
+        hotelId: "",
+        page: 1,
+        limit: 6,
+        sortBy: "",
+        order: "",
+    }
+) => {
+    const { hotelId, page, limit, sortBy, order } = query;
+    const params = new URLSearchParams({
+        page: page || 1,
+        limit: limit || 6,
+        sortBy: sortBy || "",
+        order: order || "",
+    });
+
+    return await axios.get(`/rooms/${hotelId}?${params.toString()}`);
+};
+
+const deleteRoom = async (roomId) => {
+    return await axios.delete(`/rooms/${roomId}`);
+};
+
+const createRoom = async (hotelId, data) => {
+    return await axios.post(`/rooms/${hotelId}`, data);
+};
+
+// Room Type
+const getRoomType = async (hotelId) => {
+    return await axios.get(`/room_types/${hotelId}`);
+};
+
+const updatePrice = async (hotelId, type, data) => {
+    const price = {
+        price: data.price || 0,
+        weekendPrice: data.weekendPrice || 0,
+        flexiblePrice: data.flexiblePrice || 0,
+    };
+
+    return await axios.post(`/room_types/price/${hotelId}/${type}`, price);
+};
+
+const updateUseFlexiblePrice = async (hotelId, type, isUse) => {
+    return await axios.get(`/room_types/price/isFlexiblePrice/${hotelId}/${type}/${isUse}`);
+};
+
+// Dashboard
+const getAvailableRoom = async (hotelId) => {
+    return await axios.get(`/rooms/total/a/${hotelId}`);
+};
+
+const getOccupiedRoom = async (hotelId) => {
+    return await axios.get(`/rooms/total/b/${hotelId}`);
+};
+
+const getTotalReservation = async (hotelId) => {
+    return await axios.get(`/booking/total/r/${hotelId}`);
+};
+
+const getTodayCheckIn = async (hotelId) => {
+    return await axios.get(`/booking/total/i/${hotelId}`);
+};
+
+const getTodayCheckOut = async (hotelId) => {
+    return await axios.get(`/booking/total/o/${hotelId}`);
+};
+
+// Guest
+const updateStatus = async (reservationId, status) => {
+    return await axios.patch(
+        `/booking/guest/update-status?bookingId=${reservationId}&status=${status.toLowerCase()}`
+    );
+};
+
+// Admin
+const updateHotelRequestStatus = async (hotelId, status) => {
+    return await axios.get(`/hotels/updateHotelStatus/${hotelId}/${status}`);
 };
 
 export {
@@ -199,8 +284,22 @@ export {
     startBooking,
     getBookingInfo,
     postBookingInfo,
+    deleteCookie,
     paymentBooking,
     checkTimeBooking,
     getBookingHistory,
     postReview,
+    getAllRooms,
+    deleteRoom,
+    createRoom,
+    getRoomType,
+    updatePrice,
+    updateUseFlexiblePrice,
+    getAvailableRoom,
+    getOccupiedRoom,
+    getTotalReservation,
+    getTodayCheckIn,
+    getTodayCheckOut,
+    updateStatus,
+    updateHotelRequestStatus,
 };

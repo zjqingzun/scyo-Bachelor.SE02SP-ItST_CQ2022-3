@@ -23,6 +23,14 @@ export class PaymentController {
     return await this.bookingService.updatePaymentStatus(req, res, body);
   }
 
+  @Get('/delete-cookie')
+  @Public()
+  async deleteCookie(
+    @Res() res
+  ){
+    return await this.paymentService.deleteCookie(res);
+  }
+
   @Post()
   create(@Body() createPaymentDto: CreatePaymentDto) {
     return this.paymentService.create(createPaymentDto);

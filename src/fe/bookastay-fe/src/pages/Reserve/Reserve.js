@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import {
     checkTimeBooking,
+    deleteCookie,
     getBookingInfo,
     getHotelDetail,
     paymentBooking,
@@ -72,8 +73,9 @@ const Reserve = () => {
                 toast.error("Failed to get booking information");
             }
         };
-
-        fetchBookingInfo();
+        if (location.state && location.state.isReturn) {
+            fetchBookingInfo();
+        }
     }, []);
 
     const searchParams = new URLSearchParams(location.search);
@@ -122,6 +124,16 @@ const Reserve = () => {
                     message,
                 });
 
+                const clearCookie = async () => {
+                    try {
+                        const res = await deleteCookie();
+                    } catch (error) {
+                        console.error("Failed to delete cookie:", error);
+                    }
+                };
+
+                clearCookie();
+
                 // Hiển thị thông báo thành công
                 toast.success("Payment successful!");
             } else {
@@ -133,6 +145,19 @@ const Reserve = () => {
                 toast.error(`Payment failed: ${message}`);
             }
         }
+
+        // clear cookie
+        return () => {
+            const clearCookie = async () => {
+                try {
+                    const res = await deleteCookie();
+                } catch (error) {
+                    console.error("Failed to delete cookie:", error);
+                }
+            };
+
+            clearCookie();
+        };
     }, [resultCode]);
 
     const intervalIdRef = useRef(null);
@@ -190,6 +215,16 @@ const Reserve = () => {
 
         return () => {
             clearInterval(intervalIdRef.current);
+
+            const clearCookie = async () => {
+                try {
+                    const res = await deleteCookie();
+                } catch (error) {
+                    console.error("Failed to delete cookie:", error);
+                }
+            };
+
+            clearCookie();
         };
     }, []);
 

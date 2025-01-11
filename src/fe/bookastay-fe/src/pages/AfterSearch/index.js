@@ -77,7 +77,7 @@ const AfterSearch = () => {
                     minPrice: filterData.minPrice || 0,
                     maxPrice: filterData.maxPrice || 0,
                     minRating: filterData.minRating || 0,
-                    minStar: filterData.minStar || 0,
+                    minStar: filterData.minStar || [1, 2, 3, 4, 5],
                     per_page: pageSize,
                 },
                 userInfo.id
@@ -188,6 +188,10 @@ const AfterSearch = () => {
               )
             : 0;
 
+        let starArrayNumber = Object.keys(selectedStars)
+            .filter((key) => selectedStars[key])
+            .map((key) => textToStar[key]);
+
         if (minRating === Infinity) {
             minRating = 0;
         }
@@ -200,7 +204,7 @@ const AfterSearch = () => {
             minPrice,
             maxPrice,
             minRating,
-            minStar,
+            minStar: starArrayNumber.length > 0 ? starArrayNumber : [1, 2, 3, 4, 5],
         });
     }, []);
 

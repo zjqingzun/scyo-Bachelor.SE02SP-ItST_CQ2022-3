@@ -188,6 +188,10 @@ const AfterSearch = () => {
               )
             : 0;
 
+        let starArrayNumber = Object.keys(selectedStars)
+            .filter((key) => selectedStars[key])
+            .map((key) => textToStar[key]);
+
         if (minRating === Infinity) {
             minRating = 0;
         }

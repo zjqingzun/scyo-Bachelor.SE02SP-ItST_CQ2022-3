@@ -414,7 +414,8 @@ export class BookingService {
     var orderInfo = orderInfo;
     var partnerCode = 'MOMO';
     var redirectUrl = 'http://localhost:3000/reserve';
-    var ipnUrl = 'https://011b-2402-800-6315-309c-8dee-2102-d327-5d0a.ngrok-free.app/callback';
+    var ipnUrl =
+      'https://1074-2401-d800-28c1-bc5c-c043-a464-cb2c-58f8.ngrok-free.app/callback';
     var requestType = 'payWithMethod';
     var amount = bookingData.sumPrice;
     var orderId = partnerCode + new Date().getTime();
@@ -992,7 +993,7 @@ export class BookingService {
         .createQueryBuilder('booking')
         .leftJoin('booking.hotel', 'hotel')
         .where('booking.hotelId = :hotelId', { hotelId: id })
-        .andWhere('hotel.status = :status', { status: 'booked'})
+        .andWhere('hotel.status = :status', { status: 'booked' })
         .andWhere('DATE(booking.checkinTime) <= :today', { today: todayDate })
         .andWhere('DATE(booking.checkoutTime) >= :today', { today: todayDate })
         .getCount();
@@ -1016,7 +1017,7 @@ export class BookingService {
         .createQueryBuilder('booking')
         .leftJoin('booking.hotel', 'hotel')
         .where('booking.hotelId = :hotelId', { hotelId: id })
-        .andWhere('hotel.status = :status', { status: 'booked'})
+        .andWhere('hotel.status = :status', { status: 'booked' })
         .andWhere('DATE(booking.checkinTime) = :today', { today: todayDate })
         .getCount();
 
@@ -1039,7 +1040,7 @@ export class BookingService {
         .createQueryBuilder('booking')
         .leftJoin('booking.hotel', 'hotel')
         .where('booking.hotelId = :hotelId', { hotelId: id })
-        .andWhere('hotel.status = :status', { status: 'booked'})
+        .andWhere('hotel.status = :status', { status: 'booked' })
         .andWhere('DATE(booking.checkoutTime) = :today', { today: todayDate })
         .getCount();
 

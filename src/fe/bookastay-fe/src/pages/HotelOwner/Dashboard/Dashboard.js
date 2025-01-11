@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Descriptions, Modal } from "antd";
 import "./Dashboard.scss";
 import { useNavigate } from "react-router-dom";
@@ -10,9 +10,11 @@ import {
     getTodayCheckOut,
     getTotalReservation,
 } from "~/services/apiService";
+import { doGetAccount } from "~/redux/action/accountAction";
 
 const Dashboard = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const userInfo = useSelector((state) => state.account.userInfo);
 
@@ -47,6 +49,12 @@ const Dashboard = () => {
         };
 
         fetchData();
+    }, [userInfo]);
+
+    useEffect(() => {
+        if (userInfo && userInfo.hotel === undefined) {
+            dispatch(doGetAccount());
+        }
     }, []);
 
     return (

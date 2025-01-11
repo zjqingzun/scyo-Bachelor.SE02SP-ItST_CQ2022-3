@@ -5,23 +5,17 @@ import icons from "~/assets/icon";
 function ManageRequests() {
   const [requests, setRequests] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // Số lượng request trên mỗi trang
+  const itemsPerPage = 5;
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [selectedRequest, setSelectedRequest] = useState(null); // Request được chọn
   const [inputPage, setInputPage] = useState('');
 
-  const handleInputPageChange = (e) => {
-    setInputPage(e.target.value);
-  };
-
-  // Hàm fetch toàn bộ dữ liệu từ API
   const fetchRequests = async () => {
     setLoading(true);
     try {
       const response = await fetch('http://localhost:3001/api/hotels/admin/dashboard/ga/request');
       const data = await response.json();
-
-      // Cập nhật state với dữ liệu từ API
       setRequests(data);
       setTotalPages(Math.ceil(data.length / itemsPerPage));
     } catch (error) {
@@ -35,7 +29,6 @@ function ManageRequests() {
     fetchRequests();
   }, []);
 
-  // Xử lý phân trang
   const handlePageChange = (newPage) => {
     if (newPage > 0 && newPage <= totalPages) {
       setCurrentPage(newPage);
@@ -54,6 +47,34 @@ function ManageRequests() {
   // Lấy danh sách requests cho trang hiện tại
   const currentRequests = requests.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
+  // Xử lý click vào hàng
+  const handleRowClick = (request) => {
+    setSelectedRequest(request); // Lưu request được chọn
+  };
+
+  // Xử lý Accept và Reject
+  const handleAction = async (action) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3001/api/hotels/admin/dashboard/ga/request/${selectedRequest.hotel_id}`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action }),
+        }
+      );
+      if (response.ok) {
+        alert(`Request has been ${action.toLowerCase()}ed successfully!`);
+        setSelectedRequest(null); // Đặt lại request được chọn
+        fetchRequests(); // Cập nhật lại danh sách requests
+      } else {
+        console.error('Error processing action:', await response.text());
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   return (
     <div className="d-flex flex-column px-5 py-3 m-5 requests">
       <div className='d-flex justify-content-between mb-3'>
@@ -66,6 +87,42 @@ function ManageRequests() {
 
       {loading ? (
         <p>Loading...</p>
+      ) : selectedRequest ? (
+        // Hiển thị chi tiết request
+        <div className="request-details mt-4">
+          <p><strong>ID:</strong> {selectedRequest.hotel_id}</p>
+          <p><strong>Name:</strong> {selectedRequest.hotel_name}</p>
+          <p><strong>Email:</strong> {selectedRequest.hotel_email}</p>
+          <p><strong>Status:</strong> {selectedRequest.hotel_status}</p>
+          <p><strong>Address:</strong> {selectedRequest.location_detailAddress}</p>
+          <p><strong>Created At:</strong> {new Date(selectedRequest.createdat).toLocaleString()}</p>
+
+          <div className="mt-5">
+            <div className='my-5 d-flex justify-content-evenly'>
+              <button
+                className="btn btn-success" style={{ fontSize: '20px', padding: '5px 15px' }}
+                onClick={() => handleAction('Accept')}
+              >
+                Accept
+                <img src={icons.checkIcon} className="icon ms-4" alt="check-icon"/>
+              </button>
+              <button
+                className="btn btn-danger" style={{ fontSize: '20px', padding: '5px 15px' }}
+                onClick={() => handleAction('Reject')}
+              >
+                Reject
+                <img src={icons.closeIcon} className="icon ms-4" alt="close-icon"/>
+              </button>
+            </div>
+          </div>
+          <button
+            className="btn btn-secondary mt-5" style={{ fontSize: '20px', padding: '5px 15px' }}
+            onClick={() => setSelectedRequest(null)}
+          >
+            <img src={icons.arrowLeftIcon} className="icon me-4" alt="arrow-left-icon"/>
+            Back to List
+          </button>
+        </div>
       ) : (
         <>
           <table className="table table-hover">
@@ -76,12 +133,12 @@ function ManageRequests() {
                 <th>Email</th>
                 <th>Status</th>
                 <th>Address</th>
-                <th>Time</th>
+                <th>Created At</th>
               </tr>
             </thead>
             <tbody>
               {currentRequests.map((request) => (
-                <tr key={request.hotel_id}>
+                <tr key={request.hotel_id} onClick={() => handleRowClick(request)}>
                   <td>{request.hotel_id}</td>
                   <td>{request.hotel_name}</td>
                   <td>{request.hotel_email}</td>
@@ -99,7 +156,7 @@ function ManageRequests() {
               disabled={currentPage === 1}
               onClick={() => handlePageChange(currentPage - 1)}
             >
-              <img src={icons.chevronLeftPinkIcon} className="left-icon icon m-2" />
+              <img src={icons.chevronLeftPinkIcon} className="left-icon icon m-2" alt="chevron-left-icon"/>
             </button>
             <span className="fs-2">
               {currentPage} / {totalPages}
@@ -108,7 +165,7 @@ function ManageRequests() {
               <input
                 type="number"
                 value={inputPage}
-                onChange={handleInputPageChange}
+                onChange={(e) => setInputPage(e.target.value)}
                 className="form-control mx-2 fs-4"
                 placeholder="Page"
                 style={{ width: '100px', padding: "5px 15px" }}
@@ -125,7 +182,7 @@ function ManageRequests() {
               disabled={currentPage === totalPages}
               onClick={() => handlePageChange(currentPage + 1)}
             >
-              <img src={icons.chevronRightPinkIcon} className="right-icon icon m-2" />
+              <img src={icons.chevronRightPinkIcon} className="right-icon icon m-2" alt="chevron-right-icon"/>
             </button>
           </div>
         </>

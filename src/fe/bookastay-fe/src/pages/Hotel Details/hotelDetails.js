@@ -8,8 +8,18 @@ import { addFavorite, getHotelDetail, removeFavorite, startBooking } from "~/ser
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
+import geocodeAddress from "~/utils/geocodeAddress";
+import { Modal } from "react-bootstrap";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import L from "leaflet";
+import staticImages from "~/assets/image";
+
+import axios from "~/utils/axiosCustomize";
 
 const HotelDetails = () => {
+    const { t } = useTranslation();
+
     const { id, isFav } = useParams();
     const location = useLocation();
     const navigate = useNavigate();
@@ -18,6 +28,8 @@ const HotelDetails = () => {
     const [isFavorite, setIsFavorite] = useState(isFav);
     console.log("check in: ", checkInDate);
     console.log("isFavorite: ", isFav);
+    const mapPositionRef = useRef([10.5279716, 107.3921728]);
+    const [showMapModal, setShowMapModal] = useState(true);
 
     const currency = useSelector((state) => state.currency.currency);
     const exchangeRate = useSelector((state) => state.currency.exchangeRate);
@@ -147,10 +159,10 @@ const HotelDetails = () => {
         const fetchHotelDetails = async () => {
             setIsLoaded(false);
             try {
-                const response = await fetch(
-                    `http://localhost:3001/api/hotels/${id}?checkInDate=${checkInDate}&checkOutDate=${checkOutDate}&roomType2=${roomType2}&roomType4=${roomType4}`
+                const response = await axios.get(
+                    `/hotels/${id}?checkInDate=${checkInDate}&checkOutDate=${checkOutDate}&roomType2=${roomType2}&roomType4=${roomType4}`
                 );
-                const data = await response.json();
+                const data = response;
                 if (data.status_code === 200) {
                     const room1 = data.data.room_types[0];
                     const room2 = data.data.room_types[1];
@@ -191,8 +203,8 @@ const HotelDetails = () => {
 
         const fetchReviews = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/review/${id}`);
-                const data = await response.json();
+                const response = await axios.get(`/review/${id}`);
+                const data = response;
                 if (data.status_code === 200) {
                     setReviews(data.data.reviews);
                 } else {
@@ -345,197 +357,237 @@ const HotelDetails = () => {
                                 style={{ fontSize: "18px", padding: "7px 20px" }}
                                 onClick={toggleImageView}
                             >
-                                {showAllImages ? "See Less" : "See More"}
+                                {showAllImages
+                                    ? t("hotelDetail.seeLess")
+                                    : t("hotelDetail.seeMore")}
                             </button>
                         )}
                     </div>
                 </div>
                 <div className="col-md-4 ps-5">
-                    <h2>Rating overall:</h2>
+                    {/* <h2>{t("hotelDetail.ratingOverall")}:</h2> */}
                     <div className="star-rating py-2 mb-5">
-                        {Array.from({ length: star }, (_, index) => (
-                            <img
-                                key={index}
-                                src={icons.starYellowIcon}
-                                alt="Star"
-                                className="star-icon mt-2"
-                                style={{ width: "40px" }}
-                            />
-                        ))}
-                    </div>
-                </div>
-            </div>
-            <div className="px-5 py-4">
-                <div className="row my-5">
-                    <p className="fs-3"> {description} </p>
-                </div>
-                <div className="my-5 search">
-                    <SearchBarNoLocation
-                        border-radius={12}
-                        searchData={{
-                            startDate: checkInDate,
-                            endDate: checkOutDate,
-                            numOfPeople: numOfPeople,
-                        }}
-                        handleSearch={handleSearch}
-                    />
-                </div>
-                <div className="px-2 my-5 py-5">
-                    <div className="card shadow p-3">
-                        <div className="card-body">
-                            <table className="table">
-                                <thead>
-                                    <tr>
-                                        <th className="fs-1">Room type</th>
-                                        <th className="fs-1">Number of guest</th>
-                                        <th className="fs-1">Today's price</th>
-                                        <th className="fs-1">Quantity</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {room_types.map((room) => (
-                                        <tr key={room.id}>
-                                            <td className="py-4">
-                                                <strong>
-                                                    {room.type === 2
-                                                        ? "Room type 2"
-                                                        : "Room type 4"}
-                                                </strong>
-                                            </td>
-                                            <td className="py-4">
-                                                <span className="fs-2">
-                                                    {room.type === 2 ? "👤👤" : "👤👤👤👤"}
-                                                </span>
-                                            </td>
-                                            <td className="py-4">
-                                                <span>
-                                                    {formatCurrency(
-                                                        room.type === 2
-                                                            ? roomPrice1Now
-                                                            : roomPrice2Now,
-                                                        newCurrency.current
-                                                    )}
-                                                </span>
-                                            </td>
-                                            <td className="py-4">
-                                                <div className="d-flex align-items-center">
-                                                    <button
-                                                        onClick={() =>
-                                                            handleRoomCountChange(
-                                                                room.id,
-                                                                -1,
-                                                                room.type === 2
-                                                                    ? maxRoom2
-                                                                    : maxRoom4
-                                                            )
-                                                        }
-                                                        className="btn btn-outline-secondary"
-                                                        disabled={(roomCounts[room.id] || 0) <= 0}
-                                                    >
-                                                        -
-                                                    </button>
-                                                    <span className="mx-3">
-                                                        {roomCounts[room.id] || 0}
-                                                    </span>
-                                                    <button
-                                                        onClick={() =>
-                                                            handleRoomCountChange(
-                                                                room.id,
-                                                                1,
-                                                                room.type === 2
-                                                                    ? maxRoom2
-                                                                    : maxRoom4
-                                                            )
-                                                        }
-                                                        className="btn btn-outline-secondary"
-                                                        disabled={
-                                                            (roomCounts[room.id] || 0) >=
-                                                            (room.type === 2 ? maxRoom2 : maxRoom4)
-                                                        }
-                                                    >
-                                                        +
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                            <div className="text-end mt-3">
-                                <p>
-                                    Total: VND{" "}
-                                    {room_types
-                                        .reduce((total, room) => {
-                                            const count = roomCounts[room.id] || 0;
-                                            const price = isWeekend
-                                                ? room.weekend_price
-                                                : room.price;
-                                            return total + count * price;
-                                        }, 0)
-                                        .toLocaleString()}
-                                </p>
-                                <button
-                                    className="btn btn-success"
-                                    style={{ fontSize: "20px", padding: "5px 15px" }}
-                                    onClick={() => handleReserve()}
-                                    disabled={
-                                        Object.values(roomCounts).reduce(
-                                            (total, count) => total + count,
-                                            0
-                                        ) === 0
-                                    }
-                                >
-                                    Reserve
-                                </button>
-                            </div>
+                        <p className="fs-2 fw-bold mb-2">Rating overall:</p>
+                        <div className="star-rating py-2 mb-4">
+                            {Array.from({ length: star }, (_, index) => (
+                                <img
+                                    key={index}
+                                    src={icons.starYellowIcon}
+                                    alt="Star"
+                                    className="star-icon mt-2"
+                                    style={{ width: "50px" }}
+                                />
+                            ))}
                         </div>
+                        <p className="fs-2 fw-bold mb-3">Location: </p>
+                        <MapContainer
+                            center={mapPositionRef.current}
+                            zoom={13}
+                            style={{
+                                height: "460px",
+                                width: "100%",
+                                borderRadius: "12px",
+                                border: "10px solid white",
+                            }}
+                        >
+                            <TileLayer
+                                maxZoom={30}
+                                attribution="Google Maps"
+                                url="https://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}"
+                            />
+                            <Marker
+                                position={mapPositionRef.current}
+                                icon={L.divIcon({
+                                    className: "custom-marker",
+                                    html: `<img src="${staticImages.mapMarkerIcon}" alt="marker" />`,
+                                    iconSize: [50, 30],
+                                })}
+                            >
+                                <Popup>
+                                    <h2>{name}</h2>
+                                </Popup>
+                            </Marker>
+                        </MapContainer>
                     </div>
                 </div>
                 <div className="px-5 py-4">
-                    <p className="mb-5" style={{ fontSize: "30px", fontWeight: "bold" }}>
-                        Customer Reviews
-                    </p>
-                    {/* Reviews Section */}
-                    <div className="reviews-section">
-                        {reviews.length > 0 ? (
-                            reviews.map((review) => (
-                                <div className="review-card" key={review.id}>
-                                    <div className="profile-pic">
-                                        <img
-                                            src={review.avatar}
-                                            alt="Profile"
-                                            className="avatar-image"
-                                        />
-                                    </div>
-                                    <div className="name mb-2 fs-2 fw-bold">{review.name}</div>
-                                    <div className="stars">
-                                        {Array.from({ length: 5 }).map((_, index) => {
-                                            const isFullStar = review.rate >= index + 1;
-                                            const isHalfStar =
-                                                review.rate > index && review.rate < index + 1;
-                                            return isFullStar ? (
-                                                <img
-                                                    key={index}
-                                                    src={icons.starYellowIcon}
-                                                    alt="Star"
-                                                    className="star-icon"
-                                                />
-                                            ) : (
-                                                <img
-                                                    key={index}
-                                                    src={icons.starEmptyIcon}
-                                                    alt="Empty Star"
-                                                    className="star-gray-icon"
-                                                />
-                                            );
-                                        })}
-                                    </div>
-                                    <div className="comment">{review.comment}</div>
+                    <div className="row my-5">
+                        <p className="fs-3"> {description} </p>
+                    </div>
+                    <div className="my-5 search">
+                        <SearchBarNoLocation
+                            border-radius={12}
+                            searchData={{
+                                startDate: checkInDate,
+                                endDate: checkOutDate,
+                                numOfPeople: numOfPeople,
+                            }}
+                            handleSearch={handleSearch}
+                        />
+                    </div>
+                    <div className="px-2 my-5 py-5">
+                        <div className="card shadow p-3">
+                            <div className="card-body">
+                                <table className="table">
+                                    <thead>
+                                        <tr>
+                                            <th className="fs-1">{t("hotelDetail.roomType")}</th>
+                                            <th className="fs-1">
+                                                {t("hotelDetail.numberOfGuest")}
+                                            </th>
+                                            <th className="fs-1">{t("hotelDetail.todayPrice")}</th>
+                                            <th className="fs-1">{t("hotelDetail.quantity")}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {room_types.map((room) => (
+                                            <tr key={room.id}>
+                                                <td className="py-4">
+                                                    <strong>
+                                                        {room.type === 2
+                                                            ? t("reserve.double")
+                                                            : t("reserve.quadruple")}
+                                                    </strong>
+                                                </td>
+                                                <td className="py-4">
+                                                    <span className="fs-2">
+                                                        {room.type === 2 ? "👤👤" : "👤👤👤👤"}
+                                                    </span>
+                                                </td>
+                                                <td className="py-4">
+                                                    <span>
+                                                        {formatCurrency(
+                                                            room.type === 2
+                                                                ? roomPrice1Now
+                                                                : roomPrice2Now,
+                                                            newCurrency.current
+                                                        )}
+                                                    </span>
+                                                </td>
+                                                <td className="py-4">
+                                                    <div className="d-flex align-items-center">
+                                                        <button
+                                                            onClick={() =>
+                                                                handleRoomCountChange(
+                                                                    room.id,
+                                                                    -1,
+                                                                    room.type === 2
+                                                                        ? maxRoom2
+                                                                        : maxRoom4
+                                                                )
+                                                            }
+                                                            className="btn btn-outline-secondary"
+                                                            disabled={
+                                                                (roomCounts[room.id] || 0) <= 0
+                                                            }
+                                                        >
+                                                            -
+                                                        </button>
+                                                        <span className="mx-3">
+                                                            {roomCounts[room.id] || 0}
+                                                        </span>
+                                                        <button
+                                                            onClick={() =>
+                                                                handleRoomCountChange(
+                                                                    room.id,
+                                                                    1,
+                                                                    room.type === 2
+                                                                        ? maxRoom2
+                                                                        : maxRoom4
+                                                                )
+                                                            }
+                                                            className="btn btn-outline-secondary"
+                                                            disabled={
+                                                                (roomCounts[room.id] || 0) >=
+                                                                (room.type === 2
+                                                                    ? maxRoom2
+                                                                    : maxRoom4)
+                                                            }
+                                                        >
+                                                            +
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                                <div className="text-end mt-3">
+                                    <p>
+                                        {t("hotelDetail.total")}: VND{" "}
+                                        {room_types
+                                            .reduce((total, room) => {
+                                                const count = roomCounts[room.id] || 0;
+                                                const price = isWeekend
+                                                    ? room.weekend_price
+                                                    : room.price;
+                                                return total + count * price;
+                                            }, 0)
+                                            .toLocaleString()}
+                                    </p>
+                                    <button
+                                        className="btn btn-success"
+                                        style={{ fontSize: "20px", padding: "5px 15px" }}
+                                        onClick={() => handleReserve()}
+                                        disabled={
+                                            Object.values(roomCounts).reduce(
+                                                (total, count) => total + count,
+                                                0
+                                            ) === 0
+                                        }
+                                    >
+                                        {t("hotelDetail.reserve")}
+                                    </button>
                                 </div>
-                            ))
-                        ) : (
-                            <p>No reviews available.</p>
-                        )}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="px-5 py-4">
+                        <p className="mb-5" style={{ fontSize: "30px", fontWeight: "bold" }}>
+                            {t("hotelDetail.customerReviews")}
+                        </p>
+                        {/* Reviews Section */}
+                        <div className="reviews-section">
+                            {reviews.length > 0 ? (
+                                reviews.map((review) => (
+                                    <div className="review-card" key={review.id}>
+                                        <div className="profile-pic">
+                                            <img
+                                                src={review.avatar}
+                                                alt="Profile"
+                                                className="avatar-image"
+                                            />
+                                        </div>
+                                        <div className="name mb-2 fs-2 fw-bold">{review.name}</div>
+                                        <div className="stars">
+                                            {Array.from({ length: 5 }).map((_, index) => {
+                                                const isFullStar = review.rate >= index + 1;
+                                                const isHalfStar =
+                                                    review.rate > index && review.rate < index + 1;
+                                                return isFullStar ? (
+                                                    <img
+                                                        key={index}
+                                                        src={icons.starYellowIcon}
+                                                        alt="Star"
+                                                        className="star-icon"
+                                                    />
+                                                ) : (
+                                                    <img
+                                                        key={index}
+                                                        src={icons.starEmptyIcon}
+                                                        alt="Empty Star"
+                                                        className="star-gray-icon"
+                                                    />
+                                                );
+                                            })}
+                                        </div>
+                                        <div className="comment">{review.comment}</div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p>No reviews available.</p>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

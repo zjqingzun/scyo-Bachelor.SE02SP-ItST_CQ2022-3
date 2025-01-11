@@ -1,7 +1,12 @@
 {
     "homepage": {
         "topDestinations": "Điểm đến hàng đầu",
-        "recommendedForYou": "Được đề xuất cho bạn"
+        "recommendedForYou": "Được đề xuất cho bạn",
+        "hcm": "Hồ Chí Minh",
+        "hanoi": "Hà Nội",
+        "danang": "Đà Nẵng",
+        "vungtau": "Vũng Tàu",
+        "dalat": "Đà Lạt"
     },
     "header": {
         "signIn": "Đăng nhập",
@@ -89,5 +94,45 @@
             "step3": "Thông tin thanh toán",
             "step4": "Hoàn tất"
         }
+    },
+    "userMenu": {
+        "profile": "Hồ sơ",
+        "history": "Lịch sử đặt phòng",
+        "favorites": "Yêu thích",
+        "signOut": "Đăng xuất"
+    },
+    "hotelDetail": {
+        "ratingOverall": "Đánh giá tổng thể",
+        "seeMore": "Xem thêm",
+        "seeLess": "Thu gọn",
+        "customerReviews": "Đánh giá của khách hàng",
+        "roomType": "Loại phòng",
+        "numberOfGuest": "Số khách",
+        "todayPrice": "Giá hôm nay",
+        "quantity": "Số lượng",
+        "reserve": "Đặt ngay",
+        "total": "Tổng"
+    },
+    "profile": {
+        "accountSetting": "Cài đặt tài khoản",
+        "personalDetails": "Thông tin cá nhân",
+        "name": "Tên",
+        "emailAddress": "Địa chỉ email",
+        "phoneNumber": "Số điện thoại",
+        "identityNumber": "Mã định danh",
+        "dateOfBirth": "Ngày sinh",
+        "change": "Thay đổi",
+        "edit": "Chỉnh sửa",
+        "save": "Lưu",
+        "cancel": "Hủy"
+    },
+    "history": {
+        "history": "Lịch sử đặt phòng",
+        "confirmed": "CONFIRMED",
+        "cancelled": "CANCELLED",
+        "pending": "PENDING",
+        "completed": "COMPLETED",
+        "review": "Đánh giá",
+        "return": "Trở lại"
     }
 }

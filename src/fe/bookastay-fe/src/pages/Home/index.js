@@ -27,37 +27,38 @@ const MockData = [
     },
 ];
 
-const MockDestination = [
-    {
-        id: 1,
-        title: "Ho Chi Minh",
-        url: "https://plus.unsplash.com/premium_photo-1663050967225-1735152ab894?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-    {
-        id: 2,
-        title: "Ha Noi",
-        url: "https://plus.unsplash.com/premium_photo-1691960159290-6f4ace6e6c4c?q=80&w=1771&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-    {
-        id: 3,
-        title: "Da Nang",
-        url: "https://images.unsplash.com/photo-1670993077545-bfeeea1e0b5f?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-    {
-        id: 4,
-        title: "Vung Tau",
-        url: "https://images.unsplash.com/photo-1707827547063-1fff65d22682?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-    {
-        id: 5,
-        title: "Da Lat",
-        url: "https://images.unsplash.com/photo-1678099006439-dba9e4d3f9f5?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-];
-
 const Home = () => {
     const { t } = useTranslation();
+
     const navigate = useNavigate();
+
+    const MockDestination = [
+        {
+            id: 1,
+            title: t("homepage.hcm"),
+            url: "https://plus.unsplash.com/premium_photo-1663050967225-1735152ab894?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        },
+        {
+            id: 2,
+            title: t("homepage.hanoi"),
+            url: "https://plus.unsplash.com/premium_photo-1691960159290-6f4ace6e6c4c?q=80&w=1771&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        },
+        {
+            id: 3,
+            title: t("homepage.danang"),
+            url: "https://images.unsplash.com/photo-1670993077545-bfeeea1e0b5f?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        },
+        {
+            id: 4,
+            title: t("homepage.vungtau"),
+            url: "https://images.unsplash.com/photo-1707827547063-1fff65d22682?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        },
+        {
+            id: 5,
+            title: t("homepage.dalat"),
+            url: "https://images.unsplash.com/photo-1678099006439-dba9e4d3f9f5?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        },
+    ];
 
     const userInfo = useSelector((state) => state.account.userInfo);
 

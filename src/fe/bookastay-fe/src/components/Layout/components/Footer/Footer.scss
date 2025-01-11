@@ -13,6 +13,7 @@
     padding: 0 50px;
     color: #fff;
     position: relative;
+    margin-top: 80px;
 }
 
 .footer::before {
@@ -68,6 +69,24 @@
     /* Dark overlay */
     height: 58px;
     z-index: 1;
+}
+
+@media (max-width: 800px) {
+    .footer-bottom::before {
+        height: 80px; /* Increased height for smaller screens */
+    }
+}
+
+@media (max-width: 550px) {
+    .footer-bottom::before {
+        height: 105px; /* Increased height for smaller screens */
+    }
+}
+
+@media (max-width: 505px) {
+    .footer-bottom::before {
+        height: 125px; /* Increased height for smaller screens */
+    }
 }
 
 .footer-bottom p {

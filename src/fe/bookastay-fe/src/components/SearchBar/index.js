@@ -126,7 +126,7 @@ const SearchBar = (props) => {
                     <input
                         className="search-bar__input"
                         type="text"
-                        placeholder="Ho Chi Minh City, Vietnam"
+                        placeholder="Ho Chi Minh"
                         value={destination}
                         onChange={(e) => setDestination(e.target.value)}
                     />
@@ -173,7 +173,7 @@ const SearchBar = (props) => {
                     />
                 </div>
                 <div
-                    className="search-bar__input-group search-bar__input-group-people"
+                    className="search-bar__input-group search-bar__input-group-people" style={{ cursor: "pointer"}}
                     onClick={() => handleTurnPopup()}
                 >
                     <div className="search-bar__input">

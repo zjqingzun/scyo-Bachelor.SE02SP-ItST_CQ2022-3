@@ -116,7 +116,7 @@ const Header = () => {
                         navigate("/account-setting");
                     }}
                 >
-                    Profile
+                    {t("userMenu.profile")}
                 </a>
             ),
             extra: "⌘P",
@@ -131,7 +131,7 @@ const Header = () => {
                         navigate("/history");
                     }}
                 >
-                    History
+                    {t("userMenu.history")}
                 </a>
             ),
             extra: "⌘H",
@@ -146,7 +146,7 @@ const Header = () => {
                         navigate("/favorite");
                     }}
                 >
-                    Favorites
+                    {t("userMenu.favorites")}
                 </a>
             ),
             extra: "⌘F",
@@ -166,7 +166,7 @@ const Header = () => {
                     }}
                     style={{ color: "#f5222d" }}
                 >
-                    Logout
+                    {t("userMenu.signOut")}
                 </a>
             ),
             extra: "⌘L",
@@ -237,13 +237,17 @@ const Header = () => {
                                     eventKey="Vietnam"
                                     onClick={() => handleChangeLanguage("vi")}
                                 >
-                                    <span className="fs-3">Vietnam</span>
+                                    <span className="fs-3">
+                                        {language === "Vietnam" ? "Việt Nam" : "Vietnam"}
+                                    </span>
                                 </BDropdown.Item>
                                 <BDropdown.Item
                                     eventKey="English"
                                     onClick={() => handleChangeLanguage("en")}
                                 >
-                                    <span className="fs-3">English</span>
+                                    <span className="fs-3">
+                                        {language === "English" ? "English" : "Tiếng Anh"}
+                                    </span>
                                 </BDropdown.Item>
                             </BDropdown.Menu>
                         </BDropdown>
@@ -338,8 +342,10 @@ const Header = () => {
                         {t("header.listYourProperty")}
                     </a>
 
-                    <div className="header__currency-group" style={{ width: "40px" }}>
-                        <span className="fs-3">Currency:</span>
+                    <div className="header__currency-group" style={{ width: "100%" }}>
+                        <span className="fs-3">
+                            {language === "Vietnam" ? "Loại tiền" : "Currency"}:
+                        </span>
                         <BDropdown>
                             <BDropdown.Toggle as={CustomToggleForCurrency}>
                                 {currency}
@@ -364,7 +370,9 @@ const Header = () => {
                     </div>
 
                     <div className="header__language-group">
-                        <span className="fs-3">Language:</span>
+                        <span className="fs-3">
+                            {language === "Vietnam" ? "Ngôn ngữ" : "Language"}:
+                        </span>
                         <BDropdown onSelect={(e) => setLanguage(e)}>
                             <BDropdown.Toggle as={CustomToggleForCurrency}>
                                 <img
@@ -383,13 +391,17 @@ const Header = () => {
                                     eventKey="Vietnam"
                                     onClick={() => handleChangeLanguage("vi")}
                                 >
-                                    <span className="fs-3">Vietnam</span>
+                                    <span className="fs-3">
+                                        {language === "Vietnam" ? "Việt Nam" : "Vietnam"}
+                                    </span>
                                 </BDropdown.Item>
                                 <BDropdown.Item
                                     eventKey="English"
                                     onClick={() => handleChangeLanguage("en")}
                                 >
-                                    <span className="fs-3">English</span>
+                                    <span className="fs-3">
+                                        {language === "English" ? "English" : "Tiếng Anh"}
+                                    </span>
                                 </BDropdown.Item>
                             </BDropdown.Menu>
                         </BDropdown>

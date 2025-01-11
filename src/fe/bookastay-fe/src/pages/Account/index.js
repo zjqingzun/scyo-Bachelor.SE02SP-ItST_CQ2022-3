@@ -11,8 +11,11 @@ import { formatDate } from "~/utils/datetime";
 import { updateAvatar, updateProfile } from "~/services/apiService";
 import dayjs from "dayjs";
 import { doGetAccount } from "~/redux/action/accountAction";
+import { useTranslation } from "react-i18next";
 
 const AccountSetting = () => {
+    const { t } = useTranslation();
+
     const dispatch = useDispatch();
     const userInfo = useSelector((state) => state.account.userInfo);
 
@@ -126,15 +129,15 @@ const AccountSetting = () => {
         <>
             <div className="m-5 py-5">
                 <div className="row">
-                    <h1 className="mb-2 mt-3">Account Setting</h1>
+                    <h1 className="mb-2 mt-3">{t("profile.accountSetting")}</h1>
                     <div className="col-9" style={{ marginTop: "40px", marginBottom: "40px" }}>
                         {/* Personal Details */}
                         <section className="p-5 shadow me-5">
-                            <h2>Personal details</h2>
+                            <h2>{t("profile.personalDetails")}</h2>
                             <table>
                                 <tbody>
                                     <tr>
-                                        <td>Name</td>
+                                        <td>{t("profile.name")}</td>
                                         <td>{personalDetails.name}</td>
                                         <td style={{ textAlign: "right" }}>
                                             <button
@@ -142,51 +145,60 @@ const AccountSetting = () => {
                                                     openModal("name", personalDetails.name)
                                                 }
                                             >
-                                                Edit
+                                                {t("profile.edit")}
                                             </button>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Email address</td>
+                                        <td>{t("profile.emailAddress")}</td>
                                         <td>{personalDetails.email}</td>
                                         <td style={{ textAlign: "right" }}>
                                             <button
                                                 onClick={() =>
-                                                    openModal("email", personalDetails.email)
+                                                    openModal(
+                                                        t("profile.emailAddress"),
+                                                        personalDetails.email
+                                                    )
                                                 }
                                             >
-                                                Edit
+                                                {t("profile.edit")}
                                             </button>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Phone number</td>
+                                        <td>{t("profile.phoneNumber")}</td>
                                         <td>{personalDetails.phone}</td>
                                         <td style={{ textAlign: "right" }}>
                                             <button
                                                 onClick={() =>
-                                                    openModal("phone", personalDetails.phone)
+                                                    openModal(
+                                                        t("profile.phoneNumber"),
+                                                        personalDetails.phone
+                                                    )
                                                 }
                                             >
-                                                Edit
+                                                {t("profile.edit")}
                                             </button>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Identify number</td>
+                                        <td>{t("profile.identityNumber")}</td>
                                         <td>{personalDetails.identify}</td>
                                         <td style={{ textAlign: "right" }}>
                                             <button
                                                 onClick={() =>
-                                                    openModal("dob", personalDetails.identify)
+                                                    openModal(
+                                                        t("profile.identityNumber"),
+                                                        personalDetails.identify
+                                                    )
                                                 }
                                             >
-                                                Edit
+                                                {t("profile.edit")}
                                             </button>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Date of birth</td>
+                                        <td>{t("profile.dateOfBirth")}</td>
                                         <td>
                                             <Space
                                                 direction="vertical"
@@ -227,7 +239,7 @@ const AccountSetting = () => {
                             <img
                                 src={
                                     personalDetails.avatar ||
-                                    "https://scontent.fsgn8-1.fna.fbcdn.net/v/t39.30808-6/472219740_1936837300138014_2401011983813679479_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeG6Fmr-BAQKdhh2ewaDivFosRYc2nCLHvuxFhzacIse-2uRmjAejNA4nBgfdDmQzbIaTKDnhaICQ5oDE7fVkWm7&_nc_ohc=ErLnqiDVoKwQ7kNvgHBkrVN&_nc_oc=AdhkO5jqzhPpwYA7roi8a2CGbn7kVSeOIRWiPrMHuRs_QTvl56H3uNzS1Mm-oFM743ZOV0aJWNER-n3kweF_QClX&_nc_zt=23&_nc_ht=scontent.fsgn8-1.fna&_nc_gid=A5noT5KVoCb-elQhCLTXe85&oh=00_AYDVpELzxAX2_3rzhoAKLwi82sMDQ5wNtMuc42R9krOuCA&oe=67849507"
+                                    "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
                                 }
                                 alt="Avatar"
                                 className="img-fluid shadow"
@@ -239,7 +251,7 @@ const AccountSetting = () => {
                             />
                         </div>
                         <button className="mt-2" onClick={(e) => handleChangeAvatar(e)}>
-                            Change
+                            {t("profile.change")}
                         </button>
                         <input ref={fileRef} type="file" className="d-none" />
                     </div>
@@ -257,7 +269,9 @@ const AccountSetting = () => {
                 {isModalOpen && (
                     <div style={modalStyles.overlay}>
                         <div style={modalStyles.modal}>
-                            <h2 className="mb-4">Edit {currentField}</h2>
+                            <h2 className="mb-4">
+                                {t("profile.edit")} {currentField}
+                            </h2>
                             {currentField !== "dob" ? (
                                 <input
                                     type="text"
@@ -283,14 +297,14 @@ const AccountSetting = () => {
                                 onClick={handleSave}
                                 style={modalStyles.buttonSave}
                             >
-                                Save
+                                {t("profile.save")}
                             </button>
                             <button
                                 className="btn btn-danger fs-4 py-2 px-4"
                                 onClick={closeModal}
                                 style={modalStyles.buttonCancel}
                             >
-                                Cancel
+                                {t("profile.cancel")}
                             </button>
                         </div>
                     </div>

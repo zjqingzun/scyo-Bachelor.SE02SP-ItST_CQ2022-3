@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useState } from "react";
 import { Button, Result } from "antd";
 import styled from "styled-components";
-import axios from "axios";
+import axios from "~/utils/axiosCustomize";
 
 import Stepper from "~/components/Stepper/Stepper";
 import {
@@ -67,7 +67,7 @@ const RegisterHotel = () => {
         try {
             // // Gửi propertyDetails
             const propertyResponse = await axios.post(
-                `http://localhost:3001/api/hotels/add/basicInfo/${userId}`,
+                `/hotels/add/basicInfo/${userId}`,
                 formData.propertyDetails
             );
             // console.log("Property details response:", propertyResponse.data);
@@ -84,7 +84,7 @@ const RegisterHotel = () => {
             });
             console.log("FormData:", formDataFiles);
             const imagesResponse = await axios.post(
-                `http://localhost:3001/api/hotels/images/upload/${hotelId}`,
+                `/hotels/images/upload/${hotelId}`,
                 formDataFiles,
                 {
                     headers: {
@@ -96,20 +96,17 @@ const RegisterHotel = () => {
 
             // Gửi payment
             const paymentResponse = await axios.post(
-                `http://localhost:3001/api/hotels/payment/add/${hotelId}`,
+                `/hotels/payment/add/${hotelId}`,
                 formData.payment.paymentAccount
             );
             // console.log("Payment response:", paymentResponse.data);
 
             // // Gửi roomDetails
             const { doubleRoomPrice, quadRoomPrice } = formData.payment;
-            const roomDetailsResponse = await axios.post(
-                `http://localhost:3001/api/room_types/add/${hotelId}`,
-                {
-                    doubleRoomPrice,
-                    quadRoomPrice,
-                }
-            );
+            const roomDetailsResponse = await axios.post(`/room_types/add/${hotelId}`, {
+                doubleRoomPrice,
+                quadRoomPrice,
+            });
 
             reduxDispatch(doGetAccount());
 

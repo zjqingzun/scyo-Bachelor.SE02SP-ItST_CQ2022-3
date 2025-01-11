@@ -837,7 +837,33 @@ const Reserve = () => {
                                                 </p>
                                             </div>
                                         </div>
-                                        <a href="#!">
+                                        <a
+                                            href="#!"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                navigate(`/hotel/${hotelId}`, {
+                                                    state: {
+                                                        checkInDate: formatDate(
+                                                            checkInDate,
+                                                            "yyyy-mm-dd"
+                                                        ),
+                                                        checkOutDate: formatDate(
+                                                            checkOutDate,
+                                                            "yyyy-mm-dd"
+                                                        ),
+                                                        roomType2,
+                                                        roomType4,
+                                                        rooms,
+                                                        sumPrice,
+                                                        type2Price,
+                                                        type4Price,
+                                                        userId,
+                                                        numberOfRoom2,
+                                                        numberOfRoom4,
+                                                    },
+                                                });
+                                            }}
+                                        >
                                             <span className="reserve-page__change">
                                                 {t("reserve.changeYourChoice")}
                                             </span>

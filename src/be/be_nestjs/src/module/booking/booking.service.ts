@@ -414,7 +414,7 @@ export class BookingService {
     var orderInfo = orderInfo;
     var partnerCode = 'MOMO';
     var redirectUrl = 'http://localhost:3000/reserve';
-    var ipnUrl = 'http://064c-42-118-113-230.ngrok-free.app/callback';
+    var ipnUrl = 'https://011b-2402-800-6315-309c-8dee-2102-d327-5d0a.ngrok-free.app/callback';
     var requestType = 'payWithMethod';
     var amount = bookingData.sumPrice;
     var orderId = partnerCode + new Date().getTime();

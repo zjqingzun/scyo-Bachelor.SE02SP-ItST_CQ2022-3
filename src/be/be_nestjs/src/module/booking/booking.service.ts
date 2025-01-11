@@ -1014,7 +1014,9 @@ export class BookingService {
 
       const count = await this.bookingRepository
         .createQueryBuilder('booking')
+        .leftJoin('booking.hotel', 'hotel')
         .where('booking.hotelId = :hotelId', { hotelId: id })
+        .andWhere('hotel.status = :status', { status: 'booked'})
         .andWhere('DATE(booking.checkinTime) = :today', { today: todayDate })
         .getCount();
 
@@ -1035,7 +1037,9 @@ export class BookingService {
 
       const count = await this.bookingRepository
         .createQueryBuilder('booking')
+        .leftJoin('booking.hotel', 'hotel')
         .where('booking.hotelId = :hotelId', { hotelId: id })
+        .andWhere('hotel.status = :status', { status: 'booked'})
         .andWhere('DATE(booking.checkoutTime) = :today', { today: todayDate })
         .getCount();
 

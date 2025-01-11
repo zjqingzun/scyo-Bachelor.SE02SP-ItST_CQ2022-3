@@ -1,7 +1,12 @@
 {
     "homepage": {
         "topDestinations": "Top Destinations",
-        "recommendedForYou": "Recommended for you"
+        "recommendedForYou": "Recommended for you",
+        "hcm": "Ho Chi Minh",
+        "hanoi": "Hanoi",
+        "danang": "Da Nang",
+        "vungtau": "Vung Tau",
+        "dalat": "Da Lat"
     },
     "header": {
         "signIn": "Sign in",
@@ -90,5 +95,45 @@
             "step3": "Payment details",
             "step4": "Finish"
         }
+    },
+    "userMenu": {
+        "profile": "Profile",
+        "history": "History",
+        "favorites": "Favorites",
+        "signOut": "Logout"
+    },
+    "hotelDetail": {
+        "ratingOverall": "Rating Overall",
+        "seeMore": "See More",
+        "seeLess": "See Less",
+        "customerReviews": "Customer Reviews",
+        "roomType": "Room Type",
+        "numberOfGuest": "Number of guest",
+        "todayPrice": "Today's price",
+        "quantity": "Quantity",
+        "reserve": "Reserve",
+        "total": "Total"
+    },
+    "profile": {
+        "accountSetting": "Account Setting",
+        "personalDetails": "Personal Details",
+        "name": "Name",
+        "emailAddress": "Email Address",
+        "phoneNumber": "Phone Number",
+        "identityNumber": "Identity Number",
+        "dateOfBirth": "Date of Birth",
+        "change": "Change",
+        "edit": "Edit",
+        "save": "Save",
+        "cancel": "Cancel"
+    },
+    "history": {
+        "history": "History",
+        "confirmed": "CONFIRMED",
+        "cancelled": "CANCELLED",
+        "pending": "PENDING",
+        "completed": "COMPLETED",
+        "review": "Đánh giá",
+        "return": "Trở lại"
     }
 }

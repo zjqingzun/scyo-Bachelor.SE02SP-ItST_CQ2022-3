@@ -8,8 +8,11 @@ import { addFavorite, getHotelDetail, removeFavorite, startBooking } from "~/ser
 import { convertCurrency, formatCurrency } from "~/utils/currencyUtils";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 const HotelDetails = () => {
+    const { t } = useTranslation();
+
     const { id, isFav } = useParams();
     const location = useLocation();
     const navigate = useNavigate();
@@ -345,13 +348,15 @@ const HotelDetails = () => {
                                 style={{ fontSize: "18px", padding: "7px 20px" }}
                                 onClick={toggleImageView}
                             >
-                                {showAllImages ? "See Less" : "See More"}
+                                {showAllImages
+                                    ? t("hotelDetail.seeLess")
+                                    : t("hotelDetail.seeMore")}
                             </button>
                         )}
                     </div>
                 </div>
                 <div className="col-md-4 ps-5">
-                    <h2>Rating overall:</h2>
+                    <h2>{t("hotelDetail.ratingOverall")}:</h2>
                     <div className="star-rating py-2 mb-5">
                         {Array.from({ length: star }, (_, index) => (
                             <img
@@ -386,10 +391,10 @@ const HotelDetails = () => {
                             <table className="table">
                                 <thead>
                                     <tr>
-                                        <th className="fs-1">Room type</th>
-                                        <th className="fs-1">Number of guest</th>
-                                        <th className="fs-1">Today's price</th>
-                                        <th className="fs-1">Quantity</th>
+                                        <th className="fs-1">{t("hotelDetail.roomType")}</th>
+                                        <th className="fs-1">{t("hotelDetail.numberOfGuest")}</th>
+                                        <th className="fs-1">{t("hotelDetail.todayPrice")}</th>
+                                        <th className="fs-1">{t("hotelDetail.quantity")}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -398,8 +403,8 @@ const HotelDetails = () => {
                                             <td className="py-4">
                                                 <strong>
                                                     {room.type === 2
-                                                        ? "Room type 2"
-                                                        : "Room type 4"}
+                                                        ? t("reserve.double")
+                                                        : t("reserve.quadruple")}
                                                 </strong>
                                             </td>
                                             <td className="py-4">
@@ -463,7 +468,7 @@ const HotelDetails = () => {
                             </table>
                             <div className="text-end mt-3">
                                 <p>
-                                    Total: VND{" "}
+                                    {t("hotelDetail.total")}: VND{" "}
                                     {room_types
                                         .reduce((total, room) => {
                                             const count = roomCounts[room.id] || 0;
@@ -485,7 +490,7 @@ const HotelDetails = () => {
                                         ) === 0
                                     }
                                 >
-                                    Reserve
+                                    {t("hotelDetail.reserve")}
                                 </button>
                             </div>
                         </div>
@@ -493,7 +498,7 @@ const HotelDetails = () => {
                 </div>
                 <div className="px-5 py-4">
                     <p className="mb-5" style={{ fontSize: "30px", fontWeight: "bold" }}>
-                        Customer Reviews
+                        {t("hotelDetail.customerReviews")}
                     </p>
                     {/* Reviews Section */}
                     <div className="reviews-section">

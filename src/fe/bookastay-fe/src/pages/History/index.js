@@ -5,148 +5,12 @@ import HistoryCard from "~/components/HotelCard/HistoryCard";
 import { getBookingHistory } from "~/services/apiService";
 import { useSelector } from "react-redux";
 import { Pagination } from "antd";
+import { useTranslation } from "react-i18next";
 
 const History = () => {
-    const userInfo = useSelector((state) => state.account.userInfo);
+    const { t } = useTranslation();
 
-    // Mock data (giả sử bạn sẽ fetch từ API hoặc database)
-    const cardsData = [
-        {
-            date: "30/12/2024",
-            time: "10:00 AM",
-            status: "Booked",
-            id: "#1234",
-            hotelName: "Hotel ABC",
-            money: "$200",
-            address: "123 ABC Street, XYZ City",
-        },
-        {
-            date: "29/12/2024",
-            time: "11:00 AM",
-            status: "Cancelled",
-            id: "#1235",
-            hotelName: "Hotel XYZ",
-            money: "$150",
-            address: "456 XYZ Street, ABC City",
-        },
-        {
-            date: "27/12/2024",
-            time: "12:00 PM",
-            status: "Checked Out",
-            id: "#1236",
-            hotelName: "Hotel LMN",
-            money: "$300",
-            address: "789 LMN Street, DEF City",
-        },
-        {
-            date: "25/12/2024",
-            time: "01:00 PM",
-            status: "Booked",
-            id: "#1237",
-            hotelName: "Hotel DEF",
-            money: "$250",
-            address: "012 DEF Street, GHI City",
-        },
-        {
-            date: "20/12/2024",
-            time: "02:00 PM",
-            status: "Cancelled",
-            id: "#1238",
-            hotelName: "Hotel GHI",
-            money: "$180",
-            address: "345 GHI Street, JKL City",
-        },
-        {
-            date: "11/12/2024",
-            time: "03:00 PM",
-            status: "Booked",
-            id: "#1239",
-            hotelName: "Hotel PQR",
-            money: "$400",
-            address: "678 PQR Street, STU City",
-        },
-        {
-            date: "01/12/2024",
-            time: "04:00 PM",
-            status: "Checked Out",
-            id: "#1240",
-            hotelName: "Hotel STU",
-            money: "$350",
-            address: "901 STU Street, VWX City",
-        },
-        {
-            date: "01/11/2024",
-            time: "05:00 PM",
-            status: "Booked",
-            id: "#1241",
-            hotelName: "Hotel VWX",
-            money: "$500",
-            address: "234 VWX Street, YZA City",
-        },
-        {
-            date: "02/11/2024",
-            time: "06:00 PM",
-            status: "Cancelled",
-            id: "#1242",
-            hotelName: "Hotel YZA",
-            money: "$450",
-            address: "567 YZA Street, BCD City",
-        },
-        {
-            date: "03/10/2024",
-            time: "07:00 PM",
-            status: "Booked",
-            id: "#1243",
-            hotelName: "Hotel BCD",
-            money: "$600",
-            address: "890 BCD Street, EFG City",
-        },
-        {
-            date: "04/09/2024",
-            time: "08:00 PM",
-            status: "Checked Out",
-            id: "#1244",
-            hotelName: "Hotel EFG",
-            money: "$550",
-            address: "123 EFG Street, HIJ City",
-        },
-        {
-            date: "05/08/2024",
-            time: "09:00 PM",
-            status: "Booked",
-            id: "#1245",
-            hotelName: "Hotel HIJ",
-            money: "$700",
-            address: "456 HIJ Street, KLM City",
-        },
-        {
-            date: "03/08/2024",
-            time: "10:00 PM",
-            status: "Cancelled",
-            id: "#1246",
-            hotelName: "Hotel KLM",
-            money: "$650",
-            address: "789 KLM Street, NOP City",
-        },
-        {
-            date: "01/07/2024",
-            time: "11:00 PM",
-            status: "Booked",
-            id: "#1247",
-            hotelName: "Hotel NOP",
-            money: "$800",
-            address: "012 NOP Street, QRS City",
-        },
-        {
-            date: "08/06/2024",
-            time: "12:00 AM",
-            status: "Checked Out",
-            id: "#1248",
-            hotelName: "Hotel QRS",
-            money: "$750",
-            address: "345 QRS Street, TUV City",
-        },
-    ];
+    const userInfo = useSelector((state) => state.account.userInfo);
 
     const [bookingHistory, setBookingHistory] = useState([]);
 
@@ -156,7 +20,6 @@ const History = () => {
     const [pendingBooking, setPendingBooking] = useState(null);
 
     const [selectedCard, setSelectedCard] = useState(null);
-    const [searchTerm, setSearchTerm] = useState("");
 
     // Change page
 
@@ -225,7 +88,7 @@ const History = () => {
                         alt="ClockRotateLeft"
                         className="clockRotateLeftIcon ms-5"
                     />
-                    <h1 className="ms-5 pt-2">History</h1>
+                    <h1 className="ms-5 pt-2">{t("history.history")}</h1>
                 </div>
             </div>
 

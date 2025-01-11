@@ -126,7 +126,7 @@ const SearchBar = (props) => {
                     <input
                         className="search-bar__input"
                         type="text"
-                        placeholder="Ho Chi Minh City, Vietnam"
+                        placeholder="Ho Chi Minh"
                         value={destination}
                         onChange={(e) => setDestination(e.target.value)}
                     />

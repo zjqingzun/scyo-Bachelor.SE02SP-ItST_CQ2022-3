@@ -97,7 +97,7 @@ const Favorite = () => {
                         <img src={icons.redHeartIcon} alt="Heart" className="heartIcon ms-5" />
                         <h1 className="ms-5 pt-2">Favorite</h1>
                     </div>
-                    <div className="col-6">
+                    {/* <div className="col-6">
                         <div className="input-group pe-5 pt-5">
                             <input
                                 type="text"
@@ -112,7 +112,7 @@ const Favorite = () => {
                                 className="btn btn-outline-primary searchIcon"
                             />
                         </div>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Hotels Section */}

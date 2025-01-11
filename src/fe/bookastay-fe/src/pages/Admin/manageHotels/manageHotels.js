@@ -7,13 +7,13 @@ import { useSelector } from "react-redux";
 import axios from "~/utils/axiosCustomize";
 
 function ManageHotels() {
-    const [applications, setApplications] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 6; // Số lượng người dùng trên mỗi trang
-    const [totalPages, setTotalPages] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const [selectedHotelId, setSelectedHotelId] = useState(null);
-    const [totalHotels, setTotalHotels] = useState(0); // State để lưu tổng số người dùng
+  const [applications, setApplications] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; // Số lượng người dùng trên mỗi trang
+  const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [selectedHotelId, setSelectedHotelId] = useState(null);
+  const [totalHotels, setTotalHotels] = useState(0); // State để lưu tổng số người dùng
 
     const [inputPage, setInputPage] = useState(""); // Input cho số trang
     const handleInputPageChange = (e) => {

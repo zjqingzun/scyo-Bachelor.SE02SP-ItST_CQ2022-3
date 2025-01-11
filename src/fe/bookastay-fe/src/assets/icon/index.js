@@ -22,6 +22,9 @@ const icons = {
     trashIcon: require("~/assets/icon/trash-alt-solid.svg").default,
     chevronLeftPinkIcon: require("~/assets/icon/chevron-left-pink.svg").default,
     chevronRightPinkIcon: require("~/assets/icon/chevron-right-pink.svg").default,
+    checkIcon: require("~/assets/icon/check-solid.svg").default,
+    closeIcon: require("~/assets/icon/x-solid.svg").default,
+    arrowLeftIcon: require("~/assets/icon/arrow-left-solid.svg").default,
 };
 
 export default icons;

@@ -1,8 +1,7 @@
 import "./OrderDetail.scss";
 
 import { useEffect, useState } from "react";
-import { Table, Descriptions, Modal, Spin } from "antd";
-
+import { Space, Table, Descriptions, Spin, Modal } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -10,7 +9,6 @@ import axios from "~/utils/axiosCustomize";
 
 const OrderDetail = () => {
     const userInfo = useSelector((state) => state.account.userInfo);
-
     const navigate = useNavigate();
     const location = useLocation();
     const { userId, reservationID } = location.state; // Lấy userId và reservationID từ state

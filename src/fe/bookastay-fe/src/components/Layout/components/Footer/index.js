@@ -3,14 +3,12 @@ import "./Footer.scss"; // Import your styles here
 
 const Footer = () => {
     return (
-        <div className="footer mt-5">
+        <div className="footer">
             <div className="footer-content row">
                 <div className="footer-left col-7 px-5 pt-5 pb-3">
-                    <h1 className="mb-5 mt-3 fw-bold">BookaStay</h1>
-                    <p className="mb-5">
-                        Sequi dolores ratione eos eveniet provident soluta. Omnis nesciunt sit eos
-                        at, eius voluptatum rem corporis. Doloremque labore assumenda explicabo
-                        velit illo, soluta, inventore hic.
+                    <h1 className="mb-4 fw-bold" style={{ fontSize: "30px" }}>BookaStay</h1>
+                    <p className="mb-3">
+                        BookaStay is an online platform designed to provide convenient and fast hotel booking services. It allows users to easily search, compare, and book hotels according to their needs, from budget accommodations to luxury options. 
                     </p>
                 </div>
                 <div className="footer-right col-5 px-5 pt-5 pb-3">

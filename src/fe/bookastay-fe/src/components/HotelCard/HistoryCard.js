@@ -58,7 +58,9 @@ function HistoryCard({ date, time, status, id, hotelName, money, onClick }) {
                                 className="btn btn-primary px-3 fs-4"
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    navigate("/reserve", (state = { hotelId: id, isReturn: true }));
+                                    navigate("/reserve", {
+                                        state: { hotelId: id, isReturn: true },
+                                    });
                                 }}
                             >
                                 Return

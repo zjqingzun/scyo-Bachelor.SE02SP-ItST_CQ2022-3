@@ -1,0 +1,94 @@
+{
+    "homepage": {
+        "topDestinations": "Top Destinations",
+        "recommendedForYou": "Recommended for you"
+    },
+    "header": {
+        "signIn": "Sign in",
+        "listYourProperty": "List your property"
+    },
+    "searchBar": {
+        "search": "Search",
+        "checkIn": "Check-in",
+        "checkOut": "Check-out",
+        "guests": "Guests",
+        "adults": "Double",
+        "children": "Quadruple",
+        "rooms": "Quadruple",
+        "double": "Double Room",
+        "quadruple": "Quadruple Room"
+    },
+    "hotelCard": {
+        "Great": "Great",
+        "Good": "Good",
+        "Average": "Average",
+        "BookNow": "Book Now",
+        "Reviews": "reviews",
+        "OpenMap": "Open Map"
+    },
+    "filter": {
+        "filter": "Filter",
+        "price": "Price (per night)",
+        "starRating": {
+            "title": "Star Rating",
+            "5stars": "5 stars",
+            "4stars": "4 stars",
+            "3stars": "3 stars",
+            "2stars": "2 stars",
+            "1star": "1 star"
+        },
+        "reviewScore": {
+            "title": "Review Score",
+            "excellent": "Excellent: 9 points or more",
+            "veryGood": "Very good: 8 points or more",
+            "good": "Good: 7 points or more",
+            "pleasant": "Pleasant: 6 points or more"
+        }
+    },
+    "calendar": {
+        "sunday": "Su",
+        "monday": "Mo",
+        "tuesday": "Tu",
+        "wednesday": "We",
+        "thursday": "Th",
+        "friday": "Fr",
+        "saturday": "Sa",
+        "ok": "OK",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "hours": "Hours",
+        "minutes": "Minutes",
+        "seconds": "Seconds"
+    },
+    "reserve": {
+        "detailHeader": "Enter your details",
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone",
+        "identityNumber": "Identity Number",
+        "specialRequests": "Special Requests (optional)",
+        "paymentHeader": "Choose your payment method",
+        "cash": "Cash",
+        "back": "Back",
+        "next": "Next",
+        "finish": "Finish",
+        "bookingHeader": "Your booking details",
+        "hotel": "Hotel",
+        "yourChoice": "Your choice",
+        "room": "Room",
+        "rooms": "Rooms",
+        "changeYourChoice": "Change your choice",
+        "summaryHeader": "Price Summary",
+        "originalPrice": "Original Price",
+        "discount": "Discount",
+        "totalPrice": "Total Price",
+        "double": "Double Room",
+        "quadruple": "Quadruple Room",
+        "stepTitle": {
+            "step1": "Your selection",
+            "step2": "Your details",
+            "step3": "Payment details",
+            "step4": "Finish"
+        }
+    }
+}

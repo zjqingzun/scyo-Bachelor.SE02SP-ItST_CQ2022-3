@@ -60,7 +60,7 @@ export class UserController {
   }
 
   @Post('avatar/upload/:email')
-  @Roles("user", "hotelier")
+  @Roles('user', 'hotelier')
   @UseInterceptors(
     FileInterceptor('file', {
       storage: memoryStorage(),
@@ -82,38 +82,38 @@ export class UserController {
   }
 
   @Get('avatar/url/:email')
-  @Roles("user", "hotelier")
+  @Roles('user', 'hotelier')
   async getImageUrl(@Param('email') email: string) {
     const result = await this.userService.getAvatarUrl(email);
     return result;
   }
 
   @Delete('delete/:id')
-  @Roles("admin")
+  @Roles('admin')
   async delete(@Param('id') id: number) {
     return await this.userService.remove(+id);
   }
 
   @Get('fav')
-  @Roles("user")
+  @Roles('user')
   async getFavs(@Req() req) {
     return await this.userService.findAllFav(req);
   }
 
   @Get('addFav')
-  @Roles("user")
+  @Roles('user')
   async addFav(@Req() req) {
     return await this.userService.addFav(req);
   }
 
   @Get('deleteFav')
-  @Roles("user")
+  @Roles('user')
   async deleteFav(@Req() req) {
     return await this.userService.deleteFav(req);
   }
 
   @Get('hotelier/dashboard/:hotelierId')
-  @Roles("hotelier")
+  @Roles('hotelier')
   async dashboardForHotelier(@Param('hotelierId') hotelierId: string) {
     return this.userService.dashboardForHotelier(
       hotelierId as unknown as number,
@@ -121,13 +121,13 @@ export class UserController {
   }
 
   @Get('admin/dashboard/t/user')
-  @Roles("admin")
+  @Public()
   async getTotalUsers() {
     return await this.userService.totalUsers();
   }
 
   @Get('admin/dashboard/t/hotel')
-  @Roles("admin")
+  @Roles('admin')
   async getTotalHotels() {
     return await this.userService.totalHotels();
   }

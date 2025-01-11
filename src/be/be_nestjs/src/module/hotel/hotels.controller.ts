@@ -117,13 +117,13 @@ export class HotelsController {
   }
 
   @Get('admin/dashboard/t/request')
-  @Roles('admin')
+  @Public()
   async totalDashboardRequest() {
     return await this.hotelsService.totalRequest();
   }
 
   @Get('admin/dashboard/ga/request')
-  @Roles('admin')
+  @Public()
   async getDashboardRequest() {
     return await this.hotelsService.getRequest();
   }

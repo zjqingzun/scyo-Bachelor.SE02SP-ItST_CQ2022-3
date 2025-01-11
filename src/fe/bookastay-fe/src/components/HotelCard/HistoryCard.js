@@ -19,7 +19,7 @@ function HistoryCard({ date, time, status, id, hotelName, money, onClick }) {
                                 color:
                                     status === "confirmed"
                                         ? "green"
-                                        : "black" && status === "canceled"
+                                        : "black" && status === "cancelled"
                                         ? "red"
                                         : "black" && status === "completed"
                                         ? "blue"

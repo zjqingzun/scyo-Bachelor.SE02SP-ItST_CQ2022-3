@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import "./register.css";
 import { Link, useNavigate } from "react-router-dom";
-
-const { userRegister } = require("~/services/apiService");
+import { userRegister } from "~/services/apiService";
 
 function Register() {
     const navigate = useNavigate();

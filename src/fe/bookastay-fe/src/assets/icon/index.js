@@ -1,30 +1,57 @@
+import questionIcon from "~/assets/icon/question-icon.svg";
+import bellIcon from "~/assets/icon/bell-icon.svg";
+import settingIcon from "~/assets/icon/setting-icon.svg";
+import vietnamIcon from "~/assets/icon/vietnam-icon.svg";
+import englishIcon from "~/assets/icon/english-icon.svg";
+import yellowStarIcon from "~/assets/icon/yellow-star-icon.svg";
+import chevronDownIcon from "~/assets/icon/chevron-down-icon.svg";
+import chevronUpIcon from "~/assets/icon/chevron-up-icon.svg";
+import chevronLeftIcon from "~/assets/icon/chevron-left-icon.svg";
+import chevronRightIcon from "~/assets/icon/chevron-right-icon.svg";
+import locationIcon from "~/assets/icon/location-dot-solid.svg";
+import starIcon from "~/assets/icon/star-solid.svg";
+import starYellowIcon from "~/assets/icon/star-solid (1).svg";
+import starHalfIcon from "~/assets/icon/star-half-stroke-solid.svg";
+import starHalfYellowIcon from "~/assets/icon/star-half-stroke-solid (1).svg";
+import starEmptyIcon from "~/assets/icon/star-regular.svg";
+import clockRotateLeftIcon from "~/assets/icon/clock-rotate-left-solid.svg";
+import searchIcon from "~/assets/icon/magnifying-glass-solid.svg";
+import redHeartIcon from "~/assets/icon/red-heart.svg";
+import heartIcon from "~/assets/icon/heart-regular.svg";
+import trashIcon from "~/assets/icon/trash-alt-solid.svg";
+import chevronLeftPinkIcon from "~/assets/icon/chevron-left-pink.svg";
+import chevronRightPinkIcon from "~/assets/icon/chevron-right-pink.svg";
+import checkIcon from "~/assets/icon/check-solid.svg";
+import closeIcon from "~/assets/icon/x-solid.svg";
+import arrowLeftIcon from "~/assets/icon/arrow-left-solid.svg";
+
 const icons = {
-    questionIcon: require("~/assets/icon/question-icon.svg").default,
-    bellIcon: require("~/assets/icon/bell-icon.svg").default,
-    settingIcon: require("~/assets/icon/setting-icon.svg").default,
-    vietnamIcon: require("~/assets/icon/vietnam-icon.svg").default,
-    englishIcon: require("~/assets/icon/english-icon.svg").default,
-    yellowStarIcon: require("~/assets/icon/yellow-star-icon.svg").default,
-    chevronDownIcon: require("~/assets/icon/chevron-down-icon.svg").default,
-    chevronUpIcon: require("~/assets/icon/chevron-up-icon.svg").default,
-    chevronLeftIcon: require("~/assets/icon/chevron-left-icon.svg").default,
-    chevronRightIcon: require("~/assets/icon/chevron-right-icon.svg").default,
-    locationIcon: require("~/assets/icon/location-dot-solid.svg").default,
-    starIcon: require("~/assets/icon/star-solid.svg").default,
-    starYellowIcon: require("~/assets/icon/star-solid (1).svg").default,
-    starHalfIcon: require("~/assets/icon/star-half-stroke-solid.svg").default,
-    starHalfYellowIcon: require("~/assets/icon/star-half-stroke-solid (1).svg").default,
-    starEmptyIcon: require("~/assets/icon/star-regular.svg").default,
-    clockRotateLeftIcon: require("~/assets/icon/clock-rotate-left-solid.svg").default,
-    searchIcon: require("~/assets/icon/magnifying-glass-solid.svg").default,
-    redHeartIcon: require("~/assets/icon/red-heart.svg").default,
-    heartIcon: require("~/assets/icon/heart-regular.svg").default,
-    trashIcon: require("~/assets/icon/trash-alt-solid.svg").default,
-    chevronLeftPinkIcon: require("~/assets/icon/chevron-left-pink.svg").default,
-    chevronRightPinkIcon: require("~/assets/icon/chevron-right-pink.svg").default,
-    checkIcon: require("~/assets/icon/check-solid.svg").default,
-    closeIcon: require("~/assets/icon/x-solid.svg").default,
-    arrowLeftIcon: require("~/assets/icon/arrow-left-solid.svg").default,
+    questionIcon,
+    bellIcon,
+    settingIcon,
+    vietnamIcon,
+    englishIcon,
+    yellowStarIcon,
+    chevronDownIcon,
+    chevronUpIcon,
+    chevronLeftIcon,
+    chevronRightIcon,
+    locationIcon,
+    starIcon,
+    starYellowIcon,
+    starHalfIcon,
+    starHalfYellowIcon,
+    starEmptyIcon,
+    clockRotateLeftIcon,
+    searchIcon,
+    redHeartIcon,
+    heartIcon,
+    trashIcon,
+    chevronLeftPinkIcon,
+    chevronRightPinkIcon,
+    checkIcon,
+    closeIcon,
+    arrowLeftIcon,
 };
 
 export default icons;

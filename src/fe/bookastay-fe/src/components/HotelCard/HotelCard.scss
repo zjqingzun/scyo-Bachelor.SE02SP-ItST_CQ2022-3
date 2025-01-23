@@ -1,4 +1,5 @@
-@import "../GlobalStyles/mixins.scss";
+// @import "../GlobalStyles/mixins.scss";
+@use "../GlobalStyles/mixins.scss" as *;
 
 .hotel-card {
     display: flex;

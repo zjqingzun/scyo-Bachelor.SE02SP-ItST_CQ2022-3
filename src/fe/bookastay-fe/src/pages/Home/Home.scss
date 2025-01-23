@@ -1,4 +1,5 @@
-@import "../../components/GlobalStyles/mixins.scss";
+// @import "../../components/GlobalStyles/mixins.scss";
+@use "../../components/GlobalStyles/mixins.scss" as *;
 
 .homepage__slider {
     padding-top: 50%;

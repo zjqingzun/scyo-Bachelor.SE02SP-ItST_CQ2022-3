@@ -1,8 +1,13 @@
+import momoIcon from "~/assets/image/momo.png";
+import visaIcon from "~/assets/image/visa.png";
+import cashIcon from "~/assets/image/cash.jpg";
+import mapMarkerIcon from "~/assets/image/location-pin.png";
+
 const images = {
-    momoIcon: require("~/assets/image/momo.png"),
-    visaIcon: require("~/assets/image/visa.png"),
-    cashIcon: require("~/assets/image/cash.jpg"),
-    mapMarkerIcon: require("~/assets/image/location-pin.png"),
+    momoIcon,
+    visaIcon,
+    cashIcon,
+    mapMarkerIcon,
 };
 
 export default images;

@@ -1,7 +1,6 @@
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
-const { Button, Result } = require("antd");
+import { Button, Result } from "antd";
 
 const NotFound = () => {
     const navigate = useNavigate();

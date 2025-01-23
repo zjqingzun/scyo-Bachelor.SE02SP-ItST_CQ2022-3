@@ -14,6 +14,7 @@ const instance = axios.create({
 axiosRetry(instance, {
     retries: 3,
     retryCondition: async (error) => {
+        console.log("error", error);
         if (error && error.response && error.response.status === 401) {
             // call to refresh token
             const refreshToken = localStorage.getItem("refresh_token");

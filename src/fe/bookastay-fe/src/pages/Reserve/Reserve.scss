@@ -1,4 +1,5 @@
-@import "../../components/GlobalStyles/mixins.scss";
+// @import "../../components/GlobalStyles/mixins.scss";
+@use "../../components/GlobalStyles/mixins.scss" as *;
 
 .reserve-page {
     margin-top: 50px;
